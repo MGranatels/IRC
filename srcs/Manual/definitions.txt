@@ -1,0 +1,252 @@
+EXTERNAL FUNCS
+// socket 			returns a file descriptor
+// close 			closes a file descriptor
+
+// setsockopt 		sets options on a socket
+// getsockname 		gets the socket name
+// getprotobyname 	gets the protocol entry
+
+// gethostbyname 	gets the host entry
+// getaddrinfo 		gets the address information
+// freeaddrinfo 	frees the address information
+
+// bind 			binds a name to a socket
+// connect 			connects to a socket
+// listen 			listens for connections on a socket
+// accept 			accepts a connection on a socket
+
+// htons			converts a short integer to a network representation
+// htonl 			converts a long integer to a network representation
+// ntohs 			converts a short integer from a network representation
+// ntohl 			converts a long integer from a network representation
+
+// inet_addr 		converts an  IPV4 dot-decimal notation to a network representation
+// inet_ntoa 		converts a network representation to an IPV4 dot-decimal notation
+
+// send				sends data on a socket
+// recv 			receives data from a socket
+
+// signal 			specifies a signal action
+// lseek 			repositions the file offset
+// fstat 			gets file status
+// fcntl 			manipulates fd, only usable as fcntl(fd, F_SETFL, O_NONBLOCK);
+// poll 			polls a set of file descriptors
+
+#SOCKETS
+	FDs can also be network connections. Call socket() to get socket descriptor and communicate using send() and recv() - equivalent to write and read - as they offer greater control over data.
+
+	SOCK_DGRAM (datagram) - connectionless sockets;
+	SOCK_STREAM - 2way connection sockets (e.g. ssh, HTTP)
+
+	TCP makes sure data arrives as it should
+	IP is responsible for data routing, not data integrity
+
+	SOCK_STREAM
+	More reliable, high level of data transmission quality.
+
+	SOCK_DGRAM
+	Datagram Sockets dont use TCP, but UDP, so data is not guaranteed to arrive. if it does, its error free tho.
+	They dont maintain 2way connection because its generally unimportant packets, they slap an IP and shoot.
+	Just like a letter. Used in Multiplayer games, streaming audio, video calls, etc.
+	ACK (ackowledgement) is a packet the recipient sends back to confirm he got the sender's packet.
+	If the sender doesnt get an ACK, resend it. In games, they just dgaf, because SPEED matters.
+	Encapsulate the packet in some way and hit sendto().
+
+	#PROTOCOLS
+	TCP & UDP also use Port number, the local address for the connection. HTTP uses prot 80, telnet port 23, DOOM game 666. Ports under 1024 are special and require OS privileges.
+
+	PCs can store bytes in reverse order - the Little-Endian. Network Byte Order is in Big Endian, so we run every value thru a function to guarantee it's in NBO.
+	You can convert Short (2 bytes) and Long (4 bytes), from Host to Network, so: htons(), htonl(), ntohs() or ntohl().
+	So, convert the numbers to NBO when they go out and to Host Byte ORder when they are coming in.
+
+#STRUCTS
+
+	struct addrinfo {
+		int ai_flags; // AI_PASSIVE, AI_CANONNAME, etc.
+		int ai_family; // AF_INET, AF_INET6, AF_UNSPEC - specifies IPv4 or IPv6 or multismth
+		int ai_socktype; // SOCK_STREAM, SOCK_DGRAM
+		int ai_protocol; // use 0 for "any"
+		size_t ai_addrlen; // size of ai_addr in bytes
+		struct sockaddr *ai_addr; // struct sockaddr_in or _in6
+		char *ai_canonname; // full canonical hostname
+		struct addrinfo *ai_next; // linked list, next node
+	};
+	getaddrinfo() returns a pointer to a new linked list containing the resolved net addrs. associated to a hostname.
+
+
+	struct sockaddr {
+		unsigned short sa_family; // AD_INET, AF_INET6
+		char sa_data[14]; // holds the actual address data. if IPV4 holds a 2 byte ort number and 4 byte ipv4 address
+	};
+	Holds address info for different socket types
+
+	struct sockaddr_in | sockaddr_in6 {
+		short int sin_family; // Address family, AF_INET explicitely
+		unsigned short int sin_port; // Port number
+		struct in_addr sin_addr; // holds the IP itself in network byte order
+		unsigned char sin_zero[8]; // Same size as struct sockaddr (should be bzero'd)
+	};
+	a pointer to a struct sockaddr_in can be cast to a pointer to a struct sockaddr and vice-versa.
+	Use connect() and pass pointer to a sockaddr_in with the destination address
+
+	struct in_addr {
+		uint32_t s_addr; // that's a 32-bit int (4 bytes)
+	};
+	simple representation of IPV4 addresses
+
+	So if you have declared in_addr to be of type struct sockaddr_in, then ina.sin_addr.s_addr references the 4-byte IP
+	address
+
+	struct sockaddr_storage {
+		sa_family_t ss_family; // address family (use this to see if its IPv4 || IPv6)
+		// all this is padding, implementation specific, ignore it:
+		char __ss_pad1[_SS_PAD1SIZE];
+		int64_t __ss_align;
+		char __ss_pad2[_SS_PAD2SIZE];
+	};
+
+	used for when you dont know if you;re calling and IPv4 or IPv6
+
+	The  inet_addr()  function converts the Internet host address cp from IPv4 numbers-and-dots notation into binary data in network byte order. inet_ntoa() does the opposite.
+
+	Firewalls hide our private network translating our public IP address to a private network using the 10.x.x.x IP, by NAT.
+
+#SYSCALLS
+	##getaddrinfo()
+		Fills necessary structs
+		int getaddrinfo(const char *node, // e.g. "www.example.com" or IP
+						const char *service, // e.g. "http" or port number
+						const struct addrinfo *hints, //bzero at start - points to a struct addrinfo with relevant information.
+						struct addrinfo **res); //res is a pointer to a LL of results.
+
+	##socket()
+		define what kind of socket you want: IPv4 or IPv6, stream or datagram, and TCP or UDP.
+		returns the socket descriptor or -1 on error
+		Usage {
+			struct addrinfo hints, *res;
+			getaddrinfo("www.example.com", "http", &hints, &res);
+			int s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+		}
+
+	##bind()
+		associates a socket to a port.
+		used along with listen() which expects incoming connections on a port.
+		int bind(int sockfd, struct sockaddr *my_addr, int addrlen);
+		Usage {
+			struct sockaddr_in my_addr;
+			int sockfd = socket(PF_INET, SOCK_STREAM, 0);
+			my_addr.sin_family = AF_INET;
+			my_addr.sin_port = htons(MYPORT); // short, network byte order
+			my_addr.sin_addr.s_addr = inet_addr("10.12.110.57");
+			memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
+			bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
+		}
+		Ports should be between 1024 (if ur not SU) and 65535, if not in use ofc.
+		If “Address already in use.”, connected socket still hanging in kernel, this fixes:
+			 int yes=1;
+			if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) {
+				perror("setsockopt");
+				exit(1);
+			}
+		If u just trying to connect to a remote machine and dont care about local port, just call connect, if the socket is unbound connect() will bind() to unused local port.
+	
+	##connect()
+		Used to connect to remote host
+		int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
+			serv_addr is a struct sockaddr containing the destination port and IP address, and addrlen is the length in bytes of the server address structure - gotten from getaddrinfo()
+		int c = connect(sockfd, res->ai_addr, res->ai_addrlen);
+		-1 on error
+
+	##listen()
+		Wait for incomming connect()ions.
+		int listen(int sockfd, int backlog);
+			backlog is nbr of connections allowed in the incoming queue.They wait in queue until you accept. Usually 20 - 10.
+		-1 on error
+		we need to call bind() before listen() so the server runs on a specific port.
+		In order:
+			getaddrinfo();
+			socket();
+			bind();
+			listen();
+			accept();
+	
+	##accept()
+		int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+		addr is a local sockaddr_storage struct which stores where the info of the incoming connection will go. addrlen is sizeof(local struct)
+		-1 on error
+		return a new fd to communicate.
+
+	##send() recv()
+		int send(int sockfd, const void *msg, int len, int flags);
+			sockfd - fd to send data to;
+			msg - pointer to data u wanna send;
+			len - sizeof data;
+			flags - (?) usually 0.
+		returns bytes sent, which might be < len. If so, you need to resend the excedent.
+
+		int recv(int sockfd, void *buf, int len, int flags);
+			buf - read to it;
+			len - maximum len of buf;
+		returns bytes read to buf. if ret == 0 either u closed the connection or the remote side has.
+
+		-1 on error.
+	
+	##close()
+		done wit
+		
+		
+	#BLOCKING
+		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). 
+	This allows you to poll the socket for info.
+		Trying to read from a non-blocking socket with no data, its not allowed to block, so you get -1 error.
+		Putting a program in a busy-wait looking for data on a socket is a bad practice.
+
+	#POLL()
+		We want to monitor a bunch of sockets and handle the ones which have data ready. 
+		Polling is very slow for big numbers. libevent might speed it up.
+		The idea is having the OS letting us know when data is ready so our process can sleep without costing resources.
+		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor. 
+	The Os will block on poll() until one of those events occurs or  user defined timeout.
+		A listen() socket should return ready to read when an incoming connection can be accepted().
+
+		int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+			fds - array of info/sockets to monitor;
+			nfds - nbr of elements in the array;
+			timeout - in ms (if negative, waits forever)
+		struct pollfd {
+			int fd; // the socket descriptor
+			short events; // bitmap of events we're interested in
+			short revents; // when poll() returns, bitmap of events that occurred
+		};
+			fd - socket fd we want to monitor;
+			events -	POLLIN -- alert when data is ready to recv() on the socket;
+						POLLOUT -- alert when I can send data to this socket without blocking.
+		Pass the pollfds to poll(), and on return check revents for POLLIN or POLLOUT set.
+		e.g.:
+		if (int pollin_happened = pfds[0].revents & POLLIN)
+			printf("File descriptor %d is ready to read\n", pfds[0].fd);
+		Returns number of entries which have non-zero revents field, stop searching after number was reached.
+
+		Make sure the array has enough space, or realloc().
+		e.g. of a chat server:
+			Start listener socket, add it to the set of fds to poll().
+			Add new connections to array of pollfds structs. If a connection closes, we remove it.
+			When connection is ready to read, we read its data and send to others, so they can see it.
+	
+	#PARTIAL SEND()S
+		Implement this for partial sends():
+		int sendall(int s, char *buf, int *len)
+		{
+			int total = 0; // how many bytes we've sent
+			int bytesleft = *len; // how many we have left to send
+			int n;
+			while(total < *len) {
+				n = send(s, buf+total, bytesleft, 0);
+				if (n == -1) { break; }
+				total += n;
+				bytesleft -= n;
+			}
+			*len = total; // return number actually sent here
+			return (n == -1) ? -1 : 0; // return -1 on failure, 0 on success
+		}
+		

@@ -1,0 +1,42 @@
+1. Beej's Guide to Network Programming - This is a great starting point for learning socket programming with C.
+The guide covers basic socket programming concepts and also includes examples of how to create client and server applications.
+
+https://beej.us/guide/bgnet/
+
+
+RFC 1459 - This is the official IRC protocol specification and provides a detailed description of how the IRC protocol works. 
+It is important to have a good understanding of the protocol before attempting to create an IRC server.
+
+https://datatracker.ietf.org/doc/html/rfc1459
+
+
+An IRC server implementation in C++ - There are several open-source IRC server implementations available that you can use as a reference. 
+An example is ircd-hybrid, an IRC server implementation written in C++ that is widely used in the IRC community.
+
+IRC developer communities - Joining IRC developer communities, such as the #ircdev channel on Freenode, 
+can be helpful in getting support and advice from experienced IRC developers.
+
+socket //ret
+close
+setsockopt
+getsockname
+getprotobyname
+gethostbyname
+getaddrinfo
+freeaddrinfo
+bind
+connect
+listen
+accept
+htons
+htonl
+ntohs
+ntohl
+inet_addr
+inet_ntoa
+send recv
+signal
+lseek
+fstat
+fcntl
+poll
