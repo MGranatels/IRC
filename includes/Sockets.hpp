@@ -2,6 +2,8 @@
 # define SOCKETS_HPP
 
 # define BACKLOG 10 // how many pending connections queue will hold
+# define MAX_CLIENTS 10
+# define MAX_READ	3500
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -16,6 +18,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <map>
+#include <netinet/in.h>
 
 //Static backend handler
 class Sockets 
@@ -23,9 +26,9 @@ class Sockets
 	private:
 		const std::string	_port;
 		const std::string	_password;
-		addrinfo			*getServerInfo();
 
 	public:
+		addrinfo			*setServerInfo();
 		Sockets( std::string port, std::string password);
 		~Sockets();
 		void	_init( void );
