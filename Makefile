@@ -4,7 +4,8 @@ CXX			= 	c++
 
 
 SRCS		=	src/main.cpp	\
-				src/Sockets.cpp
+				src/Sockets.cpp	\
+				src/utils.cpp
 
 
 SRCS_DIR	=	src

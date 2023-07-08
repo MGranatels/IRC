@@ -21,13 +21,16 @@
 class Sockets 
 {
 	private:
-		addrinfo			*getServerInfo();
 		const std::string	_port;
 		const std::string	_password;
+		addrinfo			*getServerInfo();
 
 	public:
 		Sockets( std::string port, std::string password);
 		~Sockets();
+		void	_init( void );
 };
+
+void	ft_bzero(void *s, size_t n);
 
 #endif
