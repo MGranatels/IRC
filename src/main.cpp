@@ -88,3 +88,5 @@ int	main(int ac, char **av)
 	}
 	return 0;
 }
+
+// 1. Handle the server response to send message to all clients via open terminal
