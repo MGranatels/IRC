@@ -1,3 +1,4 @@
+HOW TO RUN PROGRAM AND TEST IT:
 a) Check Number of Arguments can only receive two, a Port and A password (password bot Yet defined)
 
 b) Build Server object you can pass any port within the limits. I have been using 6667
@@ -25,3 +26,22 @@ e) To run the program and test it without the UGI its pretty simple, just follow
 
 	Congratz!! you just did your first IRC connection and trasmited information trough a TPC protocol :D
 
+HOW TO RUN PROGRAM AND TEST IT WITH IRC CLIENT HEXCHAT:
+a) make install => it will automatically install HEXCHAT in your machine
+b) make config => It will make necessary configurations in your HEXCHAT and set it ready to run
+c) make run	=> Will run the program with a pre-defined set of input and a port, it will automatically
+	open your HEXCHAT interface. It will prompt you to open HEXCHAT
+	I) Do you want to start an instance of Hexchat: "y" 
+	II) In HEXCHAT check box: Show Favorites Only
+	III) Select ft_irc (should be the only option available)
+	IV) Click connect => It will open the Hexchat interface and connect it to your terminal
+	V) In terminal again: Do you want to start an instance of Hexchat: "n" (unless you wwant to open many HEXCHAT interfaces, which you can)
+	VI) In HEXCHAT input the following command for testing purpuses: /MESSAGE "Your Message"
+		
+Notes:
+1. The terminal will only display messages from HEXCHAT that follow a valid command like so:
+	a) /MESSAGE "Your Message"
+	b) /JOIN "Your message"
+	C) /NICK "Your message"
+2. Check the HEXCHAT manual to see which inputs are valid. Subject also refers to some
+3. We need to handle the messages by the first input we receive on our server

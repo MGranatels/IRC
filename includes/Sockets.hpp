@@ -21,6 +21,7 @@
 #include <netinet/in.h>
 #include <Error.hpp>
 #include <utils.hpp>
+#include <csignal>
 
 //Static backend handler
 class Sockets 

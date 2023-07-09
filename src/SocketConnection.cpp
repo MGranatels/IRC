@@ -1,4 +1,5 @@
 #include <Sockets.hpp>
+#include <Clients.hpp>
 
 
 void	Sockets::sendMessage(int fd_max, int i, int read, char *buffer)
@@ -33,6 +34,8 @@ void	Sockets::acceptConnection(int &max_socket)
 		FD_SET(newSocket, &_fdMaster); // Add new socket to set of sockets
 		if (newSocket > max_socket) // Keep track of the max socket number
 			max_socket = newSocket;
+		Clients *newClient = new Clients(newSocket);
+		newClient->setNickname("Fagget");
 		std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << " on socket " << newSocket << std::endl;
 	}
 }
@@ -54,7 +57,10 @@ void	Sockets::socketActivity(fd_set readFd, int &fd_max)
 					if ((readbytes = recv(i, buffer, sizeof buffer, 0)) <= 0)
 					{
 						if (readbytes == 0)
+						{
 							std::cout << "Connection on Socket " << i << " Disconnected from Server" << std::endl;
+							Clients::removeClient(i);
+						}
 						else
 							exit(Error::message("Receive Message failed"));
 						close(i);

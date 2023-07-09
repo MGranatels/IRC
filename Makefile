@@ -62,6 +62,7 @@ NAME = ircserv
 SRCS = 	utils.cpp \
 		Sockets.cpp \
 		SocketConnection.cpp \
+		Clients.cpp \
 		main.cpp
 
 
