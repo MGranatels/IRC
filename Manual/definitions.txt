@@ -198,6 +198,17 @@ EXTERNAL FUNCS
 			listen();
 			accept();
 	
+	##select() 
+	Is used to monitor multiple file descriptors (sockets) for activity, 
+	such as incoming data or connection requests. 
+	The function takes five parameters:
+		1. nfds: The highest-numbered file descriptor in any of the three sets, plus 1. 
+		2. readfds: A pointer to a set of file descriptors to be monitored for read activity. 
+		3. writefds: A pointer to a set of file descriptors to be monitored for write activity. 
+		4. exceptfds: A pointer to a set of file descriptors to be monitored for exceptions. 
+		5. timeout: A pointer to a struct timeval that specifies the maximum time to wait for activity to occur. 
+		In this case, you can pass NULL, which will cause select() to block indefinitely until activity occurs on one of the monitored sockets.
+	
 	##accept()
 		int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 		addr is a local sockaddr_storage struct which stores where the info of the incoming connection will go. addrlen is sizeof(local struct)
