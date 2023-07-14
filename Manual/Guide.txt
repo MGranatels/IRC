@@ -45,3 +45,22 @@ Notes:
 	C) /NICK "Your message"
 2. Check the HEXCHAT manual to see which inputs are valid. Subject also refers to some
 3. We need to handle the messages by the first input we receive on our server
+
+
+Hexchat configurations:
+1. In order to make HEXCHAT work with our server we need to make some configurations
+2. We need to add a new server to HEXCHAT, we do that by:
+	a) Open HEXCHAT
+	b) Click on the Hexchat icon on the top left corner
+	c) Click on Network List
+	d) Click on Add
+	e) Fill the following fields:
+		i) Network: ft_irc
+		ii) Server: Add: localhost/6667 (or any other port you want to use)
+		iii) Password: (define one)
+		iv) Username: (define one)
+		v) Real Name: (define one)
+		vi) Nick Name: (define one)
+		vii) Uncheck all boxes in configurations except for the last one
+		viii) Login Method: Challenge Auto (username + password)
+		ix) Character Set: UTF-8(Unicode)
