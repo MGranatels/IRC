@@ -42,14 +42,14 @@ int	Sockets::bindSocketFD(struct addrinfo *serv)
 		if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
 		{
 			close(fd_socket);
-			exit(Error::message("Set Sock Option: Failed to free up port"));
 			freeaddrinfo(serv);
+			exit(Error::message("Set Sock Option: Failed to free up port"));
 		}
 		if (bind(fd_socket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 		{
 			close(fd_socket);
-			exit(Error::message("bind: Failed to bind socket"));
 			freeaddrinfo(serv);
+			exit(Error::message("bind: Failed to bind socket"));
 		}
 		else
 		{
