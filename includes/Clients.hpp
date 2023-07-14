@@ -14,7 +14,6 @@ class Clients
 		Clients( int _id);
 		~Clients( void );
 		//Setters 
-		static std::vector<Clients *> _clients;
 		void		setId( int id );
 		void		setNickname( std::string nickname );
 		void		setUsername( std::string username );
