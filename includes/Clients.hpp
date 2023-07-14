@@ -23,7 +23,7 @@ class Clients
 		std::string	getNickname( void ) const;
 		std::string	getUsername( void ) const;
 		Clients*	getClientById(int id);
-		void	addClient(Clients *client);
+		void		addClient(Clients *client);
 		static	void	removeClient(int id);
 };
 

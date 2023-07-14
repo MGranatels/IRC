@@ -36,20 +36,21 @@ int	Sockets::bindSocketFD(struct addrinfo *serv)
 	// Create socket and Bind it. We use a loop to check if we can bind to the socket continusly until we succeed
 	for (struct addrinfo *tmp = serv; tmp; tmp = tmp->ai_next)
 	{
+		// Make a time limit or a try error limit 
 		int	fd_socket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
 		if (fd_socket == -1 || tmp->ai_family != AF_INET6)
 			continue ;
 		if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
 		{
 			close(fd_socket);
-			exit(Error::message("Set Sock Option: Failed to free up port"));
 			freeaddrinfo(serv);
+			exit(Error::message("Set Sock Option: Failed to free up port"));
 		}
 		if (bind(fd_socket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 		{
 			close(fd_socket);
-			exit(Error::message("bind: Failed to bind socket"));
 			freeaddrinfo(serv);
+			exit(Error::message("bind: Failed to bind socket"));
 		}
 		else
 		{
@@ -78,7 +79,6 @@ void		Sockets::_init( void )
 
 	if (!IsDigit(_port) || atoi(_port.c_str()) < 0 || atoi(_port.c_str()) > 65535)
 		exit(Error::message("Port Number out of range or incorrecly formatted"));
-	
 	if(_password.empty())
 		exit(Error::message("Password Cannot be Empty"));
 	for (unsigned int i = 0; i < _password.length(); i++)

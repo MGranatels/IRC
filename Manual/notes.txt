@@ -1,4 +1,3 @@
 Tutorial Link for Server Build:
 
 https://beej.us/guide/bgnet/pdf/bgnet_a4_c_1.pdf
-
