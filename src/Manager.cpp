@@ -49,3 +49,16 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	return (1);
 }
 
+void	Manager::setChanop( void )
+{
+	// Channel Operators
+	//	KICK    - Eject a client from the channel
+	//	MODE    - Change the channel's mode
+	//	INVITE  - Invite a client to an invite-only channel (mode +i)
+	//	TOPIC   - Change the channel topic in a mode +t channel
+
+	this->_chanoper.push_back("/KICK");
+	this->_chanoper.push_back("/MODE");
+	this->_chanoper.push_back("/INVITE");
+	this->_chanoper.push_back("/TOPIC");
+}

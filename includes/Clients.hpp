@@ -9,9 +9,9 @@ class Clients
 		int			_id;
 		std::string	_nickcname;
 		std::string	_username;
-		std::vector<std::string> _cmds;
 
 	public:
+		
 		Clients( int _id);
 		~Clients( void );
 		//Setters 
