@@ -1,5 +1,5 @@
 #include <utils.hpp>
-#include <Clients.hpp>
+#include <Sockets.hpp>
 
 void	ft_bzero(void *s, size_t n)
 {
@@ -23,10 +23,5 @@ void	handlesginal(int sig)
 {
 	(void)sig;
 	std::cout << "Signal received" << std::endl;
-	for (unsigned int i = 0; i < Clients::_clients.size(); i++)
-	{
-		if (Clients::_clients[i] != NULL)
-			delete Clients::_clients[i];
-	}
 	exit(0);
 }
