@@ -1,19 +1,18 @@
 #ifndef	CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <Sockets.hpp>
-# include <Clients.hpp>
+# include <iostream>
 
-class Channel
+class	Channel
 {
 	private:
+		std::string _name;
 		std::string _topic;
-        std::vector<int> _clientsIds;
-        std::vector<int> _ChannelOpsIds;
 
-    public:
-        std::string getTopic() const;
-        int BroadcastMessage(std::string message, int sender_fd);
+	public:
+		Channel( std::string name);
+		~Channel( void );
+
 };
 
 #endif

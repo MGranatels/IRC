@@ -6,3 +6,22 @@ https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands
 
 	https://www.youtube.com/watch?v=BDV8zK6Y8EU
 
+
+
+void	Sockets::handleMessage(int i, int read, char *buffer)
+{
+	std::cout << "Message received from socket " << i << ": " << buffer;
+	buffer[read] = 0;
+	for(int j = 0; j <= _fdMax; j++)
+	{
+		if (FD_ISSET(j, &_fdMaster))
+		{
+			// except the listener and ourselves
+			if (j != _fdSocket && j != i)
+			{
+				if (send(j, buffer, read, 0) == -1)
+					exit(Error::message("Error sending message"));
+			}
+		}
+	}
+}

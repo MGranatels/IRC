@@ -42,5 +42,5 @@ any error.
 [  ]			2) t: Set/remove the restrictions of the TOPIC command to channel
 				operators
 [  ]			3) k: Set/remove the channel key (password)
-[  ]			4) o: Give/take channel operator privileg~
+[  ]			4) o: Give/take channel operator privilege 	
 [  ]			5) l: Set/remove the user limit to channel

@@ -63,6 +63,9 @@ SRCS = 	utils.cpp \
 		Sockets.cpp \
 		SocketConnection.cpp \
 		Clients.cpp \
+		Manager.cpp \
+		ManagerCommands.cpp \
+		Channel.cpp \
 		main.cpp
 
 
@@ -70,7 +73,7 @@ CC = @c++
 
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address -Iincludes/
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -g -Ofast -fsanitize=address -Iincludes/
 
 SRCS_DIR = ./src/
 
