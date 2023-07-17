@@ -60,7 +60,7 @@ Clients* Clients::getClientById(int id)
 	return (NULL);
 }
 
-void	Clients::addClient(Clients *client)
+void	Clients::addClient(Clients client)
 {
 	this->_clients.push_back(client);
 	std::cout << "Client Succesfully Added" << std::endl;

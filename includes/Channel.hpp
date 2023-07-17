@@ -13,6 +13,7 @@ class Channel
 
     public:
         std::string getTopic() const;
+        int BroadcastMessage(std::string message, int sender_fd);
 };
 
 #endif
