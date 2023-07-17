@@ -5,8 +5,8 @@
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
-	std::cout << "Message received from socket " << i << ": " << std::endl;
 	buffer[read] = 0;
+	std::cout << buffer << std::endl;
 	for(int j = 0; j <= _fdMax; j++)
 	{
 		if (FD_ISSET(j, &_fdMaster))
@@ -19,12 +19,11 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
 			if (iter != Manager::getClients().end())
 					Manager::firstTimeClient(iter);
-
 			// This for now is to send the messages without any kind of validation
-			// Its merely for testing purpuses. Use this as a base to send messages
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)
-				exit(Error::message("Error sending message"));
+					exit(Error::message("Error sending message"));
+			// Its merely for testing purpuses. Use this as a base to send messages
 		}
 	}
 }
