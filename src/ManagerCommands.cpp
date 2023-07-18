@@ -1,20 +1,29 @@
 #include <Manager.hpp>
-
-
+#include <utils.hpp>
 
 void	Manager::parseCommands(std::vector<Clients>::iterator iter, char *buffer, int read)
 {
 	(void)iter;
 	(void)read;
-	std::string str = buffer;
-
+	buffer[read] = 0;
+	std::string str(buffer);
+	std::vector<std::string> splits = split(str, ' ');
+	for (unsigned int i = 0 ; i < splits.size(); i++)
+	{
+		std::cout << i << ": Print Splits: ";
+		std::cout << splits[i] << std::endl;
+	}
 	// Use the cmd vector to parse the commands
 	// Vector of strings that is in the client class
 
+	// CALADO: Pesquisa sobre um tipo de container que se chama std::map. 
+	// E um tipo de variavel que emparalhada variaveis com funcoes. 
+	// Ou variaveis com outras variaveis e top para fazer parsings
 	std::vector<std::string>::iterator it = _chanoper.begin();
 	for (; it != _chanoper.end(); ++it)
 		if (*it == str)
 		{
+
 			std::cout << *it << "was identified." << std::endl;
 			break;
 		}

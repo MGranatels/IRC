@@ -1,6 +1,7 @@
 #include <Manager.hpp>
 
 std::vector<Clients> Manager::_clients;
+std::vector<std::string> Manager::_chanoper;
 std::string Manager::_hostname = ":localhost ";
 
 void	Manager::addClient(int id)
@@ -57,8 +58,11 @@ void	Manager::setChanop( void )
 	//	INVITE  - Invite a client to an invite-only channel (mode +i)
 	//	TOPIC   - Change the channel topic in a mode +t channel
 
-	this->_chanoper.push_back("/KICK");
-	this->_chanoper.push_back("/MODE");
-	this->_chanoper.push_back("/INVITE");
-	this->_chanoper.push_back("/TOPIC");
+	// CALADO:
+	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
+	// porque nao estamos a instancializar a classe
+	_chanoper.push_back("/KICK");
+	_chanoper.push_back("/MODE");
+	_chanoper.push_back("/INVITE");
+	_chanoper.push_back("/TOPIC");
 }
