@@ -22,13 +22,16 @@ std::vector<int> Channel::getUsersNoSender(int senderId) const
 {
 	std::vector<int> noSender(this->_usersIds);
 
-	//TODO:
+	std::vector<int>::iterator it = std::remove(noSender.begin(), noSender.end(), senderId);
+    noSender.erase(it, noSender.end());
+	return noSender;
 }
 
 //function to remove users from channel
 void Channel::removeUser(int UserId)
 {
-	//TODO:
+    std::vector<int>::iterator it = std::remove(_usersIds.begin(), _usersIds.end(), UserId);
+    _usersIds.erase(it, _usersIds.end());
 }
 
 //returns the users in a channel but just a const reference, i.e we can only edit this inside the class
