@@ -48,4 +48,3 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	client.setUsername("teste");
 	return (1);
 }
-

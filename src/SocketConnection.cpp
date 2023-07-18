@@ -2,6 +2,18 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
+void	Sockets::passwordCHeck(int _id)
+{
+	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
+	Clients& foundCLient = *iter;
+	foundCLient.setPassword("password");
+	if (foundCLient.getPassword() != this->_password)
+	{
+		close(_id);
+		FD_CLR(_id, &_fdMaster);
+		Manager::removeClient(_id);
+	}
+}
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
@@ -18,7 +30,10 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			// However the parser needs to run first so that we have all that information to add to the client
 			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
 			if (iter != Manager::getClients().end())
-					Manager::firstTimeClient(iter);
+			{
+				passwordCHeck(i);	
+				Manager::firstTimeClient(iter);
+			}
 			// This for now is to send the messages without any kind of validation
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)
