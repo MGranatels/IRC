@@ -33,7 +33,7 @@ std::vector<Clients>::iterator Manager::getClientById(int id)
 	for (; it != _clients.end(); ++it)
 		if (it->getId() == id)
 			break;
-	return (it);	
+	return (it);
 }
 
 const std::vector<Clients>& Manager::getClients() {
@@ -46,7 +46,7 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	// After the parse does its work we assign the username and nickname
 	// They should be in a list of commands, like a vector of strings
 	// We also need to check if the password is correct
-	// We should also add 
+	// We should also add
 	std::cout << client.getId() << std::endl;
 	if (!client.getUsername().empty())
 		return 0;

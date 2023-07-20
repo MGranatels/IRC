@@ -26,6 +26,13 @@ void	handlesginal(int sig)
 	exit(0);
 }
 
+//takes an element and removes it from the vector
+void    removeElementFromVector(std::vector<int> &vector, int element)
+{
+	std::vector<int>::iterator it = std::remove(vector.begin(), vector.end(), element);
+    vector.erase(it, vector.end());
+}
+
 std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> tokens;
     std::size_t start = 0;
