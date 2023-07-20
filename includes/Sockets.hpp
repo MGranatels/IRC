@@ -22,7 +22,7 @@
 # include <csignal>
 # include <Error.hpp>
 # include <utils.hpp>
-
+# include <bits/stdc++.h> 
 //Static backend handler
 class Sockets 
 {
@@ -39,6 +39,7 @@ class Sockets
 		void	acceptConnection( void );
 		void	socketActivity(fd_set readFd);
 		void	_select( void );
+		void	passwordCheck( int _id );
 
 	public:
 		Sockets( std::string port, std::string password);
