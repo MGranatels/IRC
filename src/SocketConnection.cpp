@@ -2,12 +2,11 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
-void	Sockets::passwordCHeck(int _id)
+void	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
-	Clients& foundCLient = *iter;
-	foundCLient.setPassword("password");
-	if (foundCLient.getPassword() != this->_password)
+	Clients& foundClient = *iter;
+	if (foundClient.getPassword() != this->_password)
 	{
 		close(_id);
 		FD_CLR(_id, &_fdMaster);
@@ -18,7 +17,7 @@ void	Sockets::passwordCHeck(int _id)
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
 	buffer[read] = 0;
-	std::cout << buffer << std::endl;
+	// std::cout << buffer << std::endl;
 	for(int j = 0; j <= _fdMax; j++)
 	{
 		if (FD_ISSET(j, &_fdMaster))
@@ -29,14 +28,9 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			//Second If is to check if the client is already in the channel, if not we add it in the function
 			// However the parser needs to run first so that we have all that information to add to the client
 			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
-			if (j != _fdSocket && j != i)
-			{
-				if (send(j, buffer, read, 0) == -1)
-					exit(Error::message("Error sending message"));
-			}
 			if (iter != Manager::getClients().end())
 			{
-				passwordCHeck(i);	
+				passwordCheck(i);
 				Manager::firstTimeClient(iter);
 			}
 			// This for now is to send the messages without any kind of validation

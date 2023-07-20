@@ -7,6 +7,7 @@ std::string Manager::_hostname = ":localhost ";
 void	Manager::addClient(int id)
 {
 	_clients.push_back(Clients(id));
+	_clients.back().setClientSettings(false);
 	std::cout << "Client Succesfully Added" << std::endl;
 }
 
@@ -44,6 +45,7 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	// They should be in a list of commands, like a vector of strings
 	// We also need to check if the password is correct
 	// We should also add 
+	std::cout << client.getId() << std::endl;
 	if (!client.getUsername().empty())
 		return 0;
 	client.setUsername("teste");
@@ -57,15 +59,6 @@ void	Manager::setChanop( void )
 	//	MODE    - Change the channel's mode
 	//	INVITE  - Invite a client to an invite-only channel (mode +i)
 	//	TOPIC   - Change the channel topic in a mode +t channel
-
-	// CALADO:
-	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
-	// porque nao estamos a instancializar a classe
-	_chanoper.push_back("/KICK");
-	_chanoper.push_back("/MODE");
-	_chanoper.push_back("/INVITE");
-	_chanoper.push_back("/TOPIC");
-}
 
 	// CALADO:
 	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->

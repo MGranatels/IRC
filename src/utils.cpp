@@ -26,14 +26,31 @@ void	handlesginal(int sig)
 	exit(0);
 }
 
-std::vector<std::string> split(const std::string& str, char delimiter) {
+std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> tokens;
-    std::stringstream ss(str);
-    std::string token;
+    std::size_t start = 0;
+    std::size_t end = str.find_first_of(delimiter);
 
-    while (std::getline(ss, token, delimiter)) {
-        tokens.push_back(token);
+    while (end != std::string::npos) {
+        std::string token = str.substr(start, end - start);
+        if (!token.empty()) {
+            tokens.push_back(token);
+        }
+        start = end + 1;
+        end = str.find_first_of(delimiter, start);
     }
 
+    std::string lastToken = str.substr(start);
+    if (!lastToken.empty()) {
+        tokens.push_back(lastToken);
+    }
     return tokens;
+}
+
+void	removeWhitespace(std::string& str)
+{
+	str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+	str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+	str.erase(std::remove(str.begin(), str.end(), '\t'), str.end());
+	str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 }

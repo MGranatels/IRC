@@ -7,9 +7,11 @@ class Clients
 {
 	private:
 		int			_id;
+		bool		_clientSettings;
 		std::string	_password;
 		std::string	_nickcname;
 		std::string	_username;
+
 
 	public:
 		
@@ -20,11 +22,13 @@ class Clients
 		void		setNickname( std::string nickname );
 		void		setUsername( std::string username );
 		void		setPassword( std::string username );
+		void		setClientSettings( bool clientSettings );
 		//Getters
 		int			getId( void ) const;
 		std::string	getNickname( void ) const;
 		std::string	getUsername( void ) const;
 		std::string	getPassword( void ) const;
+		bool		getClientSettings( void ) const;
 		void		initClient(std::string nickname, std::string username);
 };
 

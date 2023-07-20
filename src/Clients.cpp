@@ -23,6 +23,10 @@ void	Clients::setPassword( std::string password ) {
 	this->_password = password;
 }
 
+void	Clients::setClientSettings( bool clientSettings ) {
+	this->_clientSettings = clientSettings;
+}
+
 //Getters
 
 int			Clients::getId( void ) const {
@@ -45,4 +49,8 @@ void	Clients::initClient(std::string username, std::string nickname)
 {
 	this->_username = username;
 	this->_nickcname = nickname;
+}
+
+bool	Clients::getClientSettings( void ) const {
+	return (this->_clientSettings);
 }
