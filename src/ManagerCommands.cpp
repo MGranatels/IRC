@@ -3,24 +3,17 @@
 
 void	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter)
 {
-	static	int	status;
-
 	Clients& foundClient = *iter;
 	if (foundClient.getClientSettings() == true)
 		return ;
 	for (unsigned int i = 0 ; i < splits.size(); i++)
 	{
-		if (splits[i] == "PASS" && status++)
+		if (splits[i] == "PASS")
 			foundClient.setPassword(splits[i + 1]);
-		else if (splits[i] == "NICK" && status++)
+		else if (splits[i] == "NICK")
 			foundClient.setNickname(splits[i + 1]);
-		else if (splits[i] == "USER" && status++)
+		else if (splits[i] == "USER")
 			foundClient.setUsername(splits[i + 1]);
-	}
-	if (status == 3)
-	{
-		foundClient.setClientSettings(true);
-		status = 0;
 	}
 }
 

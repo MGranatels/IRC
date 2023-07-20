@@ -6,13 +6,19 @@ void	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
 	Clients& foundClient = *iter;
-	if (foundClient.getPassword().empty())
+	if (foundClient.getClientSettings() == true)
 		return ;
+	std::cout << "Waiting for password Verification... Please Hold..." << std::endl;
 	if (foundClient.getPassword() != this->_password)
 	{
+		std::cout << "Password Incorrect" << std::endl;
 		close(_id);
 		FD_CLR(_id, &_fdMaster);
-		Manager::removeClient(_id);
+	}
+	else
+	{
+		std::cout << "Password Correct!!" << std::endl;
+		foundClient.setClientSettings(true);
 	}
 }
 
@@ -26,15 +32,9 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		{
 			// Lets get the client object from the vector
 			std::vector<Clients>::iterator iter = Manager::getClientById(j);
-			//Check if the client was added to the vector, thats the first if
-			//Second If is to check if the client is already in the channel, if not we add it in the function
-			// However the parser needs to run first so that we have all that information to add to the client
-			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
+			Manager::parseCommands(iter, buffer, read);
 			if (iter != Manager::getClients().end())
-			{
 				passwordCheck(i);
-				Manager::firstTimeClient(iter);
-			}
 			// This for now is to send the messages without any kind of validation
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)

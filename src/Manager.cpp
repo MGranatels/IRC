@@ -6,6 +6,8 @@ std::string Manager::_hostname = ":localhost ";
 
 void	Manager::addClient(int id)
 {
+	if (Manager::getClientById(id) != _clients.end())
+		return ;
 	_clients.push_back(Clients(id));
 	_clients.back().setClientSettings(false);
 	std::cout << "Client Succesfully Added" << std::endl;
@@ -48,7 +50,6 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	std::cout << client.getId() << std::endl;
 	if (!client.getUsername().empty())
 		return 0;
-	client.setUsername("teste");
 	return (1);
 }
 

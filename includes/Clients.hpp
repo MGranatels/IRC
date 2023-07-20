@@ -8,6 +8,7 @@ class Clients
 	private:
 		int			_id;
 		bool		_clientSettings;
+		bool		_passCheck;
 		std::string	_password;
 		std::string	_nickcname;
 		std::string	_username;
