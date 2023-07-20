@@ -5,7 +5,7 @@
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
-	std::cout << "Message received from socket " << i << ": " << std::endl;
+	// std::cout << "Message received from socket " << i << ": " << std::endl;
 	buffer[read] = 0;
 	for(int j = 0; j <= _fdMax; j++)
 	{

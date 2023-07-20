@@ -27,6 +27,7 @@ class Manager
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
 		static	void	parseCommands(std::vector<Clients>::iterator iter, char *buffer, int read);
+		static	void	checkCommands(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 };
 
 #endif

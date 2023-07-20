@@ -7,7 +7,7 @@ class Clients
 {
 	private:
 		int			_id;
-		std::string	_nickcname;
+		std::string	_nickname;
 		std::string	_username;
 
 	public:
