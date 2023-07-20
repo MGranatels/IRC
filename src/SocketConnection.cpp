@@ -2,11 +2,23 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
+void	Sockets::passwordCHeck(int _id)
+{
+	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
+	Clients& foundCLient = *iter;
+	foundCLient.setPassword("password");
+	if (foundCLient.getPassword() != this->_password)
+	{
+		close(_id);
+		FD_CLR(_id, &_fdMaster);
+		Manager::removeClient(_id);
+	}
+}
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
-	// std::cout << "Message received from socket " << i << ": " << std::endl;
 	buffer[read] = 0;
+	std::cout << buffer << std::endl;
 	for(int j = 0; j <= _fdMax; j++)
 	{
 		if (FD_ISSET(j, &_fdMaster))
@@ -17,14 +29,21 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			//Second If is to check if the client is already in the channel, if not we add it in the function
 			// However the parser needs to run first so that we have all that information to add to the client
 			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
+			if (j != _fdSocket && j != i)
+			{
+				if (send(j, buffer, read, 0) == -1)
+					exit(Error::message("Error sending message"));
+			}
 			if (iter != Manager::getClients().end())
-					Manager::firstTimeClient(iter);
-
+			{
+				passwordCHeck(i);	
+				Manager::firstTimeClient(iter);
+			}
 			// This for now is to send the messages without any kind of validation
-			// Its merely for testing purpuses. Use this as a base to send messages
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)
-				exit(Error::message("Error sending message"));
+					exit(Error::message("Error sending message"));
+			// Its merely for testing purpuses. Use this as a base to send messages
 		}
 	}
 }
@@ -43,7 +62,7 @@ void	Sockets::acceptConnection( void )
 	{
 		FD_SET(newSocket, &_fdMaster); // Add new socket to set of sockets
 		if (newSocket > _fdMax) // Keep track of the max socket number
-			_fdMax = newSocket;
+			_fdMax = newSocket + 1;
 		Manager::addClient(newSocket);
 		std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << " on socket " << newSocket << std::endl;
 	}

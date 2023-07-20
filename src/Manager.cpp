@@ -66,3 +66,12 @@ void	Manager::setChanop( void )
 	_chanoper.push_back("/INVITE");
 	_chanoper.push_back("/TOPIC");
 }
+
+	// CALADO:
+	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
+	// porque nao estamos a instancializar a classe
+	_chanoper.push_back("/KICK");
+	_chanoper.push_back("/MODE");
+	_chanoper.push_back("/INVITE");
+	_chanoper.push_back("/TOPIC");
+}
