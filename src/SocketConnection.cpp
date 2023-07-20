@@ -6,6 +6,8 @@ void	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
 	Clients& foundClient = *iter;
+	if (foundClient.getPassword().empty())
+		return ;
 	if (foundClient.getPassword() != this->_password)
 	{
 		close(_id);
