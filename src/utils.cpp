@@ -25,3 +25,10 @@ void	handlesginal(int sig)
 	std::cout << "Signal received" << std::endl;
 	exit(0);
 }
+
+//takes an element and removes it from the vector
+void    removeElementFromVector(std::vector<int> &vector, int element)
+{
+	std::vector<int>::iterator it = std::remove(vector.begin(), vector.end(), element);
+    vector.erase(it, vector.end());
+}
