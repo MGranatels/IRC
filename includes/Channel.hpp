@@ -29,6 +29,7 @@ class	Channel
 		const std::vector<int>& getOperators(void) const;
 		void addOperator(int operatorId);
 		void removeOperator(int operatorId);
+		bool isChanop(int userId); //to do -> return if a given user is a chanop i.e has right to execute the commands
 };
 
 #endif
