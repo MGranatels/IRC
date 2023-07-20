@@ -29,6 +29,11 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			//Second If is to check if the client is already in the channel, if not we add it in the function
 			// However the parser needs to run first so that we have all that information to add to the client
 			Manager::parseCommands(iter, buffer, read); // Its empty for now, just layout func
+			if (j != _fdSocket && j != i)
+			{
+				if (send(j, buffer, read, 0) == -1)
+					exit(Error::message("Error sending message"));
+			}
 			if (iter != Manager::getClients().end())
 			{
 				passwordCHeck(i);	
@@ -57,7 +62,7 @@ void	Sockets::acceptConnection( void )
 	{
 		FD_SET(newSocket, &_fdMaster); // Add new socket to set of sockets
 		if (newSocket > _fdMax) // Keep track of the max socket number
-			_fdMax = newSocket;
+			_fdMax = newSocket + 1;
 		Manager::addClient(newSocket);
 		std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << " on socket " << newSocket << std::endl;
 	}

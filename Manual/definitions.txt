@@ -33,7 +33,7 @@ EXTERNAL FUNCS
 // poll 			polls a set of file descriptors
 
 #SOCKETS
-	FDs can also be network connections. Call socket() to get socket descriptor and communicate using send() and recv() - equivalent to write and read - as they offer 
+	FDs can also be network connections. Call socket() to get socket descriptor and communicate using send() and recv() - equivalent to write and read - as they offer
 	greater control over data. There are many types of sockets but in this case we will only be dealing with internet Sockets.
 
 	Two Types of Internet Sockets:
@@ -55,26 +55,26 @@ EXTERNAL FUNCS
 	Encapsulate the packet in some way and hit sendto().
 
 	#PROTOCOLS
-	TCP & UDP also use Port number, the local address for the connection. HTTP uses prot 80, telnet port 23, DOOM game 666. 
+	TCP & UDP also use Port number, the local address for the connection. HTTP uses prot 80, telnet port 23, DOOM game 666.
 	Ports under 1024 are special and require OS privileges.
 
 	PCs can store bytes in reverse order - the Little-Endian. Network Byte Order is in Big Endian, so we run every value thru a function to guarantee it's in NBO.
 	You can convert Short (2 bytes) and Long (4 bytes), from Host to Network, so: htons(), htonl(), ntohs() or ntohl().
 	So, convert the numbers to NBO when they go out and to Host Byte ORder when they are coming in.
-	
+
 	#PORT NUMBERS
 	Think of it like this if IP is the street address of your house and a port number would be the number of the door.
-	
+
 	Let's imagine you have a computer that handles incoming email and Web Services in order to differenciate both you would have a port number
 	for each.
 
-	Different services on the internet have different well known and established port numbers. You can see them all at: Big IANA Port List 
+	Different services on the internet have different well known and established port numbers. You can see them all at: Big IANA Port List
 
 	#BYTE ORDER
 	This is the way information in stored in bytes. And it can be in reverse order or normal order (as you would read it)
 
 	Big-Endian (Network Order) => This is normar order
-	Little-Endian (Host Byte Order) => Reserve Order
+	Little-Endian (Host Byte Order) => Reverse Order
 
 	This means that many times when you are building packtes or filling out data structures you'll need to make sure your byte numbers are in
 	Network Order (normar order). In order to do this we can use the following functions:
@@ -83,10 +83,10 @@ EXTERNAL FUNCS
 		c) ntohs() network to host short
 		d) ntohl() network to host long
 	By using this functions you make sure your code is compatible and portable to machines of different Endiannes.
-	
+
 	Basically, you’ll want to convert the numbers to Network Byte Order before they go out on the wire, and
 	convert them to Host Byte Order as they come in off the wire.
-	
+
 #STRUCTS
 
 	struct addrinfo {
@@ -141,8 +141,7 @@ EXTERNAL FUNCS
 
 #SYSCALLS
 	##getaddrinfo()
-		Fills necessary structs
-		int getaddrinfo(const char *node, // e.g. "www.example.com" or IP
+		Fills necessary structs I'm keen tonode, // e.g. "www.example.com" or IP
 						const char *service, // e.g. "http" or port number
 						const struct addrinfo *hints, //bzero at start - points to a struct addrinfo with relevant information.
 						struct addrinfo **res); //res is a pointer to a LL of results.
@@ -177,7 +176,7 @@ EXTERNAL FUNCS
 				exit(1);
 			}
 		If u just trying to connect to a remote machine and dont care about local port, just call connect, if the socket is unbound connect() will bind() to unused local port.
-	
+
 	##connect()
 		Used to connect to remote host
 		int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
@@ -197,18 +196,18 @@ EXTERNAL FUNCS
 			bind();
 			listen();
 			accept();
-	
-	##select() 
-	Is used to monitor multiple file descriptors (sockets) for activity, 
-	such as incoming data or connection requests. 
+
+	##select()
+	Is used to monitor multiple file descriptors (sockets) for activity,
+	such as incoming data or connection requests.
 	The function takes five parameters:
-		1. nfds: The highest-numbered file descriptor in any of the three sets, plus 1. 
-		2. readfds: A pointer to a set of file descriptors to be monitored for read activity. 
-		3. writefds: A pointer to a set of file descriptors to be monitored for write activity. 
-		4. exceptfds: A pointer to a set of file descriptors to be monitored for exceptions. 
-		5. timeout: A pointer to a struct timeval that specifies the maximum time to wait for activity to occur. 
+		1. nfds: The highest-numbered file descriptor in any of the three sets, plus 1.
+		2. readfds: A pointer to a set of file descriptors to be monitored for read activity.
+		3. writefds: A pointer to a set of file descriptors to be monitored for write activity.
+		4. exceptfds: A pointer to a set of file descriptors to be monitored for exceptions.
+		5. timeout: A pointer to a struct timeval that specifies the maximum time to wait for activity to occur.
 		In this case, you can pass NULL, which will cause select() to block indefinitely until activity occurs on one of the monitored sockets.
-	
+
 	##accept()
 		int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 		addr is a local sockaddr_storage struct which stores where the info of the incoming connection will go. addrlen is sizeof(local struct)
@@ -229,22 +228,22 @@ EXTERNAL FUNCS
 		returns bytes read to buf. if ret == 0 either u closed the connection or the remote side has.
 
 		-1 on error.
-	
+
 	##close()
 		done wit
-		
-		
+
+
 	#BLOCKING
-		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). 
+		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK).
 	This allows you to poll the socket for info.
 		Trying to read from a non-blocking socket with no data, its not allowed to block, so you get -1 error.
 		Putting a program in a busy-wait looking for data on a socket is a bad practice.
 
 	#POLL()
-		We want to monitor a bunch of sockets and handle the ones which have data ready. 
+		We want to monitor a bunch of sockets and handle the ones which have data ready.
 		Polling is very slow for big numbers. libevent might speed it up.
 		The idea is having the OS letting us know when data is ready so our process can sleep without costing resources.
-		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor. 
+		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor.
 	The Os will block on poll() until one of those events occurs or  user defined timeout.
 		A listen() socket should return ready to read when an incoming connection can be accepted().
 
@@ -271,7 +270,7 @@ EXTERNAL FUNCS
 			Start listener socket, add it to the set of fds to poll().
 			Add new connections to array of pollfds structs. If a connection closes, we remove it.
 			When connection is ready to read, we read its data and send to others, so they can see it.
-	
+
 	#PARTIAL SEND()S
 		Implement this for partial sends():
 		int sendall(int s, char *buf, int *len)
@@ -288,4 +287,3 @@ EXTERNAL FUNCS
 			*len = total; // return number actually sent here
 			return (n == -1) ? -1 : 0; // return -1 on failure, 0 on success
 		}
-		
