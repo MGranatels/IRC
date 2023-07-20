@@ -8,17 +8,17 @@ class Clients
 	private:
 		int			_id;
 		bool		_clientSettings;
-		bool		_passCheck;
+		//bool		_passCheck;
 		std::string	_password;
 		std::string	_nickcname;
 		std::string	_username;
 
 
 	public:
-		
+
 		Clients( int _id);
 		~Clients( void );
-		//Setters 
+		//Setters
 		void		setId( int id );
 		void		setNickname( std::string nickname );
 		void		setUsername( std::string username );

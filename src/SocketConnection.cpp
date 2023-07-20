@@ -32,7 +32,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		{
 			// Lets get the client object from the vector
 			std::vector<Clients>::iterator iter = Manager::getClientById(j);
-			Manager::parseCommands(iter, buffer, read);
+			Manager::parseActions(iter, buffer, read);
 			if (iter != Manager::getClients().end())
 				passwordCheck(i);
 			// This for now is to send the messages without any kind of validation
@@ -85,7 +85,7 @@ void	Sockets::socketActivity(fd_set readFd)
 						else
 							exit(Error::message("Receive Message failed"));
 						close(i);
-						FD_CLR(i, &_fdMaster); // Remove fd from master 
+						FD_CLR(i, &_fdMaster); // Remove fd from master
 					}
 					else
 						handleMessage(i, readbytes, buffer);
@@ -96,10 +96,10 @@ void	Sockets::socketActivity(fd_set readFd)
 
 void	Sockets::HandleConnection( void )
 {
-	// We set the max fd in order to keep track of all the Highest file descriptor number, need for the 
+	// We set the max fd in order to keep track of all the Highest file descriptor number, need for the
 	// select function loop. When we loop trought the fd set we will only loop trought the sockets that are active
 	// and not all the sockets in the set
-	_fdMax = _fdSocket; 
+	_fdMax = _fdSocket;
 	fd_set	readFd; // This is the temporary set of sockets we will use to check for activity
 
 	FD_ZERO(&_fdMaster); // Clear the socket set
@@ -107,7 +107,7 @@ void	Sockets::HandleConnection( void )
 	while (1)
 	{
 		readFd = _fdMaster; // Copy the master socket to the temporary set thats going to read the activity
-		// wait until either socket has data ready to be recv() 
+		// wait until either socket has data ready to be recv()
 		if (select(_fdMax + 1, &readFd, NULL, NULL, NULL) == -1) // This is a blocking call, sellect will wait until there is activity on the socket
 			exit(Error::message("Select failed"));
 		// Check all the sockets for activity
