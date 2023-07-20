@@ -24,20 +24,20 @@ class Manager
 		static	void		setChanop( void ); //TODO: change name to setChanCommand
 		static	void		addClient(int id);
 		static	void		removeClient(int id);
-		static	void		addChannel(std::string name);//TODO: gabi
-		static	void		removeChannel(std::string name); //TODO: Gabi
-		static	Channel&	getChannelByName(std::string name); //TODO: Gabi
-		static	Client&		getClientById(int id); //TODO:
+		static	void		addChannel(std::string name) = 0;//TODO: gabi
+		static	void		removeChannel(std::string name) = 0; //TODO: Gabi
+		static	Channel&	getChannelByName(std::string name) = 0; //TODO: Gabi
+		static	Client&		getClientById(int id) = 0; //TODO:
 
 		//Channel commands
 		// KICK - Eject a client from the channel
-		static	kick(Channel &channel, int userId); //TODO:
+		static	kick(Channel &channel, int userId) = 0;//TODO:
 		// INVITE - Invite a client to a channel
-		static	invite(Channel &channel, int userId); //TODO:
+		static	invite(Channel &channel, int userId) = 0; //TODO:
 		// TOPIC - Change or view the channel topic
-		static	topic(Channel &channel, int option, int userId); //TODO:
+		static	topic(Channel &channel, int option, int userId) = 0; //TODO:
 		// MODE - Change the channel’s mode:
-		static	mode(Channel &channel, int option, int userId); //TODO:
+		static	mode(Channel &channel, int option, int userId) = 0; //TODO:
 
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
