@@ -35,7 +35,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		{
 			// Lets get the client object from the vector
 			std::vector<Clients>::iterator iter = Manager::getClientById(j);
-			Manager::parseCommands(iter, buffer, read);
+			Manager::parseActions(iter, buffer, read);
 			if (iter != Manager::getClients().end())
 				if (!passwordCheck(i))
 					cleanSocket(i);

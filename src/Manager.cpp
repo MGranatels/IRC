@@ -1,8 +1,50 @@
 #include <Manager.hpp>
 
 std::vector<Clients> Manager::_clients;
-std::vector<std::string> Manager::_chanoper;
 std::string Manager::_hostname = ":localhost ";
+std::map<std::string, Manager::MemberFunctionPointer> Manager::_chanActions;
+
+void	Manager::setChanActions( void )
+{
+	// Channel Operators
+	//	KICK    - Eject a client from the channel
+	//	MODE    - Change the channel's mode
+	//	INVITE  - Invite a client to an invite-only channel (mode +i)
+	//	TOPIC   - Change the channel topic in a mode +t channel
+
+	// CALADO:
+
+	_chanActions["KICK"] = &Manager::kickAction;
+    _chanActions["MODE"] = &Manager::modeAction;
+    _chanActions["TOPIC"] = &Manager::topicAction;
+    _chanActions["INVITE"] = &Manager::inviteAction;
+}
+
+int	Manager::kickAction( void )
+{
+    std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
+    return(1);
+}
+
+int	Manager::modeAction( void )
+{
+    std::cout << "modos obscuros de fazer cenas" << std::endl;
+    return(1);
+}
+
+int	Manager::topicAction( void )
+{
+    std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
+    return(1);
+}
+
+int	Manager::inviteAction( void )
+{
+    std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
+    return(1);
+}
+
+
 
 int	Manager::addClient(int id)
 {
@@ -53,20 +95,3 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 		return 0;
 	return (1);
 }
-
-// void	Manager::setChanop( void )
-// {
-// 	// Channel Operators
-// 	//	KICK    - Eject a client from the channel
-// 	//	MODE    - Change the channel's mode
-// 	//	INVITE  - Invite a client to an invite-only channel (mode +i)
-// 	//	TOPIC   - Change the channel topic in a mode +t channel
-
-// 	// CALADO:
-// 	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
-// 	// porque nao estamos a instancializar a classe
-// 	_chanoper.push_back("/KICK");
-// 	_chanoper.push_back("/MODE");
-// 	_chanoper.push_back("/INVITE");
-// 	_chanoper.push_back("/TOPIC");
-// }
