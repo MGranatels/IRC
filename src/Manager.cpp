@@ -67,7 +67,7 @@ void	Manager::removeClient(int id)
 			return ;
 		}
 	}
-	std::cout << "Client Not Found" << std::endl;
+	// std::cout << "Client Not Found" << std::endl;
 }
 
 std::vector<Clients>::iterator Manager::getClientById(int id)

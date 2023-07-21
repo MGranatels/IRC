@@ -32,9 +32,8 @@ int	Manager::parseActions(std::vector<Clients>::iterator iter, char *buffer, int
 	{
         MemberFunctionPointer func = it->second;
        	return func();
-    } else
-	{
-        std::cout << RED << "Action not found." << NC << std::endl;
     }
+	else
+        std::cout << Red << "Action not found." << NC << std::endl;
 	return(-1);
 }
