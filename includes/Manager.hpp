@@ -22,7 +22,7 @@ class Manager
 		typedef int (*MemberFunctionPointer)();
 		static	std::map<std::string, MemberFunctionPointer> _chanActions;
 
-		static	void		addClient(int id);
+		static	int			addClient(int id);
 		static	void		removeClient(int id);
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
