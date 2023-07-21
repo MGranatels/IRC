@@ -43,7 +43,7 @@ class Sockets
 		void		acceptConnection( void );
 		void		socketActivity(fd_set readFd);
 		void		_select( void );
-		bool		passwordCheck( int _id );
+		int			passwordCheck( int _id );
 
 	public:
 		Sockets( std::string port, std::string password);

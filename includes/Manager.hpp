@@ -31,6 +31,7 @@ class Manager
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
+		static	void		sendIrcMessage(std::string message, int id);
 
 
 		//static	kick(Channel &channel, int userId) = 0;//TODO:
@@ -49,6 +50,7 @@ class Manager
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
 		static	int		parseActions(std::vector<Clients>::iterator iter, std::vector<std::string> splits);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
+		static  bool	checkNickName(int id, std::string nickName);
 };
 #endif
 

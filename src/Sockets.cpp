@@ -5,15 +5,10 @@ Sockets::Sockets( std::string port, std::string password): _port(port), _passwor
 	ft_bzero(_ignoreSockets, sizeof(_ignoreSockets));
 }
 
-Sockets::~Sockets()
-{
+Sockets::~Sockets() {
 	std::cout << "End of Server Connection" << std::endl;
 }
 
-// Take in account that the struct addrinfo defined in the <netdb.h> which means the members of the struct already
-// exist. Thus we do not need to declare them prior.
-// Here’s a sample call if you’re a server who wants to listen on your host’s IP address, port 3490. Note that
-// this doesn’t actually do any listening or network setup; it merely sets up structures we’ll use later:
 addrinfo	*Sockets::setServerInfo()
 {
 	int	status = 0;
@@ -41,28 +36,15 @@ int	Sockets::bindSocketFD(struct addrinfo *serv)
 		if (fd_socket == -1 || tmp->ai_family != AF_INET6)
 			continue ;
 		if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-		{
 			close(fd_socket);
-			freeaddrinfo(serv);
-			exit(Error::message("Set Sock Option: Failed to free up port"));
-		}
 		if (bind(fd_socket, tmp->ai_addr, tmp->ai_addrlen) == -1)
-		{
 			close(fd_socket);
-			freeaddrinfo(serv);
-			exit(Error::message("bind: Failed to bind socket"));
-		}
-		else
-		{
+		else {
 			std::cout << fd_socket << std::endl;
 			return (fd_socket);
 		}
 	}
 	return (-1);
-}
-
-void	Sockets::setIgnoredSockets(int fd)	{
-	this->_ignoreSockets[fd] = 1;
 }
 
 void		Sockets::_init( void )

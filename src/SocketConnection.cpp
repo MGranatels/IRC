@@ -2,28 +2,27 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
-bool	Sockets::passwordCheck(int _id)
+int	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
 	Clients& foundClient = *iter;
 
 	if (foundClient.getClientSettings() == true)
-		return true;
-	std::cout << Cyan << "Waiting for password Verification... Please Hold..." << NC  << std::endl;
+		return 1;
+	printMessage("Waiting for password Verification... Please Hold...", Cyan);
 	if (foundClient.getPassword().empty() == true) {
-		std::cout << Red << "Password is empty, Trying to retrive password..." << NC  << std::endl;
-		return false;
+		printMessage("Password is empty, Trying to retrive password...", Red);
+		return 0;
 	}
 	else if (foundClient.getPassword() != this->_password) {
-		std::cout << Red << "Password Incorrect, disconnecting from server..." << NC  << std::endl;
-		cleanSocket(_id);
-		return false;
+		printMessage("Password Incorrect, disconnecting from server...", Red);
+		//Manager::sendIrcMessage("PRIVMSG NickServ :IDENTIFY <1234>\r\n", _id);		//cleanSocket(_id);
+		return 0;
 	}
-	else {
-		std::cout << Green << "Password Correct!!" << NC  << std::endl;
-		foundClient.setClientSettings(true);
-	}
-	return true;
+	foundClient.setClientSettings(true);
+	if (!Manager::checkNickName(_id, foundClient.getNickname()))
+		return 0;
+	return (printMessage("Password Correct!!", Green));
 }
 
 

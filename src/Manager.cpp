@@ -44,8 +44,6 @@ int	Manager::inviteAction( void )
     return(1);
 }
 
-
-
 int	Manager::addClient(int id)
 {
 	if (Manager::getClientById(id) != _clients.end())
@@ -94,4 +92,25 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	if (!client.getUsername().empty())
 		return 0;
 	return (1);
+}
+
+
+void	Manager::sendIrcMessage(std::string message, int id)
+{
+	std::string msg = _hostname + message + "\r\n";
+	std::cout << "Sending message: " << msg << std::endl;
+	if (send(id, msg.c_str(), msg.length(), 0) == -1)
+		exit(Error::message("Error sending message"));
+}
+
+bool	Manager::checkNickName(int id, std::string nickName) {
+	for (std::vector<Clients>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->getId() == id)
+			continue ;
+		if (it->getNickname() == nickName) {
+			std::cout << "Nickname already in use" << std::endl;
+			return false;
+		}
+	}
+	return true;
 }

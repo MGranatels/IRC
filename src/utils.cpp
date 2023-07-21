@@ -61,3 +61,9 @@ void	removeWhitespace(std::string& str)
 	str.erase(std::remove(str.begin(), str.end(), '\t'), str.end());
 	str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
 }
+
+int	printMessage(std::string message, std::string color)
+{
+	std::cout << color << message << NC << std::endl;
+	return (1);
+}
