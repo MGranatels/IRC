@@ -23,12 +23,13 @@ void	Manager::parseCommands(std::vector<Clients>::iterator iter, char *buffer, i
 	buffer[read] = 0;
 	std::string str(buffer);
 	std::vector<std::string> splits = split(str, "\r\n\t ");
+	// std::cout << str << std::endl;
 	if (iter != Manager::getClients().end())
 		checkClientData(splits, iter);
 	// Use the cmd vector to parse the commands
 	// Vector of strings that is in the client class
 
-	// CALADO: Pesquisa sobre um tipo de container que se chama std::map. 
+	// CALADO: Pesquisa sobre um tipo de container que se chama std::map.
 	// E um tipo de variavel que emparalhada variaveis com funcoes.
 	// Ou variaveis com outras variaveis e top para fazer parsings
 

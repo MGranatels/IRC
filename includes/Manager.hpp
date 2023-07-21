@@ -6,6 +6,7 @@
 # include <vector>
 # include <iterator>
 # include <Clients.hpp>
+# include <colors.h>
 
 class Channel;
 class Sockets;
@@ -21,7 +22,7 @@ class Manager
 		static	std::vector<std::string> _chanoper; // changed the name to chanop > more accurate. Public cuse no need to be private and helps.
 
 		// static	void		setChanop( void ); //TODO: change name to setChanCommand
-		static	void		addClient(int id);
+		static	int			addClient(int id);
 		static	void		removeClient(int id);
 		// static	void		addChannel(std::string name) = 0;//TODO: gabi
 		// static	void		removeChannel(std::string name) = 0; //TODO: Gabi

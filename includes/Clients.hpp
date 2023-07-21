@@ -15,10 +15,10 @@ class Clients
 
 
 	public:
-		
+
 		Clients( int _id);
 		~Clients( void );
-		//Setters 
+		//Setters
 		void		setId( int id );
 		void		setNickname( std::string nickname );
 		void		setUsername( std::string username );

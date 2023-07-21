@@ -4,13 +4,14 @@ std::vector<Clients> Manager::_clients;
 std::vector<std::string> Manager::_chanoper;
 std::string Manager::_hostname = ":localhost ";
 
-void	Manager::addClient(int id)
+int	Manager::addClient(int id)
 {
 	if (Manager::getClientById(id) != _clients.end())
-		return ;
+		return 1;
 	_clients.push_back(Clients(id));
 	_clients.back().setClientSettings(false);
-	std::cout << "Client Succesfully Added" << std::endl;
+	std::cout << LightGreen << "Client Succesfully Added" << std::endl;
+	return (0);
 }
 
 void	Manager::removeClient(int id)
@@ -53,19 +54,19 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	return (1);
 }
 
-void	Manager::setChanop( void )
-{
-	// Channel Operators
-	//	KICK    - Eject a client from the channel
-	//	MODE    - Change the channel's mode
-	//	INVITE  - Invite a client to an invite-only channel (mode +i)
-	//	TOPIC   - Change the channel topic in a mode +t channel
+// void	Manager::setChanop( void )
+// {
+// 	// Channel Operators
+// 	//	KICK    - Eject a client from the channel
+// 	//	MODE    - Change the channel's mode
+// 	//	INVITE  - Invite a client to an invite-only channel (mode +i)
+// 	//	TOPIC   - Change the channel topic in a mode +t channel
 
-	// CALADO:
-	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
-	// porque nao estamos a instancializar a classe
-	_chanoper.push_back("/KICK");
-	_chanoper.push_back("/MODE");
-	_chanoper.push_back("/INVITE");
-	_chanoper.push_back("/TOPIC");
-}
+// 	// CALADO:
+// 	// 	Meti a variavel como estatica por isso nao podes chamar o elemento this->
+// 	// porque nao estamos a instancializar a classe
+// 	_chanoper.push_back("/KICK");
+// 	_chanoper.push_back("/MODE");
+// 	_chanoper.push_back("/INVITE");
+// 	_chanoper.push_back("/TOPIC");
+// }
