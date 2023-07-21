@@ -34,7 +34,7 @@ int	Manager::parseActions(std::vector<Clients>::iterator iter, char *buffer, int
        	return func();
     } else
 	{
-        std::cout << "Action not found." << std::endl;
+        std::cout << RED << "Action not found." << NC << std::endl;
     }
 	return(-1);
 }

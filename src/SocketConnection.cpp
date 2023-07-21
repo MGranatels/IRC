@@ -2,24 +2,27 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
-void	Sockets::passwordCheck(int _id)
+bool	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
 	Clients& foundClient = *iter;
+
 	if (foundClient.getClientSettings() == true)
-		return ;
-	std::cout << "Waiting for password Verification... Please Hold..." << std::endl;
-	if (foundClient.getPassword() != this->_password)
-	{
-		std::cout << "Password Incorrect" << std::endl;
-		close(_id);
-		FD_CLR(_id, &_fdMaster);
+		return true;
+	std::cout << Cyan << "Waiting for password Verification... Please Hold..." << NC  << std::endl;
+	if (foundClient.getPassword().empty() == true) {
+		std::cout << Red << "Password is empty, Trying to retrive password..." << NC  << std::endl;
+		return false;
 	}
-	else
-	{
-		std::cout << "Password Correct!!" << std::endl;
+	else if (foundClient.getPassword() != this->_password) {
+		std::cout << Red << "Password Incorrect, disconnecting from server..." << NC  << std::endl;
+		return false;
+	}
+	else {
+		std::cout << Green << "Password Correct!!" << NC  << std::endl;
 		foundClient.setClientSettings(true);
 	}
+	return true;
 }
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
@@ -34,7 +37,8 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			std::vector<Clients>::iterator iter = Manager::getClientById(j);
 			Manager::parseActions(iter, buffer, read);
 			if (iter != Manager::getClients().end())
-				passwordCheck(i);
+				if (!passwordCheck(i))
+					cleanSocket(i);
 			// This for now is to send the messages without any kind of validation
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)
@@ -54,14 +58,10 @@ void	Sockets::acceptConnection( void )
 	newSocket = accept(_fdSocket, (struct sockaddr *)&clientAddr, &clientSize);
 	if (newSocket == -1)
 		exit(Error::message("Could not accept Client connection"));
-	else
-	{
-		FD_SET(newSocket, &_fdMaster); // Add new socket to set of sockets
-		if (newSocket > _fdMax) // Keep track of the max socket number
-			_fdMax = newSocket + 1;
-		Manager::addClient(newSocket);
-		std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << " on socket " << newSocket << std::endl;
-	}
+	FD_SET(newSocket, &_fdMaster); // Add new socket to set of sockets
+	if (newSocket > _fdMax) // Keep track of the max socket number
+		_fdMax = newSocket + 1;
+	Manager::addClient(newSocket);
 }
 
 void	Sockets::socketActivity(fd_set readFd)
@@ -72,6 +72,8 @@ void	Sockets::socketActivity(fd_set readFd)
 	for (int i = 0; i <= _fdMax; i++)
 	{
 		bzero(buffer, MAX_READ + 1);
+		if (ignoreSocket(i) == 1)
+			continue ;
 		if (FD_ISSET(i, &readFd))
 		{
 			if (i == _fdSocket) // If its the master socket we got a new connection
@@ -124,4 +126,17 @@ void	Sockets::startConnection( void )
 		exit(Error::message("Listen failed"));
 	std::cout << "Server is listening on port " << _port << std::endl;
 	HandleConnection();
+}
+
+int	Sockets::ignoreSocket(int i) const {
+	if (_ignoreSockets[i] == 1)
+		return (1);
+	return (0);
+}
+
+void	Sockets::cleanSocket(int i)
+{
+	close(i);
+	FD_CLR(i, &_fdMaster); // Remove fd from master
+	Manager::removeClient(i);
 }

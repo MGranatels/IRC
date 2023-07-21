@@ -46,13 +46,14 @@ int	Manager::inviteAction( void )
 
 
 
-void	Manager::addClient(int id)
+int	Manager::addClient(int id)
 {
 	if (Manager::getClientById(id) != _clients.end())
-		return ;
+		return 1;
 	_clients.push_back(Clients(id));
 	_clients.back().setClientSettings(false);
-	std::cout << "Client Succesfully Added" << std::endl;
+	std::cout << LightGreen << "Client Succesfully Added" << NC << std::endl;
+	return (0);
 }
 
 void	Manager::removeClient(int id)
@@ -62,7 +63,7 @@ void	Manager::removeClient(int id)
 		if (_clients[i].getId() == id)
 		{
 			_clients.erase(_clients.begin() + i);
-			std::cout << "Client Succesfully Removed" << std::endl;
+			std::cout << LightRed << "Client Succesfully Removed" << NC << std::endl;
 			return ;
 		}
 	}

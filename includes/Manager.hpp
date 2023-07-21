@@ -6,6 +6,7 @@
 # include <vector>
 # include <iterator>
 # include <Clients.hpp>
+# include <colors.h>
 
 class Channel;
 class Sockets;
@@ -17,12 +18,11 @@ class Manager
 		static std::string 			_hostname;
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channel;
-
 	public:
 		typedef int (*MemberFunctionPointer)();
 		static	std::map<std::string, MemberFunctionPointer> _chanActions;
 
-		static	void		addClient(int id);
+		static	int			addClient(int id);
 		static	void		removeClient(int id);
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
