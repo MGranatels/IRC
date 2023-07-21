@@ -16,6 +16,7 @@ bool	Sockets::passwordCheck(int _id)
 	}
 	else if (foundClient.getPassword() != this->_password) {
 		std::cout << Red << "Password Incorrect, disconnecting from server..." << NC  << std::endl;
+		cleanSocket(_id);
 		return false;
 	}
 	else {
@@ -25,21 +26,23 @@ bool	Sockets::passwordCheck(int _id)
 	return true;
 }
 
+
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
 	buffer[read] = 0;
+	std::string str(buffer);
 	// std::cout << buffer << std::endl;
+	std::vector<std::string> splits = split(str, "\r\n\t ");
 	for(int j = 0; j <= _fdMax; j++)
 	{
 		if (FD_ISSET(j, &_fdMaster))
 		{
-			// Lets get the client object from the vector
 			std::vector<Clients>::iterator iter = Manager::getClientById(j);
-			Manager::parseActions(iter, buffer, read);
 			if (iter != Manager::getClients().end())
-				if (!passwordCheck(i))
-					cleanSocket(i);
+				if (!Manager::checkClientData(splits, iter))
+					passwordCheck(j);
 			// This for now is to send the messages without any kind of validation
+			Manager::parseActions(iter, splits);
 			if (j != _fdSocket && j != i)
 				if (send(j, buffer, read, 0) == -1)
 					exit(Error::message("Error sending message"));

@@ -47,8 +47,8 @@ class Manager
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	int		parseActions(std::vector<Clients>::iterator iter, char *buffer, int read);
-		static	void	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
+		static	int		parseActions(std::vector<Clients>::iterator iter, std::vector<std::string> splits);
+		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 };
 #endif
 
