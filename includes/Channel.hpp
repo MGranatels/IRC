@@ -6,6 +6,9 @@
 # include <algorithm>
 # include <utils.hpp>
 
+//notes:
+// Channel names are case insensitive.
+
 class	Channel
 {
 	private:

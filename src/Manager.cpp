@@ -1,7 +1,7 @@
 #include <Manager.hpp>
 
 std::vector<Clients> Manager::_clients;
-std::string Manager::_hostname = ":localhost ";
+std::string Manager::_hostname = ":localhost";
 std::map<std::string, Manager::MemberFunctionPointer> Manager::_chanActions;
 
 void	Manager::setChanActions( void )
@@ -94,12 +94,18 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	return (1);
 }
 
-
-void	Manager::sendIrcMessage(std::string message, int id)
+//id: the user receiver
+void	Manager::sendIrcMessage(std::string command, std::string arg, int clientId)
 {
-	std::string msg = _hostname + message + "\r\n";
+	//:<nickname>@<username>!<hostname> <COMMAND> <arg>\r\n
+	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	Clients& client = *iter;
+	std::string msg = ":" + client.getNickname() + "@" + client.getUsername() + "!" + _hostname + " " + command + " " + arg + "\r\n";
+	std::string aux = command + " " + arg;
 	std::cout << "Sending message: " << msg << std::endl;
-	if (send(id, msg.c_str(), msg.length(), 0) == -1)
+	if (send(clientId, msg.c_str(), msg.length(), 0) == -1)
+		exit(Error::message("Error sending message"));
+	if (send(clientId, aux.c_str(), aux.length(), 0) == -1)
 		exit(Error::message("Error sending message"));
 }
 

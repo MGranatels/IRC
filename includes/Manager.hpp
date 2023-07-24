@@ -31,7 +31,7 @@ class Manager
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
-		static	void		sendIrcMessage(std::string message, int id);
+		static	void				sendIrcMessage(std::string command, std::string arg, int clientId);
 
 
 		//static	kick(Channel &channel, int userId) = 0;//TODO:
