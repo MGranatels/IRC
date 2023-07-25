@@ -2,50 +2,51 @@
 #include <Clients.hpp>
 #include <Manager.hpp>
 
-bool	Sockets::passwordCheck(int _id)
+int	Sockets::passwordCheck(int _id)
 {
 	std::vector<Clients>::iterator iter = Manager::getClientById(_id);
 	Clients& foundClient = *iter;
 
 	if (foundClient.getClientSettings() == true)
-		return true;
-	std::cout << Cyan << "Waiting for password Verification... Please Hold..." << NC  << std::endl;
+		return 1;
+	printMessage("Waiting for password Verification... Please Hold...", Cyan);
 	if (foundClient.getPassword().empty() == true) {
-		std::cout << Red << "Password is empty, Trying to retrive password..." << NC  << std::endl;
-		return false;
+		printMessage("Password is empty, Trying to retrive password...", Red);
+		return 0;
 	}
 	else if (foundClient.getPassword() != this->_password) {
-		std::cout << Red << "Password Incorrect, disconnecting from server..." << NC  << std::endl;
-		return false;
+		printMessage("Password Incorrect, disconnecting from server...", Red);
+		//Manager::sendIrcMessage("PRIVMSG NickServ :IDENTIFY <1234>\r\n", _id);		//cleanSocket(_id);
+		return 0;
 	}
-	else {
-		std::cout << Green << "Password Correct!!" << NC  << std::endl;
-		foundClient.setClientSettings(true);
-	}
-	return true;
+	foundClient.setClientSettings(true);
+	if (!Manager::checkNickName(_id, foundClient.getNickname()))
+		return 0;
+	return (printMessage("Password Correct!!", Green));
 }
+
 
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
 	buffer[read] = 0;
-	// std::cout << buffer << std::endl;
-	for(int j = 0; j <= _fdMax; j++)
-	{
-		if (FD_ISSET(j, &_fdMaster))
+	std::string str(buffer);
+	std::vector<std::string> splits = split(str, "\r\n\t ");
+	// for(int j = 0; j <= _fdMax; j++)
+	// {
+		if (FD_ISSET(i, &_fdMaster))
 		{
-			// Lets get the client object from the vector
-			std::vector<Clients>::iterator iter = Manager::getClientById(j);
-			Manager::parseActions(iter, buffer, read);
+			std::vector<Clients>::iterator iter = Manager::getClientById(i);
 			if (iter != Manager::getClients().end())
-				if (!passwordCheck(i))
-					cleanSocket(i);
+				if (!Manager::checkClientData(splits, iter))
+					passwordCheck(i);
 			// This for now is to send the messages without any kind of validation
-			if (j != _fdSocket && j != i)
-				if (send(j, buffer, read, 0) == -1)
+			std::cout << Manager::parseActions(splits) << std::endl;
+			if (i != _fdSocket)
+				if (send(i, buffer, read, 0) == -1)
 					exit(Error::message("Error sending message"));
 			// Its merely for testing purpuses. Use this as a base to send messages
 		}
-	}
+	// }
 }
 
 
@@ -69,6 +70,7 @@ void	Sockets::socketActivity(fd_set readFd)
 	int		readbytes;
 	char	buffer[MAX_READ + 1];
 
+	Manager::setChanActions();
 	for (int i = 0; i <= _fdMax; i++)
 	{
 		bzero(buffer, MAX_READ + 1);
