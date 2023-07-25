@@ -24,21 +24,21 @@ class Manager
 
 		static	int			addClient(int id);
 		static	void		removeClient(int id);
+		// static	void		addChannel(std::string name);//TO DO: gabi
+		// static	void		removeChannel(std::string name); //TO DO: Gabi
+		// static	Channel&	getChannelByName(std::string name); //TO DO: Gabi
+		// static	Client&		getClientById(int id); //TO DO:
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
-		static	void		setChanActions( void ); //TO DO: change name to setChanCommand
+		static	void		setChanActions( void );
 		static	int			joinAction( void );
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
-		static	void		sendIrcMessage(std::string command, std::string arg, int clientId);
 		static	int			privAction( void );
+		static	void		sendIrcMessage(std::string message, int clientId);
 
-		//static	void		addChannel(std::string name);//TO DO: gabi
-		//static	void		removeChannel(std::string name); //TO DO: Gabi
-		//static	Channel&	getChannelByName(std::string name); //TO DO: Gabi
-		//static	Client&		getClientById(int id); //TO DO:
 
 
 		static	std::vector<Clients>::iterator	getClientById(int id);

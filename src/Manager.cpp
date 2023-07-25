@@ -24,42 +24,6 @@ void	Manager::setChanActions( void )
 	_chanActions["PRIVMSG"] = &Manager::privAction;
 }
 
-int	Manager::joinAction( void )
-{
-	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
-	return (1);
-}
-
-int	Manager::kickAction( void )
-{
-	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
-	return(1);
-}
-
-int	Manager::modeAction( void )
-{
-	std::cout << "modos obscuros de fazer cenas" << std::endl;
-	return(1);
-}
-
-int	Manager::topicAction( void )
-{
-	std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
-	return(1);
-}
-
-int	Manager::inviteAction( void )
-{
-	std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
-	return(1);
-}
-
-int	Manager::privAction( void )
-{
-	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
-	return (1);
-}
-
 int	Manager::addClient(int id)
 {
 	if (Manager::getClientById(id) != _clients.end())
@@ -111,17 +75,10 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 }
 
 //id: the user receiver
-void	Manager::sendIrcMessage(std::string command, std::string arg, int clientId)
+void	Manager::sendIrcMessage(std::string message, int clientId)
 {
-	//:<nickname>@<username>!<hostname> <COMMAND> <arg>\r\n
-	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
-	Clients& client = *iter;
-	std::string msg = ":" + client.getNickname() + "@" + client.getUsername() + "!" + _hostname + " " + command + " " + arg + "\r\n";
-	std::string aux = command + " " + arg;
-	std::cout << "Sending message: " << msg << std::endl;
-	if (send(clientId, msg.c_str(), msg.length(), 0) == -1)
-		exit(Error::message("Error sending message"));
-	if (send(clientId, aux.c_str(), aux.length(), 0) == -1)
+	std::cout << "Sending message: " << message << std::endl;
+	if (send(clientId, message.c_str(), message.length(), 0) == -1)
 		exit(Error::message("Error sending message"));
 }
 
