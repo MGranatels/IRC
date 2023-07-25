@@ -27,17 +27,13 @@ class Manager
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
 		static	void		setChanActions( void ); //TO DO: change name to setChanCommand
+		static	int			joinAction( void );
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
-		static	void				sendIrcMessage(std::string command, std::string arg, int clientId);
-
-
-		//static	kick(Channel &channel, int userId) = 0;//TODO:
-		//static	invite(Channel &channel, int userId) = 0; //TODO:
-		//static	mode(Channel &channel, int option, int userId) = 0; //TODO:
-		//static	topic(Channel &channel, int option, int userId) = 0; //TODO:
+		static	void		sendIrcMessage(std::string command, std::string arg, int clientId);
+		static	int			privAction( void );
 
 		//static	void		addChannel(std::string name);//TO DO: gabi
 		//static	void		removeChannel(std::string name); //TO DO: Gabi
@@ -48,7 +44,7 @@ class Manager
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	int		parseActions(std::vector<Clients>::iterator iter, std::vector<std::string> splits);
+		static	int		parseActions(std::vector<std::string> splits);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(int id, std::string nickName);
 };
