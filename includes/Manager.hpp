@@ -10,7 +10,6 @@
 # include <Channel.hpp>
 
 
-class Channel;
 class Sockets;
 
 //Static management
@@ -38,7 +37,7 @@ class Manager
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
 		static	int			privAction( void );
-		static	int			runChanActions( std::vector<std::string> splits );
+		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
 
 		static	std::vector<Clients>::iterator	getClientById(int id);

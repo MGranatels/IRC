@@ -22,8 +22,6 @@ int	Sockets::passwordCheck(int _id)
 	foundClient.setClientSettings(true);
 	if (!Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
-	if (!foundClient.getNickname().empty() && !foundClient.getUsername().empty())
-		Manager::sendIrcMessage("JOIN", 2);
 	return (printMessage("Password Correct!!", Green));
 }
 
@@ -41,7 +39,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 				passwordCheck(i);
 		// This for now is to send the messages without any kind of validation
 		else
-			std::cout << Manager::runChanActions(splits) << std::endl;
+			std::cout << Manager::runChanActions(splits, i) << std::endl;
 		}
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)

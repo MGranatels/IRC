@@ -40,7 +40,7 @@ const std::vector<Clients>& Manager::getClients() {
 //Channel names are case insensitive
 Channel&	Manager::getChannelByName(std::string name)
 {
-	int  i;
+	long unsigned int  i;
 	for (i = 0; i < _channels.size(); i++)
 	{
 		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
@@ -51,7 +51,7 @@ Channel&	Manager::getChannelByName(std::string name)
 
 bool	Manager::isValidChannel(std::string name)
 {
-	int  i;
+	long unsigned int  i;
 	for (i = 0; i < _channels.size(); i++)
 	{
 		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
@@ -77,6 +77,7 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 //id: the user receiver
 void	Manager::sendIrcMessage(std::string message, int clientId)
 {
+	message = message + "\r\n";
 	std::cout << "Sending message: " << message << std::endl;
 	if (send(clientId, message.c_str(), message.length(), 0) == -1)
 		exit(Error::message("Error sending message"));
