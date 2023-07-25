@@ -42,7 +42,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 				if (!Manager::checkClientData(splits, iter))
 					passwordCheck(i);
 			// This for now is to send the messages without any kind of validation
-			std::cout << Manager::parseActions(splits) << std::endl;
+			std::cout << Manager::runChanActions(splits) << std::endl;
 			if (i != _fdSocket)
 				if (send(i, buffer, read, 0) == -1)
 					exit(Error::message("Error sending message"));
@@ -72,7 +72,6 @@ void	Sockets::socketActivity(fd_set readFd)
 	int		readbytes;
 	char	buffer[MAX_READ + 1];
 
-	Manager::setChanActions();
 	for (int i = 0; i <= _fdMax; i++)
 	{
 		bzero(buffer, MAX_READ + 1);

@@ -1,15 +1,42 @@
-#include "Manager.hpp"
+#include <Manager.hpp>
 
-int			Manager::joinAction( void )
+std::vector<Clients> Manager::_clients;
+std::string Manager::_hostname = ":localhost ";
+
+// aqui podes passar mais parametros
+
+int	Manager::runChanActions( std::vector<std::string> splits )
 {
-   //First send a message to create the channel
-    //If the channel does not exist
-    //send a message for the user to join the channel
+	if (splits[0].compare("JOIN") == 0)
+		return( Manager::joinAction() );
+	else if (splits[0].compare("KICK") == 0)
+		return( Manager::kickAction() );
+	else if (splits[0].compare("MODE") == 0)
+		return( Manager::modeAction() );
+	else if (splits[0].compare("TOPIC") == 0)
+		return( Manager::topicAction() );
+	else if (splits[0].compare("INVITE") == 0)
+		return( Manager::inviteAction() );
+	else if (splits[0].compare("PRIVMSG") == 0)
+		return( Manager::privAction() );
+	else
+		std::cout << "Action not found" << std::endl;
+	return (-1);
+}
+
+// aqui podes passar mais parametros
+
+int	Manager::joinAction( void )
+{
+	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
+	return (1);
 }
 
 int	Manager::kickAction( void )
 {
 	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
+	//	KICK <channel> <user> :<reason>
+
 	return(1);
 }
 
