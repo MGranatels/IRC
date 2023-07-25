@@ -7,6 +7,8 @@
 # include <iterator>
 # include <Clients.hpp>
 # include <colors.h>
+# include <Channel.hpp>
+
 
 class Channel;
 class Sockets;
@@ -17,18 +19,20 @@ class Manager
 	private:
 		static std::string 			_hostname;
 		static std::vector<Clients>	_clients;
-		static std::vector<Channel>	_channel;
+		static std::vector<Channel>	_channels;
 	public:
 
 		static	int			addClient(int id);
 		static	void		removeClient(int id);
 		// static	void		addChannel(std::string name);//TO DO: gabi
 		// static	void		removeChannel(std::string name); //TO DO: Gabi
-		// static	Channel&	getChannelByName(std::string name); //TO DO: Gabi
+		static	Channel&	getChannelByName(std::string name);
+		static bool			isValidChannel(std::string name);
+
 		// static	Client&		getClientById(int id); //TO DO:
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
-		static	int			joinAction( void );
+		static	int			joinAction( std::string channelName, int clientId );
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
@@ -36,8 +40,6 @@ class Manager
 		static	int			privAction( void );
 		static	int			runChanActions( std::vector<std::string> splits );
 		static	void		sendIrcMessage(std::string message, int id);
-
-
 
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();

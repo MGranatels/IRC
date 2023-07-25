@@ -37,6 +37,30 @@ const std::vector<Clients>& Manager::getClients() {
 	return _clients;
 }
 
+//Channel names are case insensitive
+Channel&	Manager::getChannelByName(std::string name)
+{
+	int  i;
+	for (i = 0; i < _channels.size(); i++)
+	{
+		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
+			break ;
+	}
+	return (_channels[i]);
+}
+
+bool	Manager::isValidChannel(std::string name)
+{
+	int  i;
+	for (i = 0; i < _channels.size(); i++)
+	{
+		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
+			return (true) ;
+	}
+	return (false);
+}
+
+
 int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 {
 	Clients& client = *it;

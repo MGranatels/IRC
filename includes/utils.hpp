@@ -6,12 +6,15 @@
 # include <iostream>
 # include <cstdlib>
 # include <vector>
+# include <algorithm>
+# include <cctype>
 
+std::string                 toUpperCase(const std::string& input);
 void						removeElementFromVector(std::vector<int> &vector, int element);
 void						ft_bzero(void *s, size_t n);
 void						handlesginal(int sig);
 void						removeWhitespace(std::string& str);
-int							printMessage(std::string message, std::string color);	
+int							printMessage(std::string message, std::string color);
 bool						IsDigit(std::string str);
 std::vector<std::string>	split(const std::string& str, const std::string& delimiter);
 

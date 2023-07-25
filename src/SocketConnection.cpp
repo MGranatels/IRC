@@ -23,7 +23,7 @@ int	Sockets::passwordCheck(int _id)
 	if (!Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
 	if (!foundClient.getNickname().empty() && !foundClient.getUsername().empty())
-		Manager::sendIrcMessage("JOIN", "#test", _id);
+		Manager::sendIrcMessage("JOIN", 2);
 	return (printMessage("Password Correct!!", Green));
 }
 

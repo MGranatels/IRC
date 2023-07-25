@@ -8,7 +8,7 @@ std::string Manager::_hostname = ":localhost ";
 int	Manager::runChanActions( std::vector<std::string> splits )
 {
 	if (splits[0].compare("JOIN") == 0)
-		return( Manager::joinAction() );
+		return( Manager::joinAction("name", 2) );
 	else if (splits[0].compare("KICK") == 0)
 		return( Manager::kickAction() );
 	else if (splits[0].compare("MODE") == 0)
@@ -26,8 +26,14 @@ int	Manager::runChanActions( std::vector<std::string> splits )
 
 // aqui podes passar mais parametros
 
-int	Manager::joinAction( void )
+int	Manager::joinAction( std::string channelName, int clientId )
 {
+	std::string command = "JOIN";
+	//:<nickname>@<username>!<hostname> <COMMAND> <arg>\r\n
+	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	Clients& client = *iter;
+	std::string msg = ":" + client.getNickname() + "@" + client.getUsername() + "!" + _hostname + " " + command + " " + channelName + "\r\n";
+	std::string aux = command + " " + channelName;
 	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
 	return (1);
 }
