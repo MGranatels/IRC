@@ -19,20 +19,18 @@ class Manager
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channel;
 	public:
-		typedef int (*MemberFunctionPointer)();
-		static	std::map<std::string, MemberFunctionPointer> _chanActions;
 
 		static	int			addClient(int id);
 		static	void		removeClient(int id);
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
-		static	void		setChanActions( void ); //TO DO: change name to setChanCommand
 		static	int			joinAction( void );
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
 		static	int			privAction( void );
+		static	int			runChanActions( std::vector<std::string> splits );
 		static	void		sendIrcMessage(std::string message, int id);
 
 		//static	void		addChannel(std::string name);//TO DO: gabi
@@ -44,7 +42,6 @@ class Manager
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	int		parseActions(std::vector<std::string> splits);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(int id, std::string nickName);
 };
