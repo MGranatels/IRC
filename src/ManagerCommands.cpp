@@ -1,8 +1,6 @@
 #include <Manager.hpp>
 #include <utils.hpp>
 
-
-
 bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter)
 {
 	Clients& foundClient = *iter;
@@ -18,19 +16,4 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 			foundClient.setUsername(splits[i + 1]);
 	}
 	return false;
-}
-
-
-int	Manager::parseActions(std::vector<std::string> splits)
-{
-	std::cout << splits[0] << std::endl;
-	std::map<std::string, MemberFunctionPointer>::iterator it = _chanActions.find(splits[0]);
-	if (it != _chanActions.end())
-	{
-		MemberFunctionPointer func = it->second;
-		return func();
-    }
-	// else
-    //     std::cout << Red << "Action not found." << NC << std::endl;
-	return(-1);
 }

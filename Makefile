@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------------ EDIT HERE ------------------------------------------------------------------------------------ # 
+# ------------------------------------------------------------------------------------ EDIT HERE ------------------------------------------------------------------------------------ #
 
 NAME = ircserv
 
@@ -65,6 +65,7 @@ SRCS = 	utils.cpp \
 		Clients.cpp \
 		Manager.cpp \
 		ManagerCommands.cpp \
+		ManagerActions.cpp \
 		Channel.cpp \
 		main.cpp
 
@@ -100,7 +101,7 @@ $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@-if [ -f $@ ]; then echo "$(OK) Object file created successfully: $(WHITE)./$@$(RESET)"; else echo "$(FAIL) Object file creation failed: $(WHITE)$@$(RESET)"; fi
 
-all: $(NAME) 
+all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
