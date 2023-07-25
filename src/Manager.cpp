@@ -4,6 +4,9 @@ std::vector<Clients> Manager::_clients;
 std::string Manager::_hostname = ":localhost ";
 std::map<std::string, Manager::MemberFunctionPointer> Manager::_chanActions;
 
+
+
+
 void	Manager::setChanActions( void )
 {
 	// Channel Operators
@@ -13,35 +16,48 @@ void	Manager::setChanActions( void )
 	//	TOPIC   - Change the channel topic in a mode +t channel
 
 	// CALADO:
-
+	_chanActions["JOIN"] = &Manager::joinAction;
 	_chanActions["KICK"] = &Manager::kickAction;
-    _chanActions["MODE"] = &Manager::modeAction;
-    _chanActions["TOPIC"] = &Manager::topicAction;
-    _chanActions["INVITE"] = &Manager::inviteAction;
+	_chanActions["MODE"] = &Manager::modeAction;
+	_chanActions["TOPIC"] = &Manager::topicAction;
+	_chanActions["INVITE"] = &Manager::inviteAction;
+	_chanActions["PRIVMSG"] = &Manager::privAction;
+}
+
+int	Manager::joinAction( void )
+{
+	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
+	return (1);
 }
 
 int	Manager::kickAction( void )
 {
-    std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
-    return(1);
+	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
+	return(1);
 }
 
 int	Manager::modeAction( void )
 {
-    std::cout << "modos obscuros de fazer cenas" << std::endl;
-    return(1);
+	std::cout << "modos obscuros de fazer cenas" << std::endl;
+	return(1);
 }
 
 int	Manager::topicAction( void )
 {
-    std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
-    return(1);
+	std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
+	return(1);
 }
 
 int	Manager::inviteAction( void )
 {
-    std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
-    return(1);
+	std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
+	return(1);
+}
+
+int	Manager::privAction( void )
+{
+	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
+	return (1);
 }
 
 int	Manager::addClient(int id)

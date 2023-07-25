@@ -21,16 +21,14 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 }
 
 
-int	Manager::parseActions(std::vector<Clients>::iterator iter, std::vector<std::string> splits)
+int	Manager::parseActions(std::vector<std::string> splits)
 {
-	(void)iter;
-	setChanActions();
-	// std::string Operation(buffer);
+	std::cout << splits[0] << std::endl;
 	std::map<std::string, MemberFunctionPointer>::iterator it = _chanActions.find(splits[0]);
 	if (it != _chanActions.end())
 	{
-        MemberFunctionPointer func = it->second;
-       	return func();
+		MemberFunctionPointer func = it->second;
+		return func();
     }
 	// else
     //     std::cout << Red << "Action not found." << NC << std::endl;
