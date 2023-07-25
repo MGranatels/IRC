@@ -19,8 +19,8 @@ int	Manager::runChanActions( std::vector<std::string> splits )
 		return( Manager::inviteAction() );
 	else if (splits[0].compare("PRIVMSG") == 0)
 		return( Manager::privAction() );
-	else
-		std::cout << "Action not found" << std::endl;
+	else if (splits[0].compare("NICK") == 0)
+		return(0);
 	return (-1);
 }
 

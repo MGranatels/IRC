@@ -33,22 +33,21 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	buffer[read] = 0;
 	std::string str(buffer);
 	std::vector<std::string> splits = split(str, "\r\n\t ");
-	// for(int j = 0; j <= _fdMax; j++)
-	// {
-		if (FD_ISSET(i, &_fdMaster))
-		{
-			std::vector<Clients>::iterator iter = Manager::getClientById(i);
-			if (iter != Manager::getClients().end())
-				if (!Manager::checkClientData(splits, iter))
-					passwordCheck(i);
-			// This for now is to send the messages without any kind of validation
+	if (FD_ISSET(i, &_fdMaster))
+	{
+		std::vector<Clients>::iterator iter = Manager::getClientById(i);
+		if (iter != Manager::getClients().end()) {
+			if (!Manager::checkClientData(splits, iter))
+				passwordCheck(i);
+		// This for now is to send the messages without any kind of validation
+		else
 			std::cout << Manager::runChanActions(splits) << std::endl;
-			if (i != _fdSocket)
-				if (send(i, buffer, read, 0) == -1)
-					exit(Error::message("Error sending message"));
-			// Its merely for testing purpuses. Use this as a base to send messages
 		}
-	// }
+		if (i != _fdSocket)
+			if (send(i, buffer, read, 0) == -1)
+				exit(Error::message("Error sending message"));
+		// Its merely for testing purpuses. Use this as a base to send messages
+	}
 }
 
 
