@@ -5,9 +5,14 @@
 # include <vector>
 # include <algorithm>
 # include <utils.hpp>
+# include <Clients.hpp>
 
 //notes:
 // Channel names are case insensitive.
+
+#define NOT_VALID -1
+#define VALID_NAME 0
+#define CREATED 1
 
 class	Channel
 {

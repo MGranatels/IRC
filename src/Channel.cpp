@@ -1,7 +1,8 @@
 #include <Channel.hpp>
 
 Channel::Channel(std::string name):
-	_name(name)
+	_name(name),
+	_topic("NO TOPIC IS SET")
 {
 	std::cout << "Channel " << _name << " created" << std::endl;
 }

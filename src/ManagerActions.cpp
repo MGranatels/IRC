@@ -3,7 +3,7 @@
 
 std::vector<Clients> Manager::_clients;
 std::vector<Channel> Manager::_channels;
-std::string Manager::_hostname = ":localhost ";
+std::string Manager::_hostname = "localhost";
 
 // aqui podes passar mais parametros
 
@@ -26,6 +26,11 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	return (-1);
 }
 
+const std::string formatMessage(Clients &client)
+{
+	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
+}
+
 // aqui podes passar mais parametros
 
 int	Manager::joinAction( std::string channelName, int clientId )
@@ -34,22 +39,27 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	Clients& client = *iter;
 
-	if (!isValidChannel(channelName))
+	if (isValidChannel(channelName) == VALID_NAME)
 	{
 		// Channel doesn't exist, so create it
 		_channels.push_back(Channel(channelName));
 		// Send the JOIN message to the client
-		sendIrcMessage(":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN #" \
-		+ channelName, clientId);
+		sendIrcMessage(formatMessage(client) + " JOIN #" + channelName, clientId);
 
 		// Send the RPL_NOTOPIC (331) message to the client
-		sendIrcMessage(_hostname + "331 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
+		sendIrcMessage(formatMessage(client) + " 331 " + channelName + " :No topic is set", clientId);
 
 		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
-		sendIrcMessage(_hostname + "353 " + client.getNickname() + " = " + channelName, clientId);
+		sendIrcMessage(formatMessage(client) + " 353 " + " = " + channelName + getUsersList(getChannelByName(channelName)), clientId);
 		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
-		sendIrcMessage(_hostname + "366 " + client.getNickname() + channelName + " :End of NAMES list", clientId);
+		sendIrcMessage(formatMessage(client) + " 366 " + channelName + " :End of NAMES list", clientId);
 		_channels.back().addUser(clientId);
+	}
+	else if (isValidChannel(channelName) == CREATED)
+	{
+		// Send the JOIN message to the client
+		sendIrcMessage(":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN #" \
+		+ channelName, clientId);
 	}
 	return 1;
 }
