@@ -16,7 +16,9 @@ int	Sockets::passwordCheck(int _id)
 	}
 	else if (foundClient.getPassword() != this->_password) {
 		printMessage("Password Incorrect, disconnecting from server...", Red);
-		//Manager::sendIrcMessage("PRIVMSG NickServ :IDENTIFY <1234>\r\n", _id);		//cleanSocket(_id);
+		// Manager::sendIrcMessage(_hostname + "464 " + "Incorrect Password", clientId);
+		Manager::sendIrcMessage(Manager::_hostname + " 464 " + foundClient.getNickname() + " :Password required", _id);
+		//cleanSocket(_id);
 		return 0;
 	}
 	foundClient.setClientSettings(true);
