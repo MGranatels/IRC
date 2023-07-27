@@ -22,6 +22,8 @@ int	Sockets::passwordCheck(int _id)
 	foundClient.setClientSettings(true);
 	if (!Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
+	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANTYPES=#", _id);
+	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANMODES=i,t,k,o,l", _id);
 	return (printMessage("Password Correct!!", Green));
 }
 
@@ -37,9 +39,9 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		if (iter != Manager::getClients().end()) {
 			if (!Manager::checkClientData(splits, iter))
 				passwordCheck(i);
-		// This for now is to send the messages without any kind of validation
-		else
-			std::cout << Manager::runChanActions(splits, i) << std::endl;
+			// This for now is to send the messages without any kind of validation
+			else
+				std::cout << Manager::runChanActions(splits, i) << std::endl;
 		}
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)

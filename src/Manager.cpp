@@ -49,6 +49,10 @@ Channel&	Manager::getChannelByName(std::string name)
 	return (_channels[i]);
 }
 
+// The isValidChannel function should be implemented to correctly validate whether the provided channel
+// name is valid or not. The function should check if the channel name conforms to the rules of IRC
+// channel naming, such as starting with the appropriate character specified in CHANTYPES and not
+// containing any spaces or special characters.
 bool	Manager::isValidChannel(std::string name)
 {
 	long unsigned int  i;

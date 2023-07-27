@@ -38,22 +38,19 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	{
 		// Channel doesn't exist, so create it
 		_channels.push_back(Channel(channelName));
-
 		// Send the JOIN message to the client
-		sendIrcMessage(":" + _hostname + " JOIN " + channelName, clientId);
+		sendIrcMessage(":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN #" \
+		+ channelName, clientId);
 
 		// Send the RPL_NOTOPIC (331) message to the client
-		sendIrcMessage(":" + _hostname + " 331 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
+		sendIrcMessage(_hostname + "331 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
 
-		// Send the RPL_TOPIC (332) message to the client (replace "Channel topic here" with the actual topic)
-		sendIrcMessage(":" + _hostname + " 332 " + client.getNickname() + " " + channelName + " :Channel topic here", clientId);
+		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
+		sendIrcMessage(_hostname + "353 " + client.getNickname() + " = " + channelName, clientId);
+		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
+		sendIrcMessage(_hostname + "366 " + client.getNickname() + channelName + " :End of NAMES list", clientId);
+		_channels.back().addUser(clientId);
 	}
-	else
-	{
-		// The channel already exists, so send a message to notify the client about the join
-		sendIrcMessage(":" + _hostname + " JOIN " + channelName, clientId);
-	}
-
 	return 1;
 }
 

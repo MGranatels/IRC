@@ -16,11 +16,11 @@ class Sockets;
 class Manager
 {
 	private:
-		static std::string 			_hostname;
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channels;
 	public:
 
+		static std::string 			_hostname;
 		static	int			addClient(int id);
 		static	void		removeClient(int id);
 		// static	void		addChannel(std::string name);//TO DO: gabi
