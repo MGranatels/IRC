@@ -18,6 +18,7 @@ void	Manager::removeClient(int id)
 		{
 			_clients.erase(_clients.begin() + i);
 			std::cout << LightRed << "Client Succesfully Removed" << NC << std::endl;
+			close(id);
 			return ;
 		}
 	}

@@ -36,14 +36,14 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	std::vector<std::string> splits = split(str, "\r\n\t ");
 	if (FD_ISSET(i, &_fdMaster))
 	{
-		std::vector<Clients>::iterator iter = Manager::getClientById(i);
-		if (iter != Manager::getClients().end()) {
-			if (!Manager::checkClientData(splits, iter))
-				passwordCheck(i);
+		//std::vector<Clients>::iterator iter = Manager::getClientById(i);
+		//if (iter != Manager::getClients().end()) {
+		//	if (!Manager::checkClientData(splits, iter))
+		//		passwordCheck(i);
 			// This for now is to send the messages without any kind of validation
-			else
-				std::cout << Manager::runChanActions(splits, i) << std::endl;
-		}
+			//else
+			//	std::cout << Manager::runChanActions(splits, i) << std::endl;
+		//}
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)
 				exit(Error::message("Error sending message"));
@@ -85,12 +85,8 @@ void	Sockets::socketActivity(fd_set readFd)
 				{
 					if ((readbytes = recv(i, buffer, sizeof buffer, 0)) <= 0)
 					{
-						if (readbytes == 0)
-							Manager::removeClient(i);
-						else
-							exit(Error::message("Receive Message failed"));
-						close(i);
-						FD_CLR(i, &_fdMaster); // Remove fd from master
+						Manager::removeClient(i);
+						FD_CLR(i, &_fdMaster);
 					}
 					else
 						handleMessage(i, readbytes, buffer);
