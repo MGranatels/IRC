@@ -53,17 +53,29 @@ Channel&	Manager::getChannelByName(std::string name)
 // name is valid or not. The function should check if the channel name conforms to the rules of IRC
 // channel naming, such as starting with the appropriate character specified in CHANTYPES and not
 // containing any spaces or special characters.
-bool	Manager::isValidChannel(std::string name)
+int	Manager::isValidChannel(std::string name)
 {
 	long unsigned int  i;
 	for (i = 0; i < _channels.size(); i++)
 	{
 		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
-			return (true) ;
+			return (CREATED) ;
 	}
-	return (false);
+	return (VALID_NAME);
 }
 
+std::string	Manager::getUsersList(Channel &Channel)
+{
+	std::string usersList;
+
+	for (std::vector<int>::size_type i = 0; i < Channel.getUsers().size(); i++)
+	{
+		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getUsers()[i]);
+		Clients& client = *iter;
+		usersList += client.getNickname() + " ";
+	}
+	return usersList;
+}
 
 int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 {

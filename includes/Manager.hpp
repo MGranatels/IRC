@@ -26,7 +26,8 @@ class Manager
 		// static	void		addChannel(std::string name);//TO DO: gabi
 		// static	void		removeChannel(std::string name); //TO DO: Gabi
 		static	Channel&	getChannelByName(std::string name);
-		static bool			isValidChannel(std::string name);
+		static int			isValidChannel(std::string name);
+		static std::string 		getUsersList(Channel &Channel);
 
 		// static	Client&		getClientById(int id); //TO DO:
 
