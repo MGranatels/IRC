@@ -44,7 +44,6 @@ int	Manager::joinAction( std::string channelName, int clientId )
 
 		// Send the RPL_NOTOPIC (331) message to the client
 		sendIrcMessage(_hostname + "331 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
-
 		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
 		sendIrcMessage(_hostname + "353 " + client.getNickname() + " = " + channelName, clientId);
 		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list

@@ -12,20 +12,19 @@ int	Sockets::passwordCheck(int _id)
 	printMessage("Waiting for password Verification... Please Hold...", Cyan);
 	if (foundClient.getPassword().empty() == true) {
 		printMessage("Password is empty, Trying to retrive password...", Red);
+		Manager::sendIrcMessage(Manager::_hostname + " 464 " + ":Password required", _id);
 		return 0;
 	}
 	else if (foundClient.getPassword() != this->_password) {
 		printMessage("Password Incorrect, disconnecting from server...", Red);
-		// Manager::sendIrcMessage(_hostname + "464 " + "Incorrect Password", clientId);
-		Manager::sendIrcMessage(Manager::_hostname + " 464 " + foundClient.getNickname() + " :Password required", _id);
-		//cleanSocket(_id);
+		Manager::sendIrcMessage(Manager::_hostname + " 464 " + ":Password required", _id);
 		return 0;
 	}
 	foundClient.setClientSettings(true);
 	if (!Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
-	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANTYPES=#", _id);
-	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANMODES=i,t,k,o,l", _id);
+	// Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANTYPES=#", _id);
+	// Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANMODES=i,t,k,o,l", _id);
 	return (printMessage("Password Correct!!", Green));
 }
 
