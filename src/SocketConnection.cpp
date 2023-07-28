@@ -10,22 +10,12 @@ int	Sockets::passwordCheck(int _id)
 	if (foundClient.getClientSettings() == true)
 		return 1;
 	printMessage("Waiting for password Verification... Please Hold...", Cyan);
-	if (foundClient.getPassword().empty() == true) {
-		printMessage("Password is empty, Trying to retrive password...", Red);
-		Manager::sendIrcMessage(Manager::_hostname + " 464 " + ":Password required", _id);
+	if (!Manager::checkPassword(foundClient, this->_password) || !Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
-	}
-	else if (foundClient.getPassword() != this->_password) {
-		printMessage("Password Incorrect, disconnecting from server...", Red);
-		Manager::sendIrcMessage(Manager::_hostname + " 464 " + ":Password required", _id);
-		return 0;
-	}
 	foundClient.setClientSettings(true);
-	if (!Manager::checkNickName(_id, foundClient.getNickname()))
-		return 0;
-	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANTYPES=#", _id);
-	Manager::sendIrcMessage(Manager::_hostname + " 005 " + foundClient.getNickname() + " CHANMODES=i,t,k,o,l", _id);
-	return (printMessage("Password Correct!!", Green));
+	Manager::setChannOpps(&foundClient);
+	std::cout << "Check Client status: "<< foundClient.getClientSettings() << std::endl;
+	return (printMessage("Client Is Correctly Connected to the Server!", Green));
 }
 
 
@@ -40,14 +30,12 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		if (iter != Manager::getClients().end()) {
 			if (!Manager::checkClientData(splits, iter))
 				passwordCheck(i);
-			// This for now is to send the messages without any kind of validation
 			else
 				std::cout << Manager::runChanActions(splits, i) << std::endl;
 		}
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)
 				exit(Error::message("Error sending message"));
-		// Its merely for testing purpuses. Use this as a base to send messages
 	}
 }
 
@@ -72,19 +60,15 @@ void	Sockets::socketActivity(fd_set readFd)
 	int		readbytes;
 	char	buffer[MAX_READ + 1];
 
-	for (int i = 0; i <= _fdMax; i++)
-	{
+	for (int i = 0; i <= _fdMax; i++) {
 		bzero(buffer, MAX_READ + 1);
 		if (ignoreSocket(i) == 1)
 			continue ;
-		if (FD_ISSET(i, &readFd))
-		{
-			if (i == _fdSocket) // If its the master socket we got a new connection
+		if (FD_ISSET(i, &readFd)) {
+			if (i == _fdSocket) // If its the master socket means we got a new connection
 				acceptConnection();
-			else
-				{
-					if ((readbytes = recv(i, buffer, sizeof buffer, 0)) <= 0)
-					{
+			else {
+					if ((readbytes = recv(i, buffer, sizeof buffer, 0)) <= 0) {
 						Manager::removeClient(i);
 						FD_CLR(i, &_fdMaster);
 					}

@@ -101,13 +101,35 @@ void	Manager::sendIrcMessage(std::string message, int clientId)
 }
 
 bool	Manager::checkNickName(int id, std::string nickName) {
+	if (!isNickValid(nickName))	{
+			std::cout << "Erroneus Nickname" << std::endl;
+			sendIrcMessage(_hostname + " 432 " + nickName + " :Erroneus nickname\r\n", id);
+			return false;
+	}
 	for (std::vector<Clients>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		if (it->getId() == id)
 			continue ;
 		if (it->getNickname() == nickName) {
 			std::cout << "Nickname already in use" << std::endl;
+			sendIrcMessage(_hostname + " 433 " + it->getNickname() + " :Nickname is already in use\r\n", id);
 			return false;
 		}
 	}
 	return true;
+}
+
+bool	Manager::checkPassword(Clients client, std::string password) {
+	if (client.getPassword() != password || client.getPassword().empty())
+	{
+		printMessage("Password Incorrect or empty, Retry Password", Red);
+		sendIrcMessage(_hostname + " 464 " + ":Password required", client.getId());
+		return false;
+	}
+	return true;
+}
+
+void	Manager::setChannOpps(Clients *client)
+{
+	sendIrcMessage(_hostname + " 005 " + client->getNickname() + " CHANTYPES=#", client->getId());
+	sendIrcMessage(_hostname + " 005 " + client->getNickname() + " CHANMODES=i,t,k,o,l", client->getId());
 }

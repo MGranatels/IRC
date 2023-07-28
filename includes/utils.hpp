@@ -16,6 +16,7 @@ void						handlesginal(int sig);
 void						removeWhitespace(std::string& str);
 int							printMessage(std::string message, std::string color);
 bool						IsDigit(std::string str);
+bool						isNickValid(const std::string &nick);
 std::vector<std::string>	split(const std::string& str, const std::string& delimiter);
 
 #endif

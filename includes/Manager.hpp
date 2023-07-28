@@ -40,12 +40,14 @@ class Manager
 		static	int			privAction( void );
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
+		static	void		setChannOpps(Clients *client);
 
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(int id, std::string nickName);
+		static	bool	checkPassword(Clients client, std::string password);
 };
 #endif
 

@@ -73,3 +73,8 @@ std::string toUpperCase(const std::string& input) {
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
     return result;
 }
+
+bool	isNickValid(const std::string &nick)
+{
+	return (nick.find_first_not_of("0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_") == std::string::npos);
+}

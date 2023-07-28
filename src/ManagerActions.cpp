@@ -38,7 +38,7 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	// First, check if the channel exists
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	Clients& client = *iter;
-
+	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChannel(channelName) == VALID_NAME)
 	{
 		// Channel doesn't exist, so create it
@@ -68,7 +68,6 @@ int	Manager::kickAction( void )
 {
 	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
 	//	KICK <channel> <user> :<reason>
-
 	return(1);
 }
 
