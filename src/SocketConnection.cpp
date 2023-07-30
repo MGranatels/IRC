@@ -28,7 +28,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
 		if (iter != Manager::getClients().end()) {
-			if (!Manager::checkClientData(splits, iter))
+			if (!Manager::checkClientData(splits, iter, i))
 				passwordCheck(i);
 			else
 				std::cout << Manager::runChanActions(splits, i) << std::endl;
