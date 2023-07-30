@@ -28,7 +28,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 
 const std::string formatMessage(Clients &client)
 {
-	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
+	return (":" + client.getUserNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
 }
 
 // aqui podes passar mais parametros
@@ -37,6 +37,7 @@ int	Manager::joinAction( std::string channelName, int clientId )
 {
 	// First, check if the channel exists
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	std::cout << clientId << std::endl;
 	Clients& client = *iter;
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChannel(channelName) == VALID_NAME)
@@ -44,11 +45,9 @@ int	Manager::joinAction( std::string channelName, int clientId )
 		// Channel doesn't exist, so create it
 		_channels.push_back(Channel(channelName));
 		// Send the JOIN message to the client
-		sendIrcMessage(formatMessage(client) + " JOIN #" + channelName, clientId);
-
+		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
 		// Send the RPL_NOTOPIC (331) message to the client
 		sendIrcMessage(formatMessage(client) + " 331 " + channelName + " :No topic is set", clientId);
-
 		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
 		sendIrcMessage(formatMessage(client) + " 353 " + " = " + channelName + getUsersList(getChannelByName(channelName)), clientId);
 		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
@@ -57,9 +56,17 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	}
 	else if (isValidChannel(channelName) == CREATED)
 	{
+		Channel& existingChannel = getChannelByName(channelName);
+		// Add the client to the user list of the existing channel
+		existingChannel.addUser(clientId);
 		// Send the JOIN message to the client
-		sendIrcMessage(":" + client.getNickname() + "!" + client.getUsername() + "@localhost JOIN #" \
-		+ channelName, clientId);
+		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
+		// Send the RPL_NOTOPIC (331) message to the client
+		sendIrcMessage(formatMessage(client) + " 331 " + channelName + " :No topic is set", clientId);
+		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
+		sendIrcMessage(formatMessage(client) + " 353 " + " = " + channelName + getUsersList(getChannelByName(channelName)), clientId);
+		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
+		sendIrcMessage(formatMessage(client) + " 366 " + channelName + " :End of NAMES list", clientId);
 	}
 	return 1;
 }

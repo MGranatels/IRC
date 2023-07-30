@@ -11,6 +11,7 @@ class Clients
 		//bool		_passCheck;
 		std::string	_password;
 		std::string	_nickcname;
+		std::string _userNickname;
 		std::string	_username;
 
 
@@ -20,13 +21,14 @@ class Clients
 		~Clients( void );
 		//Setters
 		void		setId( int id );
-		void		setNickname( std::string nickname );
+		void		setNickname( std::string nickname, int id );
 		void		setUsername( std::string username );
 		void		setPassword( std::string username );
 		void		setClientSettings( bool clientSettings );
 		//Getters
 		int			getId( void ) const;
 		std::string	getNickname( void ) const;
+		std::string	getUserNickname( void ) const;
 		std::string	getUsername( void ) const;
 		std::string	getPassword( void ) const;
 		bool		getClientSettings( void ) const;
