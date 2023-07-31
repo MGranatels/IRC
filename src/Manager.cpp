@@ -73,7 +73,7 @@ std::string	Manager::getUsersList(Channel &Channel)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getUsers()[i]);
 		Clients& client = *iter;
-		usersList += client.getNickname() + " ";
+		usersList += client.getUserNickname() + " ";
 	}
 	return usersList;
 }
@@ -132,6 +132,6 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 
 void	Manager::setChannOpps(Clients *client)
 {
-	sendIrcMessage(_hostname + " 005 " + client->getNickname() + " CHANTYPES=#", client->getId());
-	sendIrcMessage(_hostname + " 005 " + client->getNickname() + " CHANMODES=i,t,k,o,l", client->getId());
+	sendIrcMessage(formatMessage(*client, "005") + " :CHANTYPES=#", client->getId());
+	sendIrcMessage(formatMessage(*client, "005") + " :CHANMODES=i,t,k,o,l", client->getId());
 }
