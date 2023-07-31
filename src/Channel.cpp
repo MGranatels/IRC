@@ -1,19 +1,16 @@
 #include <Channel.hpp>
 
 Channel::Channel(std::string name):
-	_name(name)
-{
+	_name(name) {
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
 Channel::Channel(std::string name, std::string topic):
-	_name(name), _topic(topic)
-{
+	_name(name), _topic(topic) {
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
-Channel::~Channel( void )
-{
+Channel::~Channel( void ) {
 	std::cout << "Channel " << _name << " deleted" << std::endl;
 }
 

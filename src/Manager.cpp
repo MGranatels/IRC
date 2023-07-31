@@ -112,7 +112,8 @@ bool	Manager::checkNickName(int id, std::string nickName) {
 			continue ;
 		if (it->getNickname() == nickName) {
 			std::cout << "Nickname already in use" << std::endl;
-			sendIrcMessage(_hostname + " 433 " + it->getNickname() + " :Nickname is already in use\r\n", id);
+
+			sendIrcMessage(formatMessage(*it, "433") + it->getNickname() + " :Nickname is already in use\r\n", id);
 			return false;
 		}
 	}
