@@ -33,7 +33,7 @@ const std::string Manager::formatMessage(Clients &client)
 
 const std::string Manager::formatMessage(Clients &client, std::string code)
 {
-	return (":" + _hostname + " " + code + " " + client.getUserNickname());
+	return (":" + _hostname + " " + code + " " + client.getNickname());
 }
 
 void Manager::BroadcastMessageChan(Channel &channel, std::string message)

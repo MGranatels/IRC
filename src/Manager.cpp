@@ -73,7 +73,7 @@ std::string	Manager::getUsersList(Channel &Channel)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getUsers()[i]);
 		Clients& client = *iter;
-		usersList += client.getUserNickname() + " ";
+		usersList += client.getNickname() + " ";
 	}
 	return usersList;
 }

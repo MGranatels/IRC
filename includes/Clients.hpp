@@ -27,7 +27,6 @@ class Clients
 		//Getters
 		int			getId( void ) const;
 		std::string	getNickname( void ) const;
-		std::string	getUserNickname( void ) const;
 		std::string	getUsername( void ) const;
 		std::string	getPassword( void ) const;
 		bool		getClientSettings( void ) const;
