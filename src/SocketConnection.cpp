@@ -12,6 +12,10 @@ int	Sockets::passwordCheck(int _id)
 	printMessage("Waiting for password Verification... Please Hold...", Cyan);
 	if (!Manager::checkPassword(foundClient, this->_password) || !Manager::checkNickName(_id, foundClient.getNickname()))
 		return 0;
+	if (foundClient.getUsername().empty() || foundClient.getNickname().empty()) {
+		printMessage("Waiting for Nickname and Username...", Cyan);
+		return 0;
+	}
 	foundClient.setClientSettings(true);
 	Manager::setChannOpps(&foundClient);
 	std::cout << "Check Client status: "<< foundClient.getClientSettings() << std::endl;
@@ -28,7 +32,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
 		if (iter != Manager::getClients().end()) {
-			if (!Manager::checkClientData(splits, iter, i))
+			if (!Manager::checkClientData(splits, iter))
 				passwordCheck(i);
 			else
 				std::cout << Manager::runChanActions(splits, i) << std::endl;

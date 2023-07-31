@@ -45,7 +45,7 @@ class Manager
 		static	std::vector<Clients>::iterator	getClientById(int id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter, int id);
+		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(int id, std::string nickName);
 		static	bool	checkPassword(Clients client, std::string password);
 };

@@ -28,7 +28,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 
 const std::string formatMessage(Clients &client)
 {
-	return (":" + client.getUserNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
+	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
 }
 
 // aqui podes passar mais parametros

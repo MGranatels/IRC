@@ -1,7 +1,7 @@
 #include <Manager.hpp>
 #include <utils.hpp>
 
-bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter, int id)
+bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter)
 {
 	Clients& foundClient = *iter;
 	if (foundClient.getClientSettings() == true)
@@ -11,7 +11,7 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 		if (splits[i] == "PASS")
 			foundClient.setPassword(splits[i + 1]);
 		else if (splits[i] == "NICK")
-			foundClient.setNickname(splits[i + 1], id);
+			foundClient.setNickname(splits[i + 1]);
 		else if (splits[i] == "USER")
 			foundClient.setUsername(splits[i + 1]);
 	}

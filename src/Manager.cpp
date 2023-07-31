@@ -101,6 +101,7 @@ void	Manager::sendIrcMessage(std::string message, int clientId)
 }
 
 bool	Manager::checkNickName(int id, std::string nickName) {
+	printMessage("Checking Nickname...", LightRed);
 	if (!isNickValid(nickName))	{
 			std::cout << "Erroneus Nickname" << std::endl;
 			sendIrcMessage(_hostname + " 432 " + nickName + " :Erroneus nickname\r\n", id);
@@ -115,6 +116,7 @@ bool	Manager::checkNickName(int id, std::string nickName) {
 			return false;
 		}
 	}
+	printMessage("NickName Validated", LightGreen);
 	return true;
 }
 
