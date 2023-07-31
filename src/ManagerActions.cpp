@@ -36,7 +36,28 @@ const std::string Manager::formatMessage(Clients &client, std::string code)
 	return (":" + _hostname + " " + code + " " + client.getUserNickname());
 }
 
-// aqui podes passar mais parametros
+void Manager::BroadcastMessageChan(Channel &channel, std::string message)
+{
+	std::vector<int> users;
+
+	users = channel.getUsers();
+	std::vector<int>::iterator it = users.begin();
+	for (; it != users.end(); it++)
+		sendIrcMessage(message, *it);
+}
+
+void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
+{
+	// Send the JOIN message to the client
+	sendIrcMessage(formatMessage(client) + " JOIN " + channel.getName(), clientId);
+	//:<server_hostname> 332 <user_nickname> <channel_name> :<channel_topic>
+	if (channel.getTopic().empty())
+		sendIrcMessage(formatMessage(client, "332") + " " + channel.getName() + " :No topic is set", clientId);
+	else
+		sendIrcMessage(formatMessage(client, "332") + " " + channel.getName() + " :" + channel.getTopic(), clientId);
+	BroadcastMessageChan(channel, formatMessage(client, "353") + " = " + channel.getName() + " :" + getUsersList(channel));
+	BroadcastMessageChan(channel, formatMessage(client, "366") + " " + channel.getName() + " :End of NAMES list");
+}
 
 int	Manager::joinAction( std::string channelName, int clientId )
 {
@@ -45,28 +66,17 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
-	if (isValidChannel(channelName) == VALID_NAME)
-	{
-		// Channel doesn't exist, so create it
-		_channels.push_back(Channel(channelName));
-		_channels.back().addUser(clientId);
-		// Send the JOIN message to the client
-		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
-		//:<server_hostname> 332 <user_nickname> <channel_name> :<channel_topic>
-		sendIrcMessage(formatMessage(client, "332") + " " + channelName + " :No topic is set", clientId);
-		sendIrcMessage(formatMessage(client, "353") + " = " + channelName + " :" + getUsersList(_channels.back()), clientId);
-		sendIrcMessage(formatMessage(client, "366") + " " + channelName + " :End of NAMES list", clientId);
-	}
-	else if (isValidChannel(channelName) == CREATED)
+	if (isValidChannel(channelName) == CREATED)
 	{
 		Channel& existingChannel = getChannelByName(channelName);
-		// Add the client to the user list of the existing channel
 		existingChannel.addUser(clientId);
-		// Send the JOIN message to the client
-		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
-		sendIrcMessage(":" + _hostname + " 332 " + client.getUserNickname() + " " + channelName + " :No topic is set", clientId);
-		sendIrcMessage(":" + _hostname + " 353 " + client.getUserNickname() + " = " + channelName + " :" + getUsersList(getChannelByName(channelName)), clientId);
-		sendIrcMessage(":" + _hostname + " 366 " + client.getUserNickname() + " " + channelName + " :End of NAMES list", clientId);
+		joinProtocol(client, existingChannel, clientId);
+	}
+	else if (isValidChannel(channelName) == VALID_NAME)
+	{
+		_channels.push_back(Channel(channelName));
+		_channels.back().addUser(clientId);
+		joinProtocol(client, _channels.back(), clientId);
 	}
 	return 1;
 }

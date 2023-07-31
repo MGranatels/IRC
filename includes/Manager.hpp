@@ -32,6 +32,7 @@ class Manager
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
 		static	int			joiningChannel(Clients &client, std::string channelName, int clientId);
 		static	int			joinAction( std::string channelName, int clientId );
+		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
@@ -39,6 +40,7 @@ class Manager
 		static	int			privAction( void );
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
+		static	void		BroadcastMessageChan(Channel &channel, std::string message);
 		static	void		setChannOpps(Clients *client);
 		static const std::string	formatMessage(Clients &client);
 		static const std::string	formatMessage(Clients &client, std::string code);
