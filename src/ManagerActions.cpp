@@ -44,15 +44,13 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	{
 		// Channel doesn't exist, so create it
 		_channels.push_back(Channel(channelName));
+		_channels.back().addUser(clientId);
 		// Send the JOIN message to the client
 		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
-		// Send the RPL_NOTOPIC (331) message to the client
-		sendIrcMessage(formatMessage(client) + " 331 " + channelName + " :No topic is set", clientId);
-		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
-		sendIrcMessage(formatMessage(client) + " 353 " + " = " + channelName + getUsersList(getChannelByName(channelName)), clientId);
-		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
-		sendIrcMessage(formatMessage(client) + " 366 " + channelName + " :End of NAMES list", clientId);
-		_channels.back().addUser(clientId);
+		//:<server_hostname> 332 <user_nickname> <channel_name> :<channel_topic>
+		sendIrcMessage(":" + _hostname + " 332 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
+		sendIrcMessage(":" + _hostname + " 353 " + client.getNickname() + " = " + channelName + " :" + getUsersList(_channels.back()), clientId);
+		sendIrcMessage(":" + _hostname + " 366 " + client.getNickname() + " " + channelName + " :End of NAMES list", clientId);
 	}
 	else if (isValidChannel(channelName) == CREATED)
 	{
@@ -61,12 +59,9 @@ int	Manager::joinAction( std::string channelName, int clientId )
 		existingChannel.addUser(clientId);
 		// Send the JOIN message to the client
 		sendIrcMessage(formatMessage(client) + " JOIN " + channelName, clientId);
-		// Send the RPL_NOTOPIC (331) message to the client
-		sendIrcMessage(formatMessage(client) + " 331 " + channelName + " :No topic is set", clientId);
-		//:<server_hostname> 353 <user_nickname> = <channel_name> :<user_list>
-		sendIrcMessage(formatMessage(client) + " 353 " + " = " + channelName + getUsersList(getChannelByName(channelName)), clientId);
-		// :<server_hostname> 366 <user_nickname> <channel_name> :End of NAMES list
-		sendIrcMessage(formatMessage(client) + " 366 " + channelName + " :End of NAMES list", clientId);
+		sendIrcMessage(":" + _hostname + " 332 " + client.getNickname() + " " + channelName + " :No topic is set", clientId);
+		sendIrcMessage(":" + _hostname + " 353 " + client.getNickname() + " = " + channelName + " :" + getUsersList(getChannelByName(channelName)), clientId);
+		sendIrcMessage(":" + _hostname + " 366 " + client.getNickname() + " " + channelName + " :End of NAMES list", clientId);
 	}
 	return 1;
 }
