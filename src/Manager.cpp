@@ -125,7 +125,7 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 	if (client.getPassword() != password || client.getPassword().empty())
 	{
 		printMessage("Password Incorrect or empty, Retry Password", Red);
-		sendIrcMessage(_hostname + " 464 " + ":Password required", client.getId());
+		sendIrcMessage(formatMessage(client, "464") + ":Password required", client.getId());
 		return false;
 	}
 	return true;
