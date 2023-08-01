@@ -131,6 +131,7 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 
 void	Manager::setChannOpps(Clients *client)
 {
+	send(client->getId(), "Welcome To The Dark Corner of The Internet!!", 44, 0);
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANTYPES=#", client->getId());
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANMODES=i,t,k,o,l", client->getId());
 	client->setOppChannel(true);
