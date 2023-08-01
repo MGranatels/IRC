@@ -3,7 +3,7 @@
 
 std::vector<Clients> Manager::_clients;
 std::vector<Channel> Manager::_channels;
-std::string Manager::_hostname = "localhost";
+std::string Manager::hostname = "localhost";
 
 // aqui podes passar mais parametros
 
@@ -27,12 +27,12 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 }
 
 const std::string Manager::formatMessage(Clients &client) {
-	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
+	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::hostname);
 }
 
 const std::string Manager::formatMessage(Clients &client, std::string code)
 {
-	return (":" + _hostname + " " + code + " " + client.getNickname());
+	return (":" + hostname + " " + code + " " + client.getNickname());
 }
 
 void Manager::BroadcastMessageChan(Channel &channel, std::string message)
@@ -80,6 +80,20 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	return 1;
 }
 
+int	Manager::privAction( std::vector<std::string> splits )
+{
+	//TODO: remember later to Verify User Permissions
+	if (isValidChannel(splits[1]) == CREATED)
+	{
+		std::cout << "it's for a channel" << std::endl;
+	}
+	else if (isValidClient(splits[1]))
+	{
+		std::cout << "it's for a friend" << std::endl;
+	}
+	return (1);
+}
+
 int	Manager::kickAction( void )
 {
 	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
@@ -105,11 +119,3 @@ int	Manager::inviteAction( void )
 	return(1);
 }
 
-int	Manager::privAction( std::vector<std::string> splits )
-{
-	if (isValidChannel(splits[1]) == CREATED)
-	{
-		std::cout << "it's for a channel" << std::endl;
-	}
-	return (1);
-}

@@ -136,12 +136,38 @@ void	Manager::setChannOpps(Clients *client)
 	client->setOppChannel(true);
 }
 
-// Clients&	Manager::getClientByNick(std::string nickname)
-// {
-// 	std::vector<Clients>::iterator it = _clients.begin();
+Clients&	Manager::getClientByNick(std::string nickname)
+{
+	std::vector<Clients>::iterator it = _clients.begin();
 
-// 	for (; it < _clients.end(); it++)
-// 	{
-// 		if (it->getName())
-// 	}
-// }
+	for (; it < _clients.end(); it++)
+	{
+		if (it->getNickname() == nickname)
+			return (*it);
+	}
+	return (*it);
+}
+
+bool		Manager::isValidClient(std::string nickname)
+{
+	std::vector<Clients>::iterator it = _clients.begin();
+
+	for (; it < _clients.end(); it++)
+	{
+		if (it->getNickname() == nickname)
+			return (true);
+	}
+	return (false);
+}
+
+bool		Manager::isValidClient(int	id)
+{
+	std::vector<Clients>::iterator it = _clients.begin();
+
+	for (; it < _clients.end(); it++)
+	{
+		if (it->getId() == id)
+			return (true);
+	}
+	return (false);
+}
