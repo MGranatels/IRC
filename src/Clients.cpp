@@ -1,6 +1,8 @@
 #include <Clients.hpp>
 
 Clients::Clients( int id ) : _id(id) {
+	this->_opChannel = false;
+	this->_clientSettings = false;
 }
 
 Clients::~Clients( void ) {
@@ -25,6 +27,11 @@ void	Clients::setPassword( std::string password ) {
 	this->_password = password;
 }
 
+
+void	Clients::setOppChannel( bool opChannel) {
+	this->_opChannel = opChannel;
+}
+
 void	Clients::setClientSettings( bool clientSettings ) {
 	this->_clientSettings = clientSettings;
 }
@@ -34,6 +41,7 @@ void	Clients::setClientSettings( bool clientSettings ) {
 int			Clients::getId( void ) const {
 	return (this->_id);
 }
+
 
 std::string	Clients::getNickname( void ) const {
 	return (this->_nickcname);
@@ -55,4 +63,8 @@ void	Clients::initClient(std::string username, std::string nickname)
 
 bool	Clients::getClientSettings( void ) const {
 	return (this->_clientSettings);
+}
+
+bool	Clients::getOppChannel( void ) const {
+	return (this->_opChannel);
 }

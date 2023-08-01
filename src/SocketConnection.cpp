@@ -10,14 +10,13 @@ int	Sockets::passwordCheck(int _id)
 	if (foundClient.getClientSettings() == true)
 		return 1;
 	printMessage("Waiting for password Verification... Please Hold...", Cyan);
-	if (!Manager::checkPassword(foundClient, this->_password) || !Manager::checkNickName(_id, foundClient.getNickname()))
+	if (!Manager::checkPassword(foundClient, this->_password) || !Manager::checkNickName(foundClient))
 		return 0;
 	if (foundClient.getUsername().empty() || foundClient.getNickname().empty()) {
 		printMessage("Waiting for Nickname and Username...", Cyan);
 		return 0;
 	}
 	foundClient.setClientSettings(true);
-	Manager::setChannOpps(&foundClient);
 	std::cout << "Check Client status: "<< foundClient.getClientSettings() << std::endl;
 	return (printMessage("Client Is Correctly Connected to the Server!", Green));
 }
@@ -31,6 +30,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	if (FD_ISSET(i, &_fdMaster))
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
+		Clients& foundClient = *iter;
 		if (iter != Manager::getClients().end()) {
 			if (!Manager::checkClientData(splits, iter))
 				passwordCheck(i);
@@ -40,6 +40,9 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)
 				exit(Error::message("Error sending message"));
+		if (foundClient.getClientSettings() && !foundClient.getOppChannel())
+			Manager::setChannOpps(&foundClient);
+
 	}
 }
 

@@ -27,7 +27,6 @@ class Manager
 		static	Channel&	getChannelByName(std::string name);
 		static int			isValidChannel(std::string name);
 		static std::string 		getUsersList(Channel &Channel);
-		// static	Client&		getClientById(int id); //TO DO:
 
 		// --------- Channel Actions (assim esta bom Gabi?) ---------
 		static	int			joiningChannel(Clients &client, std::string channelName, int clientId);
@@ -50,7 +49,7 @@ class Manager
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
-		static  bool	checkNickName(int id, std::string nickName);
+		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
 };
 #endif
