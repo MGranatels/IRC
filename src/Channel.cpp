@@ -41,6 +41,15 @@ void Channel::addUser(int newUserId)
 	_usersIds.push_back(newUserId);
 }
 
+int		Channel::isUserInChannel(int clientFd)
+{
+	std::vector<int>::iterator iter = _usersIds.begin();
+	while(iter != _usersIds.end())
+	{
+		
+	}
+}
+
 void Channel::setTopic(std::string topic)
 {
 	_topic = topic;

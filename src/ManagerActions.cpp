@@ -11,8 +11,10 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 {
 	if (splits[0].compare("JOIN") == 0)
 		return( Manager::joinAction(splits[1], clientId) );
-	else if (splits[0].compare("KICK") == 0)
-		return( Manager::kickAction() );
+	//else if (splits[0].compare("KICK") == 0)
+		//return( Manager::kickAction() );
+	else if (splits[0].compare("QUIT") == 0)
+		return(Manager::quitAction(clientId));
 	else if (splits[0].compare("MODE") == 0)
 		return( Manager::modeAction() );
 	else if (splits[0].compare("TOPIC") == 0)
@@ -80,12 +82,37 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	return 1;
 }
 
-int	Manager::kickAction( void )
+int	Manager::quitAction(int clientId)
 {
-	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
-	//	KICK <channel> <user> :<reason>
-	return(1);
+	// Find the client who wants to quit
+	std::vector<Clients>::iterator iter = getClientById(clientId);
+	if (iter == _clients.end()) {
+		// Client not found
+		return -1;
+	}
+	Clients& quittingClient = *iter;
+
+	// Remove the client from all channels
+	for (Channel& channel : _channels)
+	{
+		if (channel.isUserInChannel(clientId))
+		{
+			// Notify other clients in the channel about the quit
+			BroadcastMessageChan(channel, formatMessage(quittingClient, "QUIT_CHANNEL") + " " + channel.getName() + " " + quittingClient.getNickname() + " :has quit");
+
+			// Remove the user from the channel
+			channel.removeUser(clientId);
+		}
+	}
+
+	// Notify the quitting client that he left
+	sendIrcMessage(formatMessage(quittingClient) + " QUIT :Goodbye!", clientId);
+
+	// Optionally, you can remove the client from the overall clients list as well.
+	removeClient(clientId);
+	return (1);
 }
+
 
 int	Manager::modeAction( void )
 {

@@ -32,7 +32,7 @@ class Manager
 		static	int			joiningChannel(Clients &client, std::string channelName, int clientId);
 		static	int			joinAction( std::string channelName, int clientId );
 		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
-		static	int			kickAction( void );
+		static	int			quitAction( int clientId );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( std::string nickName, int clientId );
