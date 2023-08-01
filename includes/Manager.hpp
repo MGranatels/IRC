@@ -31,20 +31,20 @@ class Manager
 		static std::string 		getUsersList(Channel &Channel);
 
 		// --------- Channel Actions ---------
-		// static	int			joiningChannel(Clients &client, std::string channelName, int clientId);
 		static	int			joinAction( std::string channelName, int clientId );
 		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
-		static	int			privAction( std::vector<std::string> splits );
+		static	int			privAction( const Clients &client, std::vector<std::string> splits );
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
+		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);
 		static	void		setChannOpps(Clients *client);
-		static const std::string	formatMessage(Clients &client);
-		static const std::string	formatMessage(Clients &client, std::string code);
+		static const std::string	formatMessage(const Clients &client);
+		static const std::string	formatMessage(const Clients &client, std::string code);
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);
@@ -56,11 +56,6 @@ class Manager
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
+		static	void	removeClientFromAllChannels(int clientId); //TODO:
 };
 #endif
-
-		//Channel commands
-		// KICK - Eject a client from the channel
-		// INVITE - Invite a client to a channel
-		// TOPIC - Change or view the channel topic
-		// MODE - Change the channel’s mode:

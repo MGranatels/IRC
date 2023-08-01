@@ -20,17 +20,17 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("INVITE") == 0)
 		return( Manager::inviteAction() );
 	else if (splits[0].compare("PRIVMSG") == 0)
-		return( Manager::privAction(splits) );
+		return( Manager::privAction( *getClientById(clientId), splits) );
 	else if (splits[0].compare("NICK") == 0)
 		return(0);
 	return (-1);
 }
 
-const std::string Manager::formatMessage(Clients &client) {
+const std::string Manager::formatMessage(const Clients &client) {
 	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::hostname);
 }
 
-const std::string Manager::formatMessage(Clients &client, std::string code)
+const std::string Manager::formatMessage(const Clients &client, std::string code)
 {
 	return (":" + hostname + " " + code + " " + client.getNickname());
 }
@@ -39,7 +39,17 @@ void Manager::BroadcastMessageChan(Channel &channel, std::string message)
 {
 	std::vector<int> users;
 
-	users = channel.getUsers();
+	users = channel.getClients();
+	std::vector<int>::iterator it = users.begin();
+	for (; it != users.end(); it++)
+		sendIrcMessage(message, *it);
+}
+
+void Manager::BroadcastMessageChan(int senderid, Channel &channel, std::string message)
+{
+	std::vector<int> users;
+
+	users = channel.getClientsNoSender(senderid);
 	std::vector<int>::iterator it = users.begin();
 	for (; it != users.end(); it++)
 		sendIrcMessage(message, *it);
@@ -68,24 +78,25 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	if (isValidChannel(channelName) == CREATED)
 	{
 		Channel& existingChannel = getChannelByName(channelName);
-		existingChannel.addUser(clientId);
+		existingChannel.addClient(clientId);
 		joinProtocol(client, existingChannel, clientId);
 	}
 	else if (isValidChannel(channelName) == VALID_NAME)
 	{
 		_channels.push_back(Channel(channelName));
-		_channels.back().addUser(clientId);
+		_channels.back().addClient(clientId);
 		joinProtocol(client, _channels.back(), clientId);
 	}
 	return 1;
 }
 
-int	Manager::privAction( std::vector<std::string> splits )
+int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 {
 	//TODO: remember later to Verify User Permissions
 	if (isValidChannel(splits[1]) == CREATED)
 	{
-		std::cout << "it's for a channel" << std::endl;
+		//:user1!user1@localhost PRIVMSG #test :Hello, everyone!\r\n
+		BroadcastMessageChan(getChannelByName(splits[1]), formatMessage(client) + " PRIVMSG #" + splits[1] + " " + splits[2]);
 	}
 	else if (isValidClient(splits[1]))
 	{

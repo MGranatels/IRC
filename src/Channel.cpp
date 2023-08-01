@@ -15,30 +15,30 @@ Channel::~Channel( void ) {
 }
 
 //function to return users in channel minus the sender
-std::vector<int> Channel::getUsersNoSender(int senderId) const
+std::vector<int> Channel::getClientsNoSender(int senderId) const
 {
-	std::vector<int> noSender(this->_usersIds);
+	std::vector<int> noSender(this->_clientsIds);
 
 	removeElementFromVector(noSender, senderId);
 	return noSender;
 }
 
 //function to remove users from channel
-void Channel::removeUser(int UserId)
+void Channel::removeClient(int clientId)
 {
-    removeElementFromVector(_usersIds, UserId);
+    removeElementFromVector(_clientsIds, clientId);
 }
 
 //returns the users in a channel but just a const reference, i.e we can only edit this inside the class
-const std::vector<int>& Channel::getUsers(void) const
+const std::vector<int>& Channel::getClients(void) const
 {
-	return (this->_usersIds);
+	return (this->_clientsIds);
 }
 
 //function to add users to channel
-void Channel::addUser(int newUserId)
+void Channel::addClient(int newClientId)
 {
-	_usersIds.push_back(newUserId);
+	_clientsIds.push_back(newClientId);
 }
 
 void Channel::setTopic(std::string topic)
@@ -63,15 +63,26 @@ std::string Channel::getName(void) const
 
 const std::vector<int>& Channel::getOperators(void) const
 {
-	return (this->_usersIds);
+	return (this->_clientsIds);
 }
 
 void Channel::addOperator(int operatorId)
 {
-	this->_usersIds.push_back(operatorId);
+	this->_clientsIds.push_back(operatorId);
 }
 
 void Channel::removeOperator(int operatorId)
 {
     removeElementFromVector(_operatorsIds, operatorId);
+}
+
+bool Channel::isClientIn(int clientId)
+{
+	std::vector<int>::iterator it = _clientsIds.begin();
+	for ( ; it != _clientsIds.end(); it ++)
+	{
+		if (*it == clientId)
+			return (true);
+	}
+	return (false);
 }

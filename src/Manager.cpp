@@ -15,6 +15,7 @@ void	Manager::removeClient(int id)
 	{
 		if (_clients[i].getId() == id)
 		{
+			removeClientFromAllChannels(id);
 			_clients.erase(_clients.begin() + i);
 			std::cout << LightRed << "Client Succesfully Removed" << NC << std::endl;
 			close(id);
@@ -68,9 +69,9 @@ std::string	Manager::getUsersList(Channel &Channel)
 {
 	std::string usersList;
 
-	for (std::vector<int>::size_type i = 0; i < Channel.getUsers().size(); i++)
+	for (std::vector<int>::size_type i = 0; i < Channel.getClients().size(); i++)
 	{
-		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getUsers()[i]);
+		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getClients()[i]);
 		Clients& client = *iter;
 		usersList += client.getNickname() + " ";
 	}
@@ -170,4 +171,20 @@ bool		Manager::isValidClient(int	id)
 			return (true);
 	}
 	return (false);
+}
+
+void	Manager::removeClientFromAllChannels(int clientId)
+{
+	std::vector<Channel>::iterator it = _channels.begin();
+	Clients &client = *getClientById(clientId);
+	for ( ; it != _channels.end(); it++)
+	{
+		if (it->isClientIn(clientId))
+		{
+			it->removeClient(clientId);
+			BroadcastMessageChan(*it, formatMessage(client, "353") + " = " + it->getName() + " :" + getUsersList(*it));
+			BroadcastMessageChan(*it, formatMessage(client, "366") + " " + it->getName() + " :End of NAMES list");
+		}
+	}
+	//TODO: check more for protocols when user is leaving a channel
 }
