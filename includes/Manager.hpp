@@ -37,7 +37,7 @@ class Manager
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			inviteAction( void );
-		static	int			privAction( void );
+		static	int			privAction( std::vector<std::string> splits );
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
@@ -46,6 +46,7 @@ class Manager
 		static const std::string	formatMessage(Clients &client, std::string code);
 
 		static	std::vector<Clients>::iterator	getClientById(int id);
+		// static	Clients&	getClientByNick(std::string nickname);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
 		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);

@@ -135,3 +135,13 @@ void	Manager::setChannOpps(Clients *client)
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANTYPES=#", client->getId());
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANMODES=i,t,k,o,l", client->getId());
 }
+
+// Clients&	Manager::getClientByNick(std::string nickname)
+// {
+// 	std::vector<Clients>::iterator it = _clients.begin();
+
+// 	for (; it < _clients.end(); it++)
+// 	{
+// 		if (it->getName())
+// 	}
+// }

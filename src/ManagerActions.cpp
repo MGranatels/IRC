@@ -20,7 +20,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("INVITE") == 0)
 		return( Manager::inviteAction() );
 	else if (splits[0].compare("PRIVMSG") == 0)
-		return( Manager::privAction() );
+		return( Manager::privAction(splits) );
 	else if (splits[0].compare("NICK") == 0)
 		return(0);
 	return (-1);
@@ -106,8 +106,11 @@ int	Manager::inviteAction( void )
 	return(1);
 }
 
-int	Manager::privAction( void )
+int	Manager::privAction( std::vector<std::string> splits )
 {
-	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
+	if (isValidChannel(splits[1]) == CREATED)
+	{
+		std::cout << "it's for a channel" << std::endl;
+	}
 	return (1);
 }
