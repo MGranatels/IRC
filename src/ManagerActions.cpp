@@ -18,7 +18,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("TOPIC") == 0)
 		return( Manager::topicAction() );
 	else if (splits[0].compare("INVITE") == 0)
-		return( Manager::inviteAction() );
+		return( Manager::inviteAction(splits[1], clientId) );
 	else if (splits[0].compare("PRIVMSG") == 0)
 		return( Manager::privAction() );
 	else if (splits[0].compare("NICK") == 0)
@@ -51,11 +51,11 @@ void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
 	sendIrcMessage(formatMessage(client) + " JOIN " + channel.getName(), clientId);
 	//:<server_hostname> 332 <user_nickname> <channel_name> :<channel_topic>
 	if (channel.getTopic().empty())
-		sendIrcMessage(formatMessage(client, "332") + " " + channel.getName() + " :No topic is set", clientId);
+		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :No topic is set", clientId);
 	else
-		sendIrcMessage(formatMessage(client, "332") + " " + channel.getName() + " :" + channel.getTopic(), clientId);
-	BroadcastMessageChan(channel, formatMessage(client, "353") + " = " + channel.getName() + " :" + getUsersList(channel));
-	BroadcastMessageChan(channel, formatMessage(client, "366") + " " + channel.getName() + " :End of NAMES list");
+		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :" + channel.getTopic(), clientId);
+	BroadcastMessageChan(channel, formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
+	BroadcastMessageChan(channel, formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
 }
 
 int	Manager::joinAction( std::string channelName, int clientId )
@@ -99,8 +99,23 @@ int	Manager::topicAction( void )
 	return(1);
 }
 
-int	Manager::inviteAction( void )
+int	Manager::inviteAction( std::string nickName, int clientId )
 {
+	(void)nickName;
+	(void)clientId;
+	// RPL_INVITING 341 to invite user
+	// ERR_NOTONCHANNEL 442 when user not in channel
+	// ERR_CHANOPRIVSNEEDED 482 When user does not have admin permission
+
+	// Check which channel the user is sending the message from, how can I do that?
+
+	// If user is not in any channel send an error response
+
+	// If nickname does not exist send error response
+
+	// If user does not have permissions to invite send error response 482
+
+
 	std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
 	return(1);
 }
