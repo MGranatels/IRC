@@ -26,8 +26,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	return (-1);
 }
 
-const std::string Manager::formatMessage(Clients &client)
-{
+const std::string Manager::formatMessage(Clients &client) {
 	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
 }
 
@@ -108,6 +107,6 @@ int	Manager::inviteAction( void )
 
 int	Manager::privAction( void )
 {
-	std::cout << "Acho que o Mario esta com ciumes Gabi" << std::endl;
+	std::cout << "Acho que o Calado esta com piolhos no cu" << std::endl;
 	return (1);
 }

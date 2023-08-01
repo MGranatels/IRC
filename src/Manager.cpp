@@ -5,7 +5,6 @@ int	Manager::addClient(int id)
 	if (Manager::getClientById(id) != _clients.end())
 		return 1;
 	_clients.push_back(Clients(id));
-	_clients.back().setClientSettings(false);
 	std::cout << LightGreen << "Client Succesfully Added" << NC << std::endl;
 	return (0);
 }
@@ -100,20 +99,19 @@ void	Manager::sendIrcMessage(std::string message, int clientId)
 		exit(Error::message("Error sending message"));
 }
 
-bool	Manager::checkNickName(int id, std::string nickName) {
+bool	Manager::checkNickName(Clients client) {
 	printMessage("Checking Nickname...", LightRed);
-	if (!isNickValid(nickName))	{
+	if (!isNickValid(client.getNickname()))	{
 			std::cout << "Erroneus Nickname" << std::endl;
-			sendIrcMessage(_hostname + " 432 " + nickName + " :Erroneus nickname\r\n", id);
+			sendIrcMessage(formatMessage(client, "432") + " :Erroneus nickname\r\n", client.getId());
 			return false;
 	}
 	for (std::vector<Clients>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if (it->getId() == id)
+		if (it->getId() == client.getId())
 			continue ;
-		if (it->getNickname() == nickName) {
+		if (it->getNickname() == client.getNickname()) {
 			std::cout << "Nickname already in use" << std::endl;
-
-			sendIrcMessage(formatMessage(*it, "433") + it->getNickname() + " :Nickname is already in use\r\n", id);
+			sendIrcMessage(formatMessage(client, "433") + " :Nickname is already in use\r\n", client.getId());
 			return false;
 		}
 	}
@@ -135,4 +133,5 @@ void	Manager::setChannOpps(Clients *client)
 {
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANTYPES=#", client->getId());
 	sendIrcMessage(formatMessage(*client, "005") + " :CHANMODES=i,t,k,o,l", client->getId());
+	client->setOppChannel(true);
 }
