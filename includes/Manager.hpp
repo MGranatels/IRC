@@ -36,8 +36,8 @@ class Manager
 		static	int			kickAction( void );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
-		static	int			inviteAction( void );
 		static	int			privAction( const Clients &client, std::vector<std::string> splits );
+		static	int			inviteAction( std::string nickName, int clientId );
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);

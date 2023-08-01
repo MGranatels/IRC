@@ -104,7 +104,7 @@ bool	Manager::checkNickName(Clients client) {
 	printMessage("Checking Nickname...", LightRed);
 	if (!isNickValid(client.getNickname()))	{
 			std::cout << "Erroneus Nickname" << std::endl;
-			sendIrcMessage(formatMessage(client, "432") + " :Erroneus nickname\r\n", client.getId());
+			sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getId());
 			return false;
 	}
 	for (std::vector<Clients>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
@@ -112,7 +112,7 @@ bool	Manager::checkNickName(Clients client) {
 			continue ;
 		if (it->getNickname() == client.getNickname()) {
 			std::cout << "Nickname already in use" << std::endl;
-			sendIrcMessage(formatMessage(client, "433") + " :Nickname is already in use\r\n", client.getId());
+			sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getId());
 			return false;
 		}
 	}
@@ -124,7 +124,7 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 	if (client.getPassword() != password || client.getPassword().empty())
 	{
 		printMessage("Password Incorrect or empty, Retry Password", Red);
-		sendIrcMessage(formatMessage(client, "464") + ":Password required", client.getId());
+		sendIrcMessage(formatMessage(client, PASSWDMISMATCH) + ":Password required", client.getId());
 		return false;
 	}
 	return true;
@@ -132,8 +132,9 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 
 void	Manager::setChannOpps(Clients *client)
 {
-	sendIrcMessage(formatMessage(*client, "005") + " :CHANTYPES=#", client->getId());
-	sendIrcMessage(formatMessage(*client, "005") + " :CHANMODES=i,t,k,o,l", client->getId());
+	sendIrcMessage(formatMessage(*client, WELCOME_MESSAGE) + " :Welcome to the Darkest Region of the Internet", client->getId());
+	sendIrcMessage(formatMessage(*client, CHANNEL_OPPS) + " :CHANTYPES=#", client->getId());
+	sendIrcMessage(formatMessage(*client, CHANNEL_OPPS) + " :CHANMODES=i,t,k,o,l", client->getId());
 	client->setOppChannel(true);
 }
 
