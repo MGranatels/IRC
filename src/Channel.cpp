@@ -41,15 +41,6 @@ void Channel::addClient(int newClientId)
 	_clientsIds.push_back(newClientId);
 }
 
-int		Channel::isUserInChannel(int clientFd)
-{
-	std::vector<int>::iterator iter = _usersIds.begin();
-	while(iter != _usersIds.end())
-	{
-		
-	}
-}
-
 void Channel::setTopic(std::string topic)
 {
 	_topic = topic;
@@ -82,10 +73,10 @@ void Channel::addOperator(int operatorId)
 
 void Channel::removeOperator(int operatorId)
 {
-    removeElementFromVector(_operatorsIds, operatorId);
+	removeElementFromVector(_operatorsIds, operatorId);
 }
 
-bool Channel::isClientIn(int clientId)
+bool Channel::isClientInChannel(int clientId)
 {
 	std::vector<int>::iterator it = _clientsIds.begin();
 	for ( ; it != _clientsIds.end(); it ++)

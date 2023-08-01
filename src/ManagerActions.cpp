@@ -92,6 +92,25 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	return 1;
 }
 
+int	Manager::quitAction(int clientId)
+{
+	// Find the client who wants to quit
+	std::vector<Clients>::iterator iter = getClientById(clientId);
+	if (iter == _clients.end()) {
+		// Client not found
+		return -1;
+	}
+	Clients& quittingClient = *iter;
+
+	// Remove the client from all channels
+	removeClientFromAllChannels(clientId);
+
+	// Notify the quitting client that they have quit
+	sendIrcMessage(formatMessage(quittingClient) + " QUIT :Goodbye!", clientId);
+	// Remove client from clients list
+	return 1;
+}
+
 int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 {
 	//TODO: remember later to Verify User Permissions
@@ -106,38 +125,6 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 	}
 	return (1);
 }
-
-int	Manager::kickAction( void )
-{
-	// Find the client who wants to quit
-	std::vector<Clients>::iterator iter = getClientById(clientId);
-	if (iter == _clients.end()) {
-		// Client not found
-		return -1;
-	}
-	Clients& quittingClient = *iter;
-
-	// Remove the client from all channels
-	for (Channel& channel : _channels)
-	{
-		if (channel.isUserInChannel(clientId))
-		{
-			// Notify other clients in the channel about the quit
-			BroadcastMessageChan(channel, formatMessage(quittingClient, "QUIT_CHANNEL") + " " + channel.getName() + " " + quittingClient.getNickname() + " :has quit");
-
-			// Remove the user from the channel
-			channel.removeUser(clientId);
-		}
-	}
-
-	// Notify the quitting client that he left
-	sendIrcMessage(formatMessage(quittingClient) + " QUIT :Goodbye!", clientId);
-
-	// Optionally, you can remove the client from the overall clients list as well.
-	removeClient(clientId);
-	return (1);
-}
-
 
 int	Manager::modeAction( void )
 {

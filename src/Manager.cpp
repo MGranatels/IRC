@@ -180,8 +180,9 @@ void	Manager::removeClientFromAllChannels(int clientId)
 	Clients &client = *getClientById(clientId);
 	for ( ; it != _channels.end(); it++)
 	{
-		if (it->isClientIn(clientId))
+		if (it->isClientInChannel(clientId))
 		{
+			BroadcastMessageChan(*it, formatMessage(client, "QUIT_CHANNEL") + " " + it->getName() + " " + client.getNickname() + " :has quit");
 			it->removeClient(clientId);
 			BroadcastMessageChan(*it, formatMessage(client, "353") + " = " + it->getName() + " :" + getUsersList(*it));
 			BroadcastMessageChan(*it, formatMessage(client, "366") + " " + it->getName() + " :End of NAMES list");
