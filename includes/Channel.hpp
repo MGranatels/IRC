@@ -19,27 +19,26 @@ class	Channel
 	private:
 		std::string _name;
 		std::string _topic;
-		std::vector<int> _usersIds;
+		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
 
 	public:
 		Channel(std::string name);
 		Channel(std::string name, std::string topic);
 		~Channel( void );
-		std::vector<int>		getUsersNoSender(int senderId) const;
-		int						isUserInChannel(int clientId);
-		void					addUser(int newUserId);
-		void					removeUser(int UserId);
-		void					setTopic(std::string topic);
-		void					setName(std::string name);
-		std::string				getTopic(void) const;
-		std::string				getName(void) const;
-		const std::vector<int>&	getOperators(void) const;
-		const std::vector<int>&	getUsers(void) const;
-		int						UserinChannel(int clientId);
-		void					addOperator(int operatorId);
-		void					removeOperator(int operatorId);
-		bool					isChanop(int userId); //to do -> return if a given user is a chanop i.e has right to execute the commands
+		std::vector<int> getClientsNoSender(int senderId) const;
+		const std::vector<int>& getClients(void) const;
+		void addClient(int newClientId);
+		void removeClient(int clientId);
+		void setTopic(std::string topic);
+		void setName(std::string name);
+		std::string getTopic(void) const;
+		std::string getName(void) const;
+		const std::vector<int>& getOperators(void) const;
+		void addOperator(int operatorId);
+		void removeOperator(int operatorId);
+		bool isClientIn(int clientId);
+		// TODO: bool isChanop(int ClientId); //to do -> return if a given client is a chanop i.e has right to execute the commands
 };
 
 #endif
