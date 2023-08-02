@@ -39,8 +39,8 @@ class	Channel
 		void	removeOperator(int operatorId);
 		void	addClient(int newClientId);
 		void	removeClient(int clientId);
-		bool	isClientIn(int clientId);
 		bool	isModeSet(const std::string& mode);
+		bool	isClientInChannel(int clientId);
 
 		//Getters and Setters:
 		void	setTopic(std::string topic);
