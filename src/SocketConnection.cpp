@@ -42,7 +42,6 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 				exit(Error::message("Error sending message"));
 		if (foundClient.getClientSettings() && !foundClient.getOppChannel())
 			Manager::setChannOpps(&foundClient);
-
 	}
 }
 

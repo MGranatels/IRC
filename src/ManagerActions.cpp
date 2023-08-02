@@ -7,6 +7,23 @@ std::string Manager::hostname = "localhost";
 
 // aqui podes passar mais parametros
 
+bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter)
+{
+	Clients& foundClient = *iter;
+	if (foundClient.getClientSettings() == true)
+		return true;
+	for (unsigned int i = 0 ; i < splits.size(); i++)
+	{
+		if (splits[i] == "PASS")
+			foundClient.setPassword(splits[i + 1]);
+		else if (splits[i] == "NICK")
+			foundClient.setNickname(splits[i + 1]);
+		else if (splits[i] == "USER")
+			foundClient.setUsername(splits[i + 1]);
+	}
+	return false;
+}
+
 int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 {
 	if (splits[0].compare("JOIN") == 0)
@@ -14,7 +31,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("KICK") == 0)
 		return( Manager::kickAction() );
 	else if (splits[0].compare("MODE") == 0)
-		return( Manager::modeAction() );
+		return( Manager::modeAction(splits, clientId) );
 	else if (splits[0].compare("TOPIC") == 0)
 		return( Manager::topicAction() );
 	else if (splits[0].compare("INVITE") == 0)
@@ -112,9 +129,19 @@ int	Manager::kickAction( void )
 	return(1);
 }
 
-int	Manager::modeAction( void )
+int	Manager::modeAction( std::vector<std::string> split, int clientId )
 {
-	std::cout << "modos obscuros de fazer cenas" << std::endl;
+	// 472 ERR_UNKNOWNMODE => When a user try's to change a channel mode that does not exist
+	// 501 ERR_UMODEUNKNOWNFLAG => When user try's to set or unset a existing channel mode but with the wrong flag
+	// 461 ERR_NEEDMOREPARAMS => When user try's to change a channel mode and does not add a flag to it (few arguments per say)
+	// 482 ERR_CHANOPRIVSNEEDED  When user does not have admin permission to change modes.
+	std::cout << LightCyan << "Channel Modes Debugger" << std::endl << NC;
+	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	std::cout << clientId << std::endl;
+	Clients& client = *iter;
+	for (unsigned int i = 0; i < split.size(); i++)
+		std::cout << i << " Split: " <<  split[i] << std::endl;
+	validateMode(split, client);
 	return(1);
 }
 

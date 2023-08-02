@@ -64,7 +64,7 @@ SRCS = 	utils.cpp \
 		SocketConnection.cpp \
 		Clients.cpp \
 		Manager.cpp \
-		ManagerCommands.cpp \
+		ManagerModes.cpp \
 		ManagerActions.cpp \
 		Channel.cpp \
 		main.cpp

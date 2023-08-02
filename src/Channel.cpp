@@ -2,11 +2,21 @@
 
 Channel::Channel(std::string name):
 	_name(name) {
+	this->_modes["i"] = MODE_NOT_SET;
+	this->_modes["t"] = MODE_SET;
+	this->_modes["k"] = MODE_NOT_SET;
+	this->_modes["o"] = MODE_NOT_SET;
+	this->_modes["l"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
 Channel::Channel(std::string name, std::string topic):
 	_name(name), _topic(topic) {
+	this->_modes["i"] = MODE_NOT_SET;
+	this->_modes["t"] = MODE_SET;
+	this->_modes["k"] = MODE_NOT_SET;
+	this->_modes["o"] = MODE_NOT_SET;
+	this->_modes["l"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -63,7 +73,7 @@ std::string Channel::getName(void) const
 
 const std::vector<int>& Channel::getOperators(void) const
 {
-	return (this->_clientsIds);
+	return (this->_operatorsIds);
 }
 
 void Channel::addOperator(int operatorId)
@@ -76,7 +86,7 @@ void Channel::removeOperator(int operatorId)
     removeElementFromVector(_operatorsIds, operatorId);
 }
 
-bool Channel::isClientIn(int clientId)
+bool	Channel::isClientIn(int clientId)
 {
 	std::vector<int>::iterator it = _clientsIds.begin();
 	for ( ; it != _clientsIds.end(); it ++)
@@ -85,4 +95,18 @@ bool Channel::isClientIn(int clientId)
 			return (true);
 	}
 	return (false);
+}
+
+void	Channel::setMode(const std::string& mode) {
+	_modes[mode] = MODE_SET;
+}
+
+// Function to unset a channel mode
+void	Channel::unsetMode(const std::string& mode) {
+	_modes[mode] = MODE_NOT_SET;
+}
+
+// Function to check if a channel mode is set
+bool Channel::isModeSet(const std::string& mode) {
+	return _modes[mode] == MODE_SET;
 }

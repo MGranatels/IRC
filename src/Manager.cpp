@@ -92,12 +92,13 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 }
 
 //id: the user receiver
-void	Manager::sendIrcMessage(std::string message, int clientId)
+int	Manager::sendIrcMessage(std::string message, int clientId)
 {
 	message = message + "\r\n";
 	std::cout << "Sending message: " << message << std::endl;
 	if (send(clientId, message.c_str(), message.length(), 0) == -1)
 		exit(Error::message("Error sending message"));
+	return 0;
 }
 
 bool	Manager::checkNickName(Clients client) {
