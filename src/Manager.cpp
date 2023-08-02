@@ -182,11 +182,10 @@ void	Manager::removeClientFromAllChannels(int clientId)
 	{
 		if (it->isClientInChannel(clientId))
 		{
-			BroadcastMessageChan(*it, formatMessage(client, "QUIT_CHANNEL") + " " + it->getName() + " " + client.getNickname() + " :has quit");
+			BroadcastMessageChan(*it, formatMessage(client, "QUIT_CHANNEL") + " :has quit");
 			it->removeClient(clientId);
 			BroadcastMessageChan(*it, formatMessage(client, "353") + " = " + it->getName() + " :" + getUsersList(*it));
 			BroadcastMessageChan(*it, formatMessage(client, "366") + " " + it->getName() + " :End of NAMES list");
 		}
 	}
-	//TODO: check more for protocols when user is leaving a channel
 }

@@ -15,6 +15,11 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 		//return( Manager::kickAction() );
 	else if (splits[0].compare("QUIT") == 0)
 		return(Manager::quitAction(clientId));
+	else if (splits[0].compare("PART") == 0)
+		if (splits.size() > 2)
+			return(partAction(splits[1], clientId, splits[2]));
+		else
+			return(partAction(splits[1], clientId, ""));
 	else if (splits[0].compare("MODE") == 0)
 		return( Manager::modeAction() );
 	else if (splits[0].compare("TOPIC") == 0)
@@ -28,46 +33,35 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	return (-1);
 }
 
-const std::string Manager::formatMessage(const Clients &client) {
-	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::hostname);
-}
-
-const std::string Manager::formatMessage(const Clients &client, std::string code)
+int	Manager::partAction(std::string channelName, int clientId, std::string partMessage)
 {
-	return (":" + hostname + " " + code + " " + client.getNickname());
-}
-
-void Manager::BroadcastMessageChan(Channel &channel, std::string message)
-{
-	std::vector<int> users;
-
-	users = channel.getClients();
-	std::vector<int>::iterator it = users.begin();
-	for (; it != users.end(); it++)
-		sendIrcMessage(message, *it);
-}
-
-void Manager::BroadcastMessageChan(int senderid, Channel &channel, std::string message)
-{
-	std::vector<int> users;
-
-	users = channel.getClientsNoSender(senderid);
-	std::vector<int>::iterator it = users.begin();
-	for (; it != users.end(); it++)
-		sendIrcMessage(message, *it);
-}
-
-void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
-{
-	// Send the JOIN message to the client
-	sendIrcMessage(formatMessage(client) + " JOIN " + channel.getName(), clientId);
-	//:<server_hostname> 332 <user_nickname> <channel_name> :<channel_topic>
-	if (channel.getTopic().empty())
-		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :No topic is set", clientId);
+	// Find the client who wants to part
+	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	if (iter == _clients.end()) {
+		// Client not found
+		return -1;
+	}
+	Clients& partingClient = *iter;
+	// Find the channel
+	Channel& channel = Manager::getChannelByName(channelName);
+	// Check if the client is in the channel
+	if (!channel.isClientInChannel(clientId)) {
+		// Client is not in the channel, nothing to do
+		return -1;
+	}
+	// Notify other clients in the channel about the PART
+	if (!partMessage.empty())
+		BroadcastMessageChan(channel, formatMessage(partingClient, "PART_CHANNEL") + " " + channel.getName() + " " + partMessage);
 	else
-		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :" + channel.getTopic(), clientId);
-	BroadcastMessageChan(channel, formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
-	BroadcastMessageChan(channel, formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
+		BroadcastMessageChan(channel, formatMessage(partingClient, "PART_CHANNEL") + " " + channel.getName());
+	// Send a PART message to the client to indicate they left the channel.
+	sendIrcMessage(formatMessage(partingClient) + " PART " + channel.getName(), clientId);
+	BroadcastMessageChan(channel, formatMessage(partingClient, "QUIT_CHANNEL") + " :has quit");
+	channel.removeClient(clientId);
+	BroadcastMessageChan(channel, formatMessage(partingClient, "353") + " = " + channel.getName() + " :" + getUsersList(channel));
+	BroadcastMessageChan(channel, formatMessage(partingClient, "366") + " " + channel.getName() + " :End of NAMES list");
+	// Remove the user from the channel
+	return 1;
 }
 
 int	Manager::joinAction( std::string channelName, int clientId )
@@ -104,12 +98,12 @@ int	Manager::quitAction(int clientId)
 
 	// Remove the client from all channels
 	removeClientFromAllChannels(clientId);
-
 	// Notify the quitting client that they have quit
 	sendIrcMessage(formatMessage(quittingClient) + " QUIT :Goodbye!", clientId);
 	// Remove client from clients list
 	return 1;
 }
+
 
 int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 {
@@ -158,4 +152,3 @@ int	Manager::inviteAction( std::string nickName, int clientId )
 	std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
 	return(1);
 }
-
