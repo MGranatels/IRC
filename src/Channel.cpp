@@ -73,10 +73,10 @@ void Channel::addOperator(int operatorId)
 
 void Channel::removeOperator(int operatorId)
 {
-    removeElementFromVector(_operatorsIds, operatorId);
+	removeElementFromVector(_operatorsIds, operatorId);
 }
 
-bool Channel::isClientIn(int clientId)
+bool Channel::isClientInChannel(int clientId)
 {
 	std::vector<int>::iterator it = _clientsIds.begin();
 	for ( ; it != _clientsIds.end(); it ++)

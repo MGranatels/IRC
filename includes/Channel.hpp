@@ -37,7 +37,7 @@ class	Channel
 		const std::vector<int>& getOperators(void) const;
 		void addOperator(int operatorId);
 		void removeOperator(int operatorId);
-		bool isClientIn(int clientId);
+		bool isClientInChannel(int clientId);
 		// TODO: bool isChanop(int ClientId); //to do -> return if a given client is a chanop i.e has right to execute the commands
 };
 

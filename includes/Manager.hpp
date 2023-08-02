@@ -33,11 +33,12 @@ class Manager
 		// --------- Channel Actions ---------
 		static	int			joinAction( std::string channelName, int clientId );
 		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
-		static	int			kickAction( void );
+		static	int			quitAction( int clientId );
 		static	int			modeAction( void );
 		static	int			topicAction( void );
 		static	int			privAction( const Clients &client, std::vector<std::string> splits );
 		static	int			inviteAction( std::string nickName, int clientId );
+		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
 		static	int			runChanActions( std::vector<std::string> splits, int clientId);
 		static	void		sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
