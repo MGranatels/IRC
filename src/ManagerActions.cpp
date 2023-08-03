@@ -26,6 +26,8 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 
 int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 {
+	for (unsigned int i = 0; i < splits.size(); i++)
+		std::cout << i << " Split: " <<  splits[i] << std::endl;
 	if (splits[0].compare("JOIN") == 0)
 		return( Manager::joinAction(splits[1], clientId) );
 	//else if (splits[0].compare("KICK") == 0)
@@ -98,6 +100,7 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	{
 		_channels.push_back(Channel(channelName));
 		_channels.back().addClient(clientId);
+		_channels.back().addOperator(clientId);
 		joinProtocol(client, _channels.back(), clientId);
 	}
 	return 1;
@@ -130,8 +133,7 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 		//:user1!user1@localhost PRIVMSG #test :Hello, everyone!\r\n
 		BroadcastMessageChan(getChannelByName(splits[1]), formatMessage(client) + " PRIVMSG #" + splits[1] + " " + splits[2]);
 	}
-	else if (isValidClient(splits[1]))
-	{
+	else if (isValidClient(splits[1])) {
 		std::cout << "it's for a friend" << std::endl;
 	}
 	return (1);
@@ -146,17 +148,12 @@ int	Manager::kickAction( void )
 
 int	Manager::modeAction( std::vector<std::string> split, int clientId )
 {
-	// 472 ERR_UNKNOWNMODE => When a user try's to change a channel mode that does not exist
-	// 501 ERR_UMODEUNKNOWNFLAG => When user try's to set or unset a existing channel mode but with the wrong flag
-	// 461 ERR_NEEDMOREPARAMS => When user try's to change a channel mode and does not add a flag to it (few arguments per say)
-	// 482 ERR_CHANOPRIVSNEEDED  When user does not have admin permission to change modes.
-	std::cout << LightCyan << "Channel Modes Debugger" << std::endl << NC;
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
-	for (unsigned int i = 0; i < split.size(); i++)
-		std::cout << i << " Split: " <<  split[i] << std::endl;
-	validateMode(split, client);
+	if (!validateMode(split, client))
+		return (1);
+	changeMode(split, client);
 	return(1);
 }
 

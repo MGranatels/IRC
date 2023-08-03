@@ -5,7 +5,7 @@ Channel::Channel(std::string name):
 	this->_modes["i"] = MODE_NOT_SET;
 	this->_modes["t"] = MODE_SET;
 	this->_modes["k"] = MODE_NOT_SET;
-	this->_modes["o"] = MODE_NOT_SET;
+	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
@@ -15,7 +15,7 @@ Channel::Channel(std::string name, std::string topic):
 	this->_modes["i"] = MODE_NOT_SET;
 	this->_modes["t"] = MODE_SET;
 	this->_modes["k"] = MODE_NOT_SET;
-	this->_modes["o"] = MODE_NOT_SET;
+	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
@@ -78,7 +78,7 @@ const std::vector<int>& Channel::getOperators(void) const
 
 void Channel::addOperator(int operatorId)
 {
-	this->_clientsIds.push_back(operatorId);
+	this->_operatorsIds.push_back(operatorId);
 }
 
 void Channel::removeOperator(int operatorId)
@@ -109,4 +109,24 @@ void	Channel::unsetMode(const std::string& mode) {
 // Function to check if a channel mode is set
 bool Channel::isModeSet(const std::string& mode) {
 	return _modes[mode] == MODE_SET;
+}
+
+std::map<std::string, ChannelModeStatus> Channel::getModes() const {
+    return _modes;
+}
+
+void Channel::setPassword(std::string password) {
+	_password = password;
+}
+
+std::string Channel::getPassword(void) const {
+	return _password;
+}
+
+void Channel::setLimit(int limit) {
+	_limit = limit;
+}
+
+int Channel::getLimit(void) const {
+	return _limit;
 }

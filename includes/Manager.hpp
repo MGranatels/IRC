@@ -46,9 +46,16 @@ class Manager
 		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);
 		static const std::string	formatMessage(const Clients &client);
 		static const std::string	formatMessage(const Clients &client, std::string code);
+		static const std::string	formatMessage(const Channel &_channel, std::string code);
 		static	void		setChannOpps(Clients *client);
 		static	bool		checkChannelOp(Channel _channel, int id);
 		static	int			validateMode(std::vector<std::string> split, Clients client);
+		static	bool		checkFlagFormat(std::string flag);
+		static	int			changeMode(std::vector<std::string> split, Clients client);
+		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
+		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
+		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
+
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);
@@ -62,4 +69,5 @@ class Manager
 		static	bool	checkPassword(Clients client, std::string password);
 		static	void	removeClientFromAllChannels(int clientId); //TODO:
 };
+
 #endif
