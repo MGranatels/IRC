@@ -125,14 +125,22 @@ int	Manager::quitAction(int clientId)
 int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 {
 	//TODO: remember later to Verify User Permissions
-	if (isValidChannel(splits[1]) == CREATED)
+
+	std::string &recipient = splits[1];
+	std::string &message = splits[2];
+
+	for (size_t i = 3; i < splits.size(); i++)
+		message += " " + splits[i];
+
+	if (isValidChannel(recipient) == CREATED)
 	{
 		//:user1!user1@localhost PRIVMSG #test :Hello, everyone!\r\n
-		BroadcastMessageChan(client.getId(), getChannelByName(splits[1]), formatMessage(client) + " PRIVMSG " + splits[1] + " " + splits[2]);
+		BroadcastMessageChan(client.getId(), getChannelByName(recipient), formatMessage(client) + " PRIVMSG " + recipient + " " + message);
 	}
-	else if (isValidClient(splits[1]))
+	else if (isValidClient(recipient))
 	{
-		std::cout << "it's for a friend " + client.getId() << std::endl;
+		int recipientId = getClientByNick(recipient).getId();
+		sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message, recipientId);
 	}
 	return (1);
 }
