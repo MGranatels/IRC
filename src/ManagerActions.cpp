@@ -128,11 +128,11 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> splits)
 	if (isValidChannel(splits[1]) == CREATED)
 	{
 		//:user1!user1@localhost PRIVMSG #test :Hello, everyone!\r\n
-		BroadcastMessageChan(getChannelByName(splits[1]), formatMessage(client) + " PRIVMSG #" + splits[1] + " " + splits[2]);
+		BroadcastMessageChan(client.getId(), getChannelByName(splits[1]), formatMessage(client) + " PRIVMSG " + splits[1] + " " + splits[2]);
 	}
 	else if (isValidClient(splits[1]))
 	{
-		std::cout << "it's for a friend" << std::endl;
+		std::cout << "it's for a friend " + client.getId() << std::endl;
 	}
 	return (1);
 }
