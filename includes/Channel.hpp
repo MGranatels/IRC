@@ -30,7 +30,7 @@ class	Channel
 		std::string _password;
 		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
-		int				 _limit;
+		unsigned int	 _limit;
 
 	public:
 		Channel(std::string name);
@@ -56,10 +56,10 @@ class	Channel
 		std::vector<int> getClientsNoSender(int senderId) const;
 		const std::vector<int>&	getClients(void) const;
 		const std::vector<int>& getOperators(void) const;
-		std::string getTopic(void) const;
-		std::string getName(void) const;
-		std::string getPassword(void) const;
-		int			getLimit(void) const;
+		std::string		getTopic(void) const;
+		std::string		getName(void) const;
+		std::string		getPassword(void) const;
+		unsigned int	getLimit(void) const;
 		// TODO: bool isChanop(int ClientId); //to do -> return if a given client is a chanop i.e has right to execute the commands
 };
 

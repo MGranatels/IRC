@@ -54,7 +54,6 @@ int	Manager::changeMode(std::vector<std::string> split, Clients client)
 	std::string key(1, split[2][1]);
 	std::map<std::string, ChannelModeStatus>::iterator it = modes.find(key);
 
-	std::cout << "Key: " << key << std::endl;
 	if (it == modes.end())
 		return (sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :Operation does Not exist in the Channel. Type for HELP to See a List of Commands", client.getId()));
 	if (split[2][1] == 'k') // Needs password as argument
@@ -88,21 +87,24 @@ int	Manager::kOperator(std::vector<std::string> split, Channel& _channel, Client
 	return 1;
 }
 
-int	Manager::oOperator(std::vector<std::string> split, Channel& _channel, Clients& client)
+int	Manager::oOperator(std::vector<std::string> split, Channel& channel, Clients& client)
 {
+	if (client.getNickname() == split[3])
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, can't remove your own privileges.", client.getId()));
 	if (split.size() != 4)
 		return (sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", client.getId()));
 	if (!isValidClient(split[3]))
 		return (sendIrcMessage(formatMessage(client, NOSUCHNICK) + " :No such Nickname", client.getId()));
 	if (split[2][0] == '+') {
-		_channel.addOperator(getClientByNick(split[3]).getId());
-		_channel.setMode("o");
+		channel.addOperator(getClientByNick(split[3]).getId());
+		channel.setMode("o");
 	}
 	else
 	{
-		_channel.removeOperator(getClientByNick(split[3]).getId());
-		_channel.unsetMode("o");
+		channel.removeOperator(getClientByNick(split[3]).getId());
+		channel.unsetMode("o");
 	}
+	BroadcastMessageChan(channel, formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
 	return 1;
 }
 
@@ -125,3 +127,29 @@ int	Manager::lOperator(std::vector<std::string> split, Channel& _channel, Client
 	return 1;
 }
 
+bool	Manager::checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits)
+{
+	Channel& _channel = getChannelByName(channelName);
+	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
+	if (modes["k"] == MODE_SET)
+	{
+		if (splits.size() != 3 || splits[2].empty() || _channel.getPassword() != splits[2]) {
+			sendIrcMessage(formatMessage(client, BADCHANNELKEY) + " :Cannot join channel (+k), bad Password", client.getId());
+			return false;
+		}
+	}
+	return true;
+}
+
+bool	Manager::checkChannelLimit(std::string channelName, Clients client)
+{
+	Channel& _channel = getChannelByName(channelName);
+	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
+
+	if (modes["l"] == MODE_SET && _channel.getClients().size() >= _channel.getLimit())
+	{
+		sendIrcMessage(formatMessage(client, CHANNELISFULL) + " :Cannot join channel (+l), Channel is Full", client.getId());
+		return false;
+	}
+	return true;
+}

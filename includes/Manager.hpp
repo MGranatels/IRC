@@ -31,7 +31,7 @@ class Manager
 		static std::string 		getUsersList(Channel &Channel);
 
 		// --------- Channel Actions ---------
-		static	int			joinAction( std::string channelName, int clientId );
+		static	int			joinAction( std::string channelName, int clientId, std::vector<std::string> splits );
 		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
 		static	int			kickAction( void );
 		static	int			quitAction( int clientId );
@@ -55,7 +55,8 @@ class Manager
 		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
 		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
-
+		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits);
+		static	bool		checkChannelLimit(std::string channelName, Clients client);
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);

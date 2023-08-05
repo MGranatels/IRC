@@ -127,6 +127,7 @@ void Channel::setLimit(int limit) {
 	_limit = limit;
 }
 
-int Channel::getLimit(void) const {
+unsigned int Channel::getLimit(void) const {
 	return _limit;
 }
+

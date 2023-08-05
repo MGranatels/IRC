@@ -29,7 +29,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	for (unsigned int i = 0; i < splits.size(); i++)
 		std::cout << i << " Split: " <<  splits[i] << std::endl;
 	if (splits[0].compare("JOIN") == 0)
-		return( Manager::joinAction(splits[1], clientId) );
+		return( Manager::joinAction(splits[1], clientId, splits) );
 	//else if (splits[0].compare("KICK") == 0)
 		//return( Manager::kickAction() );
 	else if (splits[0].compare("QUIT") == 0)
@@ -83,15 +83,20 @@ int	Manager::partAction(std::string channelName, int clientId, std::string partM
 	return 1;
 }
 
-int	Manager::joinAction( std::string channelName, int clientId )
+int	Manager::joinAction( std::string channelName, int clientId, std::vector<std::string> splits )
 {
 	// First, check if the channel exists
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
+
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChannel(channelName) == CREATED)
 	{
+		if (!checkChannelPassword(channelName, client, splits))
+			return (0);
+		if (!checkChannelLimit(channelName, client))
+			return (0);
 		Channel& existingChannel = getChannelByName(channelName);
 		existingChannel.addClient(clientId);
 		joinProtocol(client, existingChannel, clientId);
