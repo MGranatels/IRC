@@ -42,7 +42,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("MODE") == 0)
 		return( Manager::modeAction(splits, clientId) );
 	else if (splits[0].compare("TOPIC") == 0)
-		return( Manager::topicAction() );
+		return( Manager::topicAction(*getClientById(clientId), splits));
 	else if (splits[0].compare("INVITE") == 0)
 		return( Manager::inviteAction(splits[1], clientId) );
 	else if (splits[0].compare("PRIVMSG") == 0)
@@ -169,10 +169,21 @@ int	Manager::modeAction( std::vector<std::string> split, int clientId )
 	return(1);
 }
 
-int	Manager::topicAction( void )
+int	Manager::topicAction( Clients &client, std::vector<std::string> splits )
 {
-	std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
-	return(1);
+	Channel& _channel = getChannelByName(splits[1]);
+
+	if (splits.size() < 3 && _channel.getTopic().empty())
+		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId()));
+	if (splits.size() < 3)
+		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
+	//Check if user has permissions in channel
+	if (!_channel.isClientOperator(client.getId()))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
+	if (!_channel.isModeSet("t"))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId()));
+	_channel.setTopic(splits[2]);
+	return(sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
 }
 
 int	Manager::inviteAction( std::string nickName, int clientId )

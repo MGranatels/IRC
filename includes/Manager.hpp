@@ -36,7 +36,7 @@ class Manager
 		static	int			kickAction( void );
 		static	int			quitAction( int clientId );
 		static	int			modeAction( std::vector<std::string> split, int clientId  );
-		static	int			topicAction( void );
+		static	int			topicAction( Clients &client, std::vector<std::string> splits );
 		static	int			privAction( const Clients &client, std::vector<std::string> splits );
 		static	int			inviteAction( std::string nickName, int clientId );
 		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
@@ -56,7 +56,7 @@ class Manager
 		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			iOperator(std::vector<std::string> split, Channel& _channel);
-		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);		
+		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);

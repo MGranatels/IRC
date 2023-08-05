@@ -97,6 +97,17 @@ bool Channel::isClientInChannel(int clientId)
 	return (false);
 }
 
+bool Channel::isClientOperator( int clientId)
+{
+	std::vector<int>::iterator it = _operatorsIds.begin();
+	for ( ; it != _operatorsIds.end(); it ++)
+	{
+		if (*it == clientId)
+			return (true);
+	}
+	return (false);
+}
+
 void	Channel::setMode(const std::string& mode) {
 	_modes[mode] = MODE_SET;
 }
