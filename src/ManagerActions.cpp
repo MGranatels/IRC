@@ -93,10 +93,8 @@ int	Manager::joinAction( std::string channelName, int clientId, std::vector<std:
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChannel(channelName) == CREATED)
 	{
-		if (!checkChannelPassword(channelName, client, splits))
-			return (0);
-		if (!checkChannelLimit(channelName, client))
-			return (0);
+		if (!checkChannelParameters(channelName, client, splits))
+			return 0;
 		Channel& existingChannel = getChannelByName(channelName);
 		existingChannel.addClient(clientId);
 		joinProtocol(client, existingChannel, clientId);

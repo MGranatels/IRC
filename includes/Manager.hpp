@@ -52,11 +52,16 @@ class Manager
 		static	int			validateMode(std::vector<std::string> split, Clients client);
 		static	bool		checkFlagFormat(std::string flag);
 		static	int			changeMode(std::vector<std::string> split, Clients client);
-		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
-		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
-		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& client);
+		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
+		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
+		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
+		static	int			iOperator(std::vector<std::string> split, Channel& _channel);
+		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);		
 		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
+		static	bool		checkChannelInvite(std::string channelName, Clients client);
+		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> splits);
+
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);
