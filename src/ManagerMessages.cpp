@@ -10,6 +10,11 @@ const std::string Manager::formatMessage(const Clients &client, std::string code
 	return (":" + hostname + " " + code + " " + client.getNickname());
 }
 
+const std::string Manager::formatMessage(const Channel &_channel, std::string code)
+{
+	return (":" + hostname + " " + code + " " + _channel.getName());
+}
+
 void Manager::BroadcastMessageChan(Channel &channel, std::string message)
 {
 	std::vector<int> users;

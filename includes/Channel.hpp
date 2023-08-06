@@ -7,6 +7,7 @@
 # include <utils.hpp>
 # include <Clients.hpp>
 # include <map>
+# include <functional>
 
 //notes:
 // Channel names are case insensitive.
@@ -26,8 +27,10 @@ class	Channel
 		std::map<std::string, ChannelModeStatus> _modes;
 		std::string _name;
 		std::string _topic;
+		std::string _password;
 		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
+		unsigned int	 _limit;
 
 	public:
 		Channel(std::string name);
@@ -41,17 +44,23 @@ class	Channel
 		void	removeClient(int clientId);
 		bool	isModeSet(const std::string& mode);
 		bool	isClientInChannel(int clientId);
+		bool	isClientOperator( int clientId);
 
 		//Getters and Setters:
 		void	setTopic(std::string topic);
 		void	setName(std::string name);
 		void	setMode(const std::string& mode);
+		void	setPassword(std::string password);
+		void	setLimit(int limit);
 		void	unsetMode(const std::string& mode);
+		std::map<std::string, ChannelModeStatus> getModes() const;
 		std::vector<int> getClientsNoSender(int senderId) const;
 		const std::vector<int>&	getClients(void) const;
-		std::string getTopic(void) const;
-		std::string getName(void) const;
 		const std::vector<int>& getOperators(void) const;
+		std::string		getTopic(void) const;
+		std::string		getName(void) const;
+		std::string		getPassword(void) const;
+		unsigned int	getLimit(void) const;
 		// TODO: bool isChanop(int ClientId); //to do -> return if a given client is a chanop i.e has right to execute the commands
 };
 

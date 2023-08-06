@@ -26,8 +26,10 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 
 int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 {
+	for (unsigned int i = 0; i < splits.size(); i++)
+		std::cout << i << " Split: " <<  splits[i] << std::endl;
 	if (splits[0].compare("JOIN") == 0)
-		return( Manager::joinAction(splits[1], clientId) );
+		return( Manager::joinAction(splits[1], clientId, splits) );
 	//else if (splits[0].compare("KICK") == 0)
 		//return( Manager::kickAction() );
 	else if (splits[0].compare("QUIT") == 0)
@@ -40,7 +42,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId)
 	else if (splits[0].compare("MODE") == 0)
 		return( Manager::modeAction(splits, clientId) );
 	else if (splits[0].compare("TOPIC") == 0)
-		return( Manager::topicAction() );
+		return( Manager::topicAction(*getClientById(clientId), splits));
 	else if (splits[0].compare("INVITE") == 0)
 		return( Manager::inviteAction(splits[1], clientId) );
 	else if (splits[0].compare("PRIVMSG") == 0)
@@ -81,15 +83,18 @@ int	Manager::partAction(std::string channelName, int clientId, std::string partM
 	return 1;
 }
 
-int	Manager::joinAction( std::string channelName, int clientId )
+int	Manager::joinAction( std::string channelName, int clientId, std::vector<std::string> splits )
 {
 	// First, check if the channel exists
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
+
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChannel(channelName) == CREATED)
 	{
+		if (!checkChannelParameters(channelName, client, splits))
+			return 0;
 		Channel& existingChannel = getChannelByName(channelName);
 		existingChannel.addClient(clientId);
 		joinProtocol(client, existingChannel, clientId);
@@ -98,6 +103,7 @@ int	Manager::joinAction( std::string channelName, int clientId )
 	{
 		_channels.push_back(Channel(channelName));
 		_channels.back().addClient(clientId);
+		_channels.back().addOperator(clientId);
 		joinProtocol(client, _channels.back(), clientId);
 	}
 	return 1;
@@ -154,24 +160,30 @@ int	Manager::kickAction( void )
 
 int	Manager::modeAction( std::vector<std::string> split, int clientId )
 {
-	// 472 ERR_UNKNOWNMODE => When a user try's to change a channel mode that does not exist
-	// 501 ERR_UMODEUNKNOWNFLAG => When user try's to set or unset a existing channel mode but with the wrong flag
-	// 461 ERR_NEEDMOREPARAMS => When user try's to change a channel mode and does not add a flag to it (few arguments per say)
-	// 482 ERR_CHANOPRIVSNEEDED  When user does not have admin permission to change modes.
-	std::cout << LightCyan << "Channel Modes Debugger" << std::endl << NC;
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
-	for (unsigned int i = 0; i < split.size(); i++)
-		std::cout << i << " Split: " <<  split[i] << std::endl;
-	validateMode(split, client);
+	if (!validateMode(split, client))
+		return (1);
+	changeMode(split, client);
 	return(1);
 }
 
-int	Manager::topicAction( void )
+int	Manager::topicAction( Clients &client, std::vector<std::string> splits )
 {
-	std::cout << "A Gabi nao pode ouvir este topico" << std::endl;
-	return(1);
+	Channel& _channel = getChannelByName(splits[1]);
+
+	if (splits.size() < 3 && _channel.getTopic().empty())
+		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId()));
+	if (splits.size() < 3)
+		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
+	//Check if user has permissions in channel
+	if (!_channel.isClientOperator(client.getId()))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
+	if (!_channel.isModeSet("t"))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId()));
+	_channel.setTopic(splits[2]);
+	return(sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
 }
 
 int	Manager::inviteAction( std::string nickName, int clientId )

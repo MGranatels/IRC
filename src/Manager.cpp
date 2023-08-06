@@ -73,7 +73,11 @@ std::string	Manager::getUsersList(Channel &Channel)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(Channel.getClients()[i]);
 		Clients& client = *iter;
-		usersList += client.getNickname() + " ";
+		//Lets get the user operator and add a @
+		if (checkChannelOp(Channel, client.getId()))
+			usersList += "@" + client.getNickname() + " ";
+		else
+			usersList += client.getNickname() + " ";
 	}
 	return usersList;
 }
