@@ -22,6 +22,8 @@
 # define CHANOPRIVSNEEDED	"482"
 # define UMODEUNKNOWNFLAG	"501"
 # define BADCHANNELNAME		"476"
+# define ERR_USERONCHANNEL	"443"
+# define ERR_NOSUCHCHANNEL	"403"
 
 class Error
 {

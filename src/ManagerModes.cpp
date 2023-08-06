@@ -142,7 +142,7 @@ int	Manager::lOperator(std::vector<std::string> split, Channel& _channel, Client
 }
 
 
-bool	Manager::checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits)
+bool	Manager::checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits)
 {
 	Channel& _channel = getChannelByName(channelName);
 	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
@@ -171,16 +171,16 @@ bool	Manager::checkChannelLimit(std::string channelName, Clients client)
 
 bool	Manager::checkChannelInvite(std::string channelName, Clients client)
 {
-	Channel& _channel = getChannelByName(channelName);
-	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
-	if (modes["i"] == MODE_SET) {
+	Channel& channel = getChannelByName(channelName);
+	std::map<std::string, ChannelModeStatus> modes = channel.getModes();
+	if (modes["i"] == MODE_SET && !channel.isClientInvited(client.getId())) {
 		sendIrcMessage(formatMessage(client, INVITEONLYCHAN) + " :Cannot join channel (+i). Access Denied, invitation only", client.getId());
 		return false;
 	}
 	return true;
 }
 
-bool	Manager::checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> splits)
+bool	Manager::checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits)
 {
 	if (!checkChannelPassword(channelName, client, splits))
 		return false;

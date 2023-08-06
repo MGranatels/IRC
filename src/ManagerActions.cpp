@@ -7,7 +7,7 @@ std::string Manager::hostname = "localhost";
 
 // aqui podes passar mais parametros
 
-bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter)
+bool	Manager::checkClientData(std::vector<std::string> &splits, std::vector<Clients>::iterator iter)
 {
 	Clients& foundClient = *iter;
 	if (foundClient.getClientSettings() == true)
@@ -24,12 +24,12 @@ bool	Manager::checkClientData(std::vector<std::string> splits, std::vector<Clien
 	return false;
 }
 
-int	Manager::runChanActions( std::vector<std::string> splits, int clientId, std::string full_message)
+int	Manager::runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message)
 {
 	for (unsigned int i = 0; i < splits.size(); i++)
 		std::cout << i << " Split: " <<  splits[i] << std::endl;
 	if (splits[0].compare("JOIN") == 0)
-		return( Manager::joinAction(splits[1], clientId, splits) );
+		return( Manager::joinAction(clientId, splits) );
 	//else if (splits[0].compare("KICK") == 0)
 		//return( Manager::kickAction() );
 	else if (splits[0].compare("QUIT") == 0)
@@ -44,7 +44,7 @@ int	Manager::runChanActions( std::vector<std::string> splits, int clientId, std:
 	else if (splits[0].compare("TOPIC") == 0)
 		return( Manager::topicAction(*getClientById(clientId), splits));
 	else if (splits[0].compare("INVITE") == 0)
-		return( Manager::inviteAction(splits[1], clientId) );
+		return( Manager::inviteAction(splits, clientId) );
 	else if (splits[0].compare("PRIVMSG") == 0)
 		return( Manager::privAction( *getClientById(clientId), splits, full_message));
 	else if (splits[0].compare("NICK") == 0)
@@ -82,12 +82,13 @@ int	Manager::partAction(std::string channelName, int clientId, std::string partM
 	return 1;
 }
 
-int	Manager::joinAction( std::string channelName, int clientId, std::vector<std::string> splits )
+int	Manager::joinAction(int clientId, std::vector<std::string> &splits )
 {
 	// First, check if the channel exists
 	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
 	std::cout << clientId << std::endl;
 	Clients& client = *iter;
+	std::string &channelName = splits[1];
 	int isValidChan = isValidChannel(channelName);
 
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
@@ -130,7 +131,7 @@ int	Manager::quitAction(int clientId)
 }
 
 
-int	Manager::privAction( const Clients &client, std::vector<std::string> splits, std::string fullMessage)
+int	Manager::privAction( const Clients &client, std::vector<std::string> &splits, std::string fullMessage)
 {
 	//TODO: remember later to Verify User Permissions
 
@@ -168,7 +169,7 @@ int	Manager::modeAction( std::vector<std::string> split, int clientId )
 	return(1);
 }
 
-int	Manager::topicAction( Clients &client, std::vector<std::string> splits )
+int	Manager::topicAction( Clients &client, std::vector<std::string> &splits )
 {
 	Channel& _channel = getChannelByName(splits[1]);
 
@@ -185,23 +186,30 @@ int	Manager::topicAction( Clients &client, std::vector<std::string> splits )
 	return(sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
 }
 
-int	Manager::inviteAction( std::string nickName, int clientId )
+int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
 {
-	(void)nickName;
-	(void)clientId;
-	// RPL_INVITING 341 to invite user
-	// ERR_NOTONCHANNEL 442 when user not in channel
-	// ERR_CHANOPRIVSNEEDED 482 When user does not have admin permission
-
-	// Check which channel the user is sending the message from, how can I do that?
-
-	// If user is not in any channel send an error response
-
-	// If nickname does not exist send error response
-
-	// If user does not have permissions to invite send error response 482
-
-
-	std::cout << "tao, pega umas cervejinhas e buga" << std::endl;
-	return(1);
+	std::string &channelName = splits[2];
+	std::string	&invitedClient = splits[1];
+	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	Clients& inviter = *iter;
+	int isValidChan = isValidChannel(channelName);
+	if (isValidChan == CREATED)
+	{
+		Channel &channel = getChannelByName(channelName);
+		if (!channel.isClientInChannel(clientId))
+			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", clientId));
+		if (!channel.isClientOperator(clientId))
+			return (sendIrcMessage(formatMessage(inviter, CHANOPRIVSNEEDED) + " " + channelName + " :User is not a Channop", clientId));
+		if (!isValidClient(invitedClient))
+			return (sendIrcMessage(formatMessage(inviter, NOSUCHNICK) + " " + invitedClient + " :Not such user in Server", clientId));
+		if (channel.isClientInChannel(getClientByNick(invitedClient).getId()))
+			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + invitedClient + " :user already in Channel " + channelName, clientId));
+		// :<server> 341 <invited_user> <channel> <inviter>
+		channel.addInvitee(getClientByNick(invitedClient).getId());
+		sendIrcMessage(formatMessage(inviter, INVITING) + " " + invitedClient + " " + channelName, clientId);
+		sendIrcMessage(formatMessage(inviter) + " NOTICE " + invitedClient + " you have been invited to join " + channelName, getClientByNick(invitedClient).getId());
+	}
+	else
+		return (sendIrcMessage(formatMessage(inviter, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ", clientId));
+	return 1;
 }

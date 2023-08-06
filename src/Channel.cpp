@@ -39,6 +39,11 @@ void Channel::removeClient(int clientId)
     removeElementFromVector(_clientsIds, clientId);
 }
 
+void Channel::removeInvitee(int clientId)
+{
+    removeElementFromVector(_inviteesIds, clientId);
+}
+
 //returns the users in a channel but just a const reference, i.e we can only edit this inside the class
 const std::vector<int>& Channel::getClients(void) const
 {
@@ -49,6 +54,11 @@ const std::vector<int>& Channel::getClients(void) const
 void Channel::addClient(int newClientId)
 {
 	_clientsIds.push_back(newClientId);
+}
+
+void Channel::addInvitee(int newClientId)
+{
+	_inviteesIds.push_back(newClientId);
 }
 
 void Channel::setTopic(std::string topic)
@@ -101,6 +111,17 @@ bool Channel::isClientOperator( int clientId)
 {
 	std::vector<int>::iterator it = _operatorsIds.begin();
 	for ( ; it != _operatorsIds.end(); it ++)
+	{
+		if (*it == clientId)
+			return (true);
+	}
+	return (false);
+}
+
+bool Channel::isClientInvited( int clientId)
+{
+	std::vector<int>::iterator it = _inviteesIds.begin();
+	for ( ; it != _inviteesIds.end(); it ++)
 	{
 		if (*it == clientId)
 			return (true);

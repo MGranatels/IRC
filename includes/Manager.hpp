@@ -31,16 +31,16 @@ class Manager
 		static std::string 		getUsersList(Channel &Channel);
 
 		// --------- Channel Actions ---------
-		static	int			joinAction( std::string channelName, int clientId, std::vector<std::string> splits );
+		static	int			joinAction( int clientId, std::vector<std::string> &splits );
 		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
 		static	int			kickAction( void );
 		static	int			quitAction( int clientId );
 		static	int			modeAction( std::vector<std::string> split, int clientId  );
-		static	int			topicAction( Clients &client, std::vector<std::string> splits );
-		static	int			privAction( const Clients &client, std::vector<std::string> splits, std::string full_message);
-		static	int			inviteAction( std::string nickName, int clientId );
+		static	int			topicAction( Clients &client, std::vector<std::string> &splits );
+		static	int			privAction( const Clients &client, std::vector<std::string> &splits, std::string full_message);
+		static	int			inviteAction( std::vector<std::string> &splits, int clientId );
 		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
-		static	int			runChanActions( std::vector<std::string> splits, int clientId, std::string full_message);
+		static	int			runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
 		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);
@@ -58,10 +58,10 @@ class Manager
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			iOperator(std::vector<std::string> split, Channel& _channel);
 		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
-		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> splits);
+		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
-		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> splits);
+		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits);
 
 
 		/* Client Methods*/
@@ -71,7 +71,7 @@ class Manager
 		static	bool		isValidClient(int	id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	bool	checkClientData(std::vector<std::string> splits, std::vector<Clients>::iterator iter);
+		static	bool	checkClientData(std::vector<std::string> &splits, std::vector<Clients>::iterator iter);
 		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
 		static	void	removeClientFromAllChannels(int clientId); //TODO:

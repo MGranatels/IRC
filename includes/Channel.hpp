@@ -30,6 +30,7 @@ class	Channel
 		std::string _password;
 		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
+		std::vector<int> _inviteesIds;
 		unsigned int	 _limit;
 
 	public:
@@ -42,6 +43,9 @@ class	Channel
 		void	removeOperator(int operatorId);
 		void	addClient(int newClientId);
 		void	removeClient(int clientId);
+		void	addInvitee(int clientId);
+		void	removeInvitee(int clientId);
+		bool	isClientInvited(int clientId);
 		bool	isModeSet(const std::string& mode);
 		bool	isClientInChannel(int clientId);
 		bool	isClientOperator( int clientId);
