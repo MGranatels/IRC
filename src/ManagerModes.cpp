@@ -119,6 +119,7 @@ int	Manager::oOperator(std::vector<std::string> split, Channel& channel, Clients
 		channel.unsetMode("o");
 	}
 	BroadcastMessageChan(channel, formatMessage(_client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
+	BroadcastMessageChan(channel, formatMessage(_client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
 	return 1;
 }
 
