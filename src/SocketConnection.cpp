@@ -35,7 +35,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 			if (!Manager::checkClientData(splits, iter))
 				passwordCheck(i);
 			else
-				Manager::runChanActions(splits, i);
+				Manager::runChanActions(splits, i, str);
 		}
 		if (i != _fdSocket)
 			if (send(i, buffer, read, 0) == -1)

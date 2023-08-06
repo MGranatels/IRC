@@ -57,6 +57,8 @@ Channel&	Manager::getChannelByName(std::string name)
 int	Manager::isValidChannel(std::string name)
 {
 	long unsigned int  i;
+	if (name[0] != '#')
+		return NOT_VALID;
 	for (i = 0; i < _channels.size(); i++)
 	{
 		if (toUpperCase(_channels[i].getName()) == toUpperCase(name))
@@ -187,7 +189,7 @@ void	Manager::removeClientFromAllChannels(int clientId)
 	{
 		if (it->isClientInChannel(clientId))
 		{
-			BroadcastMessageChan(*it, formatMessage(client, "QUIT_CHANNEL") + " :has quit");
+			BroadcastMessageChan(*it, formatMessage(client) + " QUIT :has quit");
 			it->removeClient(clientId);
 			messageUpdateUserList(*it, client);
 		}

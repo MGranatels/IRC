@@ -37,10 +37,10 @@ class Manager
 		static	int			quitAction( int clientId );
 		static	int			modeAction( std::vector<std::string> split, int clientId  );
 		static	int			topicAction( Clients &client, std::vector<std::string> splits );
-		static	int			privAction( const Clients &client, std::vector<std::string> splits );
+		static	int			privAction( const Clients &client, std::vector<std::string> splits, std::string full_message);
 		static	int			inviteAction( std::string nickName, int clientId );
 		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
-		static	int			runChanActions( std::vector<std::string> splits, int clientId);
+		static	int			runChanActions( std::vector<std::string> splits, int clientId, std::string full_message);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
 		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);

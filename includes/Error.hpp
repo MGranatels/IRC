@@ -21,6 +21,7 @@
 # define BADCHANNELKEY		"475"
 # define CHANOPRIVSNEEDED	"482"
 # define UMODEUNKNOWNFLAG	"501"
+# define BADCHANNELNAME		"476"
 
 class Error
 {
