@@ -35,6 +35,12 @@ void Manager::BroadcastMessageChan(int senderid, Channel &channel, std::string m
 		sendIrcMessage(message, *it);
 }
 
+void Manager::messageUpdateUserList(Channel &channel, Clients &client)
+{
+	BroadcastMessageChan(channel, formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
+	BroadcastMessageChan(channel, formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
+}
+
 void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
 {
 	// Send the JOIN message to the client
@@ -44,6 +50,5 @@ void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
 		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :No topic is set", clientId);
 	else
 		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + channel.getName() + " :" + channel.getTopic(), clientId);
-	BroadcastMessageChan(channel, formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + getUsersList(channel));
-	BroadcastMessageChan(channel, formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
+	messageUpdateUserList(channel, client);
 }

@@ -44,6 +44,7 @@ class Manager
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
 		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);
+		static	void			messageUpdateUserList(Channel &channel, Clients &client);
 		static const std::string	formatMessage(const Clients &client);
 		static const std::string	formatMessage(const Clients &client, std::string code);
 		static const std::string	formatMessage(const Channel &_channel, std::string code);

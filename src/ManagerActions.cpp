@@ -77,8 +77,7 @@ int	Manager::partAction(std::string channelName, int clientId, std::string partM
 	sendIrcMessage(formatMessage(partingClient) + " PART " + channel.getName(), clientId);
 	BroadcastMessageChan(channel, formatMessage(partingClient, "QUIT_CHANNEL") + " :has quit");
 	channel.removeClient(clientId);
-	BroadcastMessageChan(channel, formatMessage(partingClient, "353") + " = " + channel.getName() + " :" + getUsersList(channel));
-	BroadcastMessageChan(channel, formatMessage(partingClient, "366") + " " + channel.getName() + " :End of NAMES list");
+	messageUpdateUserList(channel, partingClient);
 	// Remove the user from the channel
 	return 1;
 }

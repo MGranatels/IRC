@@ -189,8 +189,7 @@ void	Manager::removeClientFromAllChannels(int clientId)
 		{
 			BroadcastMessageChan(*it, formatMessage(client, "QUIT_CHANNEL") + " :has quit");
 			it->removeClient(clientId);
-			BroadcastMessageChan(*it, formatMessage(client, "353") + " = " + it->getName() + " :" + getUsersList(*it));
-			BroadcastMessageChan(*it, formatMessage(client, "366") + " " + it->getName() + " :End of NAMES list");
+			messageUpdateUserList(*it, client);
 		}
 	}
 }
