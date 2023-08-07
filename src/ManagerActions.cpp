@@ -29,26 +29,28 @@ int	Manager::runChanActions( std::vector<std::string> &splits, int clientId, std
 	for (unsigned int i = 0; i < splits.size(); i++)
 		std::cout << i << " Split: " <<  splits[i] << std::endl;
 	if (splits[0].compare("JOIN") == 0)
-		return( Manager::joinAction(clientId, splits) );
+		return( joinAction(clientId, splits) );
 	//else if (splits[0].compare("KICK") == 0)
 		//return( Manager::kickAction() );
 	else if (splits[0].compare("QUIT") == 0)
-		return(Manager::quitAction(clientId));
+		return( quitAction(clientId));
 	else if (splits[0].compare("PART") == 0)
 		if (splits.size() > 2)
 			return(partAction(splits[1], clientId, splits[2]));
 		else
 			return(partAction(splits[1], clientId, ""));
 	else if (splits[0].compare("MODE") == 0)
-		return( Manager::modeAction(splits, clientId) );
+		return(modeAction(splits, clientId) );
 	else if (splits[0].compare("TOPIC") == 0)
-		return( Manager::topicAction(*getClientById(clientId), splits));
+		return(topicAction(*getClientById(clientId), splits));
 	else if (splits[0].compare("INVITE") == 0)
-		return( Manager::inviteAction(splits, clientId) );
+		return(inviteAction(splits, clientId));
 	else if (splits[0].compare("PRIVMSG") == 0)
-		return( Manager::privAction( *getClientById(clientId), splits, full_message));
+		return(privAction( *getClientById(clientId), splits, full_message));
 	else if (splits[0].compare("NICK") == 0)
 		return(0);
+	//else if (splits[0].compare("MUTE") == 0 || splits[0].compare("UNMUTE") == 0)
+	//	return(muteAction( *getClientById(clientId), splits));
 	return (-1);
 }
 
@@ -140,8 +142,11 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> &splits
 
 	if (isValidChannel(recipient) == CREATED)
 	{
-		//:user1!user1@localhost PRIVMSG #test :Hello, everyone!\r\n
-		BroadcastMessageChan(client.getId(), getChannelByName(recipient), formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
+		Channel& channel = getChannelByName(recipient);
+		std::cout  << channel.isClientMuted(client.getId()) << std::endl;
+		if (channel.isClientMuted(client.getId()))
+			return (sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId()));
+		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
 	}
 	else if (isValidClient(recipient))
 	{
@@ -173,13 +178,13 @@ int	Manager::topicAction( Clients &client, std::vector<std::string> &splits )
 {
 	Channel& _channel = getChannelByName(splits[1]);
 
+	if (!_channel.isClientOperator(client.getId()))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
 	if (splits.size() < 3 && _channel.getTopic().empty())
 		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId()));
 	if (splits.size() < 3)
 		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
 	//Check if user has permissions in channel
-	if (!_channel.isClientOperator(client.getId()))
-		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
 	if (!_channel.isModeSet("t"))
 		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId()));
 	_channel.setTopic(splits[2]);
@@ -190,16 +195,16 @@ int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
 {
 	std::string &channelName = splits[2];
 	std::string	&invitedClient = splits[1];
-	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
+	std::vector<Clients>::iterator iter = getClientById(clientId);
 	Clients& inviter = *iter;
 	int isValidChan = isValidChannel(channelName);
 	if (isValidChan == CREATED)
 	{
 		Channel &channel = getChannelByName(channelName);
+		if (!channel.isClientOperator(clientId))
+			return (sendIrcMessage(formatMessage(inviter, CHANOPRIVSNEEDED) + " " + channelName + " :Permission denied, you're not channel operator.", clientId));
 		if (!channel.isClientInChannel(clientId))
 			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", clientId));
-		if (!channel.isClientOperator(clientId))
-			return (sendIrcMessage(formatMessage(inviter, CHANOPRIVSNEEDED) + " " + channelName + " :User is not a Channop", clientId));
 		if (!isValidClient(invitedClient))
 			return (sendIrcMessage(formatMessage(inviter, NOSUCHNICK) + " " + invitedClient + " :Not such user in Server", clientId));
 		if (channel.isClientInChannel(getClientByNick(invitedClient).getId()))
@@ -213,3 +218,31 @@ int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
 		return (sendIrcMessage(formatMessage(inviter, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ", clientId));
 	return 1;
 }
+
+/*int	Manager::muteAction( const Clients &client, std::vector<std::string> &splits)
+{
+	if (splits.size() < 3)
+		return (sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Action. Type HELP For a List of Commands", client.getId()));
+	std::string &channelName = splits[2];
+	if (!isValidClient(splits[1]))
+		return (sendIrcMessage(formatMessage(client, NOSUCHNICK) + " " + splits[1] + " :No such user in Server", client.getId()));
+	Clients	&mutedClient = getClientByNick(splits[1]);
+	int isValidChan = isValidChannel(channelName);
+	if (isValidChan == CREATED)
+	{
+		Channel &channel = getChannelByName(channelName);
+		if (!channel.isClientOperator(client.getId()))
+			return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + channelName + " :Permission denied, you're not channel operator.", client.getId()));
+		if (!channel.isClientInChannel(mutedClient.getId()))
+			return (sendIrcMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", client.getId()));
+		if (channel.isClientMuted(mutedClient.getId()))
+			return (sendIrcMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + mutedClient.getNickname() + " :user already muted" + channelName, client.getId()));
+		if (splits[0] == "MUTED")
+			channel.addMuted(mutedClient.getId());
+		else
+			channel.removeMuted(mutedClient.getId());
+	}
+	else
+		return (sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ", client.getId()));
+	return 1;
+}*/

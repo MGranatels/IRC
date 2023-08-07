@@ -31,6 +31,7 @@ class	Channel
 		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
 		std::vector<int> _inviteesIds;
+		std::vector<int> _mutedIds;
 		unsigned int	 _limit;
 
 	public:
@@ -44,11 +45,14 @@ class	Channel
 		void	addClient(int newClientId);
 		void	removeClient(int clientId);
 		void	addInvitee(int clientId);
+		void	addMuted(int newClientId);
 		void	removeInvitee(int clientId);
+		void	removeMuted(int clientId);
 		bool	isClientInvited(int clientId);
 		bool	isModeSet(const std::string& mode);
 		bool	isClientInChannel(int clientId);
 		bool	isClientOperator( int clientId);
+		bool 	isClientMuted( int clientId);
 
 		//Getters and Setters:
 		void	setTopic(std::string topic);

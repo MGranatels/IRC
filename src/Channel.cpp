@@ -7,6 +7,7 @@ Channel::Channel(std::string name):
 	this->_modes["k"] = MODE_NOT_SET;
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
+	this->_modes["m"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -17,6 +18,7 @@ Channel::Channel(std::string name, std::string topic):
 	this->_modes["k"] = MODE_NOT_SET;
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
+	this->_modes["m"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -44,6 +46,11 @@ void Channel::removeInvitee(int clientId)
     removeElementFromVector(_inviteesIds, clientId);
 }
 
+void Channel::removeMuted(int clientId)
+{
+	removeElementFromVector(_mutedIds, clientId);
+}
+
 //returns the users in a channel but just a const reference, i.e we can only edit this inside the class
 const std::vector<int>& Channel::getClients(void) const
 {
@@ -59,6 +66,11 @@ void Channel::addClient(int newClientId)
 void Channel::addInvitee(int newClientId)
 {
 	_inviteesIds.push_back(newClientId);
+}
+
+void Channel::addMuted(int newClientId)
+{
+	_mutedIds.push_back(newClientId);
 }
 
 void Channel::setTopic(std::string topic)
@@ -129,6 +141,17 @@ bool Channel::isClientInvited( int clientId)
 	return (false);
 }
 
+bool Channel::isClientMuted( int clientId)
+{
+	std::vector<int>::iterator it = _mutedIds.begin();
+	for ( ; it != _mutedIds.end(); it ++)
+	{
+		if (*it == clientId)
+			return (true);
+	}
+	return (false);
+}
+
 void	Channel::setMode(const std::string& mode) {
 	_modes[mode] = MODE_SET;
 }
@@ -162,4 +185,3 @@ void Channel::setLimit(int limit) {
 unsigned int Channel::getLimit(void) const {
 	return _limit;
 }
-

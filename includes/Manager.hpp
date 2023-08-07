@@ -40,6 +40,7 @@ class Manager
 		static	int			privAction( const Clients &client, std::vector<std::string> &splits, std::string full_message);
 		static	int			inviteAction( std::vector<std::string> &splits, int clientId );
 		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
+		static	int			muteAction( const Clients &client, std::vector<std::string> &splits);
 		static	int			runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
@@ -58,6 +59,7 @@ class Manager
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			iOperator(std::vector<std::string> split, Channel& _channel);
 		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
+		static	int			mOperator(std::vector<std::string> split, Channel& _channel, Clients _client);
 		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);

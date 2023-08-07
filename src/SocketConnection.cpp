@@ -21,7 +21,6 @@ int	Sockets::passwordCheck(int _id)
 	return (printMessage("Client Is Correctly Connected to the Server!", Green));
 }
 
-
 void	Sockets::handleMessage(int i, int read, char *buffer)
 {
 	buffer[read] = 0;

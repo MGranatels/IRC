@@ -67,6 +67,7 @@ SRCS = 	utils.cpp \
 		ManagerModes.cpp \
 		ManagerMessages.cpp \
 		ManagerActions.cpp \
+		ManagerOperations.cpp \
 		Channel.cpp \
 		main.cpp
 
