@@ -48,7 +48,7 @@ int	Manager::runChanActions( std::vector<std::string> &splits, int clientId, std
 	else if (splits[0].compare("PRIVMSG") == 0)
 		return(privAction( *getClientById(clientId), splits, full_message));
 	else if (splits[0].compare("NICK") == 0)
-		return(0);
+		return(nickAction(*getClientById(clientId), splits));
 	//else if (splits[0].compare("MUTE") == 0 || splits[0].compare("UNMUTE") == 0)
 	//	return(muteAction( *getClientById(clientId), splits));
 	return (-1);
@@ -219,6 +219,18 @@ int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
 	return 1;
 }
 
+int	Manager::nickAction( Clients &client, std::vector<std::string> &splits )
+{
+	if (splits.size() < 2)
+		return (sendIrcMessage(formatMessage(client, NONICKNAMEGIVEN) + " :No nickname given", client.getId()));
+	if (splits[1].size() > 9)
+		return (sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " " + splits[1] + " :Erroneous nickname", client.getId()));
+	if (isValidClient(splits[1]))
+		return (sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + splits[1] + " :Nickname is already in use", client.getId()));
+	client.setNickname(splits[1]);
+	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + splits[1] + " :Nickname changed successfully", client.getId());
+	return 1;
+}
 /*int	Manager::muteAction( const Clients &client, std::vector<std::string> &splits)
 {
 	if (splits.size() < 3)
