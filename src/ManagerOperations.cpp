@@ -13,7 +13,7 @@ int	Manager::tOperator(std::vector<std::string> split, Channel& _channel, Client
 	else {
 		_channel.unsetMode("t");
 		_channel.setTopic("");
-		sendIrcMessage(formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", _client.getId());
+		BroadcastMessageChan(_channel, formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set");
 	}
 	return 1;
 }
