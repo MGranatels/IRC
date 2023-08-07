@@ -178,23 +178,17 @@ int	Manager::topicAction( Clients &client, std::vector<std::string> &splits )
 {
 	Channel& _channel = getChannelByName(splits[1]);
 
+	if (!_channel.isClientOperator(client.getId()))
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
 	if (splits.size() < 3 && _channel.getTopic().empty())
 		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId()));
 	if (splits.size() < 3)
 		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
-	std::string	newTopic = splits[2];
-	//Check if user has permissions in channel to chan
-	if (!_channel.isClientOperator(client.getId()))
-		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
+	//Check if user has permissions in channel
 	if (!_channel.isModeSet("t"))
 		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId()));
-
-	if (splits.size() > 3)
-		for (unsigned int i = 3; i < splits.size(); i++)
-			newTopic += " " + splits[i];
-	_channel.setTopic(newTopic);
-	BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
-	return(1);
+	_channel.setTopic(splits[2]);
+	return(sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
 }
 
 int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
@@ -215,6 +209,7 @@ int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
 			return (sendIrcMessage(formatMessage(inviter, NOSUCHNICK) + " " + invitedClient + " :Not such user in Server", clientId));
 		if (channel.isClientInChannel(getClientByNick(invitedClient).getId()))
 			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + invitedClient + " :user already in Channel " + channelName, clientId));
+		// :<server> 341 <invited_user> <channel> <inviter>
 		channel.addInvitee(getClientByNick(invitedClient).getId());
 		sendIrcMessage(formatMessage(inviter, INVITING) + " " + invitedClient + " " + channelName, clientId);
 		sendIrcMessage(formatMessage(inviter) + " NOTICE " + invitedClient + " you have been invited to join " + channelName, getClientByNick(invitedClient).getId());
