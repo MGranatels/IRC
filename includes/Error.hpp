@@ -26,6 +26,7 @@
 # define BADCHANNELKEY		"475"
 # define CHANOPRIVSNEEDED	"482"
 # define UMODEUNKNOWNFLAG	"501"
+# define ERR_NOTEXTTOSEND	"412"
 
 class Error
 {

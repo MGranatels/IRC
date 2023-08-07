@@ -138,8 +138,15 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> &splits
 	//TODO: remember later to Verify User Permissions
 
 	std::string &recipient = splits[1];
-	std::vector<std::string> message = split(fullMessage, ":");
+	std::vector<std::string> message;
 
+	if (fullMessage.find(':') != std::string::npos)
+		message = split(fullMessage, ":");
+	else
+	{
+		sendIrcMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send, TRY ADDING A ':' AFTER THE NICKNAME", client.getId());
+		return (0);
+	}
 	if (isValidChannel(recipient) == CREATED)
 	{
 		Channel& channel = getChannelByName(recipient);
