@@ -77,11 +77,3 @@ void	Clients::setCmd( std::vector<std::string> cmd ) {
 std::vector<std::string>	Clients::getCmd( void ) const {
 	return (this->_cmd);
 }
-
-void	Clients::setFullMessage(std::string message) {
-	this->_fullMessage = message;
-}
-
-std::string	Clients::getFullMessage( void ) const {
-	return (this->_fullMessage);
-}

@@ -12,12 +12,12 @@ class Clients
 		std::string	_password;
 		std::string	_nickcname;
 		std::string	_username;
-		std::string	_fullMessage;
 		std::vector<std::string>	_cmd;
 
 
 	public:
 
+		std::string	fullMessage;
 		Clients( int _id);
 		~Clients( void );
 		//Setters
@@ -29,13 +29,11 @@ class Clients
 		void		setPassword( std::string username );
 		void		setClientSettings( bool clientSettings );
 		void		setOppChannel( bool opChannel );
-		void		setFullMessage( std::string fullMessage );
 		//Getters
 		int							getId( void ) const;
 		std::string					getNickname( void ) const;
 		std::string					getUsername( void ) const;
 		std::string					getPassword( void ) const;
-		std::string					getFullMessage( void ) const;
 		std::vector<std::string>	getCmd( void ) const;
 		bool						getClientSettings( void ) const;
 		bool						getOppChannel( void ) const;

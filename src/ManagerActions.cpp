@@ -21,7 +21,7 @@ void Manager::defineActionMap( void )
 	on("JOIN", &Manager::joinAction);
 	on("INVITE", &Manager::inviteAction);
 	on("PRIVMSG", &Manager::privAction);
-	//on("NICK", &Manager::nickAction);
+	// on("NICK", &Manager::nickAction);
     // actionMap["KICK"] = &Manager::kickAction;
 }
 
@@ -117,7 +117,6 @@ void	Manager::quitAction( Clients &client )
 {
 	removeClientFromAllChannels(client.getId());
 	sendIrcMessage(formatMessage(client) + " QUIT :Goodbye!", client.getId());
-	removeClient(client.getId());
 	return ;
 }
 
@@ -128,8 +127,8 @@ void	Manager::privAction( Clients &client)
 	std::string &recipient = cmd[1];
 	std::vector<std::string> message;
 
-	if (client.getFullMessage().find(':') != std::string::npos)
-		message = split(client.getFullMessage(), ":");
+	if (client.fullMessage.find(':') != std::string::npos)
+		message = split(client.fullMessage, ":");
 	else
 	{
 		sendIrcMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send, TRY ADDING A ':' AFTER THE NICKNAME", client.getId());
@@ -149,7 +148,8 @@ void	Manager::privAction( Clients &client)
 	else if (isValidClient(recipient))
 	{
 		int recipientId = getClientByNick(recipient).getId();
-		sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
+		if (recipientId != client.getId())
+			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
 	}
 }
 
