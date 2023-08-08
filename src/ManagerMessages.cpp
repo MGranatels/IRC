@@ -41,7 +41,7 @@ void Manager::messageUpdateUserList(Channel &channel, Clients &client)
 	BroadcastMessageChan(channel, formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list");
 }
 
-void	Manager::joinProtocol(Clients &client, Channel &channel, int &clientId)
+void	Manager::joinProtocol(Clients &client, Channel &channel, int clientId)
 {
 	// Send the JOIN message to the client
 	sendIrcMessage(formatMessage(client) + " JOIN " + channel.getName(), clientId);

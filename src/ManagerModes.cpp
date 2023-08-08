@@ -2,7 +2,7 @@
 #include <utils.hpp>
 
 
-int	Manager::changeMode(std::vector<std::string> split, Clients client)
+int	Manager::changeMode(std::vector<std::string> split, Clients& client)
 {
 	Channel& _channel = getChannelByName(split[1]);
 	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
@@ -54,8 +54,6 @@ int	Manager::validateMode(std::vector<std::string> split, Clients client)
 		BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
 		return (0);
 	}
-	if (split.size() < 3)
-		return (sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Mode. Type for HELP to See a List of Commands", client.getId()));
 	if (!checkFlagFormat(split[2]))
 		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
 	if (!checkChannelOp(getChannelByName(split[1]), client.getId()))

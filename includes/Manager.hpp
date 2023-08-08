@@ -9,7 +9,10 @@
 # include <colors.h>
 # include <Channel.hpp>
 
+
 class Sockets;
+
+typedef void (*ActionFunction)(Clients& client, std::vector<std::string>& splits, std::string fullMessage);
 
 //Static management
 class Manager
@@ -17,6 +20,7 @@ class Manager
 	private:
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channels;
+   		static std::map<std::string, ActionFunction> actionMap;
 
 	public:
 		static std::string 			hostname;
@@ -31,17 +35,18 @@ class Manager
 		static std::string 		getUsersList(Channel &Channel);
 
 		// --------- Channel Actions ---------
-		static	int			joinAction( int clientId, std::vector<std::string> &splits );
-		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
-		static	int			kickAction( void );
-		static	int			quitAction( int clientId );
-		static	int			modeAction( std::vector<std::string> split, int clientId  );
-		static	int			topicAction( Clients &client, std::vector<std::string> &splits );
-		static	int			privAction( const Clients &client, std::vector<std::string> &splits, std::string full_message);
-		static	int			inviteAction( std::vector<std::string> &splits, int clientId );
-		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
-		static	int			muteAction( const Clients &client, std::vector<std::string> &splits);
-		static	int			nickAction( Clients &client, std::vector<std::string> &splits);
+		static	void 		on(std::string event, void (*ActionFunction)(Clients& client, std::vector<std::string>& splits, std::string fullMessage));
+		static	void		joinAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		quitAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		partAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		modeAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage  );
+		static	void		topicAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		inviteAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		privAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		nickAction( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static	void		kickAction( void );
+		//static	int			(*muteAction)( Clients &client, std::vector<std::string> &splits, std::string fullMessage );
+		static void			joinProtocol(Clients &client, Channel &channelName, int clientId);
 		static	int			runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
@@ -54,7 +59,7 @@ class Manager
 		static	bool		checkChannelOp(Channel _channel, int id);
 		static	int			validateMode(std::vector<std::string> split, Clients client);
 		static	bool		checkFlagFormat(std::string flag);
-		static	int			changeMode(std::vector<std::string> split, Clients client);
+		static	int			changeMode(std::vector<std::string> split, Clients &client);
 		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
@@ -65,6 +70,7 @@ class Manager
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
 		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits);
+		static	void		defineActionMap();
 
 
 		/* Client Methods*/

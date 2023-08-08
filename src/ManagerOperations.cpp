@@ -44,10 +44,10 @@ int	Manager::kOperator(std::vector<std::string> split, Channel& _channel, Client
 
 int	Manager::oOperator(std::vector<std::string> split, Channel& channel, Clients& _client)
 {
+	if (split.size() != 4)
+		return (sendIrcMessage(formatMessage(channel, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 	if (_client.getNickname() == split[3])
 		return (sendIrcMessage(formatMessage(_client, CHANOPRIVSNEEDED) + " :Permission denied, can't remove your own privileges.", _client.getId()));
-	if (split.size() != 4)
-		return (sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 	if (!isValidClient(split[3]))
 		return (sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " :No such Nickname", _client.getId()));
 	if (split[2][0] == '+') {
