@@ -10,7 +10,7 @@ void Manager::on(std::string event, ActionFunction fun) {
 	actionMap.insert(std::pair<std::string, ActionFunction>(event, fun));
 }
 
-void Manager::defineActionMap( )
+void Manager::defineActionMap( void )
 {
 	on("JOIN", &Manager::joinAction);
 	on("QUIT", &Manager::quitAction);
