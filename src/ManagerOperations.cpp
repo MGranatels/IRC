@@ -4,8 +4,6 @@
 int	Manager::tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client)
 {
 	if (split[2][0] == '+') {
-		if (split.size() != 4)
-			return (sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 		_channel.setMode("t");
 		_channel.setTopic(split[3]);
 		sendIrcMessage(formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), _client.getId());
