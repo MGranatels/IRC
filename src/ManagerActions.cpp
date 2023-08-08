@@ -1,158 +1,149 @@
 #include <Manager.hpp>
 #include <Channel.hpp>
 
-std::vector<Clients> Manager::_clients;
-std::vector<Channel> Manager::_channels;
-std::string Manager::hostname = "localhost";
+std::vector<Clients> 		Manager::_clients;
+std::vector<Channel> 		Manager::_channels;
+std::string 				Manager::hostname = "localhost";
+std::map<std::string, ActionFunction> Manager::actionMap;
 
-// aqui podes passar mais parametros
 
-bool	Manager::checkClientData(std::vector<std::string> &splits, std::vector<Clients>::iterator iter)
+void Manager::on(std::string event, ActionFunction fun) {
+	actionMap.insert(std::pair<std::string, ActionFunction>(event, fun));
+}
+
+void Manager::defineActionMap( void )
 {
-	Clients& foundClient = *iter;
+	on("JOIN", &Manager::joinAction);
+	on("QUIT", &Manager::quitAction);
+	on("PART", &Manager::partAction);
+	on("MODE", &Manager::modeAction);
+	on("TOPIC", &Manager::topicAction);
+	on("JOIN", &Manager::joinAction);
+	on("INVITE", &Manager::inviteAction);
+	on("PRIVMSG", &Manager::privAction);
+	//on("NICK", &Manager::nickAction);
+    // actionMap["KICK"] = &Manager::kickAction;
+}
+
+bool	Manager::checkClientData( Clients& foundClient )
+{
+	std::vector<std::string> cmd = foundClient.getCmd();
+	for (unsigned int i = 0; i < cmd.size(); i++)
+		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (foundClient.getClientSettings() == true)
 		return true;
-	for (unsigned int i = 0 ; i < splits.size(); i++)
+	for (unsigned int i = 0 ; i < cmd.size(); i++)
 	{
-		if (splits[i] == "PASS")
-			foundClient.setPassword(splits[i + 1]);
-		else if (splits[i] == "NICK")
-			foundClient.setNickname(splits[i + 1]);
-		else if (splits[i] == "USER")
-			foundClient.setUsername(splits[i + 1]);
+		if (cmd[i] == "PASS")
+			foundClient.setPassword(cmd[i + 1]);
+		else if (cmd[i] == "NICK")
+			foundClient.setNickname(cmd[i + 1]);
+		else if (cmd[i] == "USER")
+			foundClient.setUsername(cmd[i + 1]);
 	}
 	return false;
 }
 
-int	Manager::runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message)
-{
-	for (unsigned int i = 0; i < splits.size(); i++)
-		std::cout << i << " Split: " <<  splits[i] << std::endl;
-	if (splits[0].compare("JOIN") == 0)
-		return( joinAction(clientId, splits) );
-	//else if (splits[0].compare("KICK") == 0)
-		//return( Manager::kickAction() );
-	else if (splits[0].compare("QUIT") == 0)
-		return( quitAction(clientId));
-	else if (splits[0].compare("PART") == 0)
-		if (splits.size() > 2)
-			return(partAction(splits[1], clientId, splits[2]));
-		else
-			return(partAction(splits[1], clientId, ""));
-	else if (splits[0].compare("MODE") == 0)
-		return(modeAction(splits, clientId) );
-	else if (splits[0].compare("TOPIC") == 0)
-		return(topicAction(*getClientById(clientId), splits));
-	else if (splits[0].compare("INVITE") == 0)
-		return(inviteAction(splits, clientId));
-	else if (splits[0].compare("PRIVMSG") == 0)
-		return(privAction( *getClientById(clientId), splits, full_message));
-	else if (splits[0].compare("NICK") == 0)
-		return(nickAction(*getClientById(clientId), splits));
-	//else if (splits[0].compare("MUTE") == 0 || splits[0].compare("UNMUTE") == 0)
-	//	return(muteAction( *getClientById(clientId), splits));
-	return (-1);
+int	Manager::runChanActions(Clients& client) {
+	std::vector<std::string> cmd = client.getCmd();
+	std::string actionName = cmd[0];
+
+	for (unsigned int i = 0; i < cmd.size(); i++)
+		std::cout << i << " Cmd: " <<  cmd[i] << std::endl;
+	defineActionMap();
+	if (!isValidClient(client.getId()))
+		return -1;
+	// Find the action function in the map
+	std::map<std::string, ActionFunction>::iterator it = actionMap.find(actionName);
+	if (it != actionMap.end())
+		(it->second)(client);
+	return -1;
 }
 
-int	Manager::partAction(std::string channelName, int clientId, std::string partMessage)
+void	Manager::partAction( Clients &client )
 {
-	// Find the client who wants to part
-	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
-	if (iter == _clients.end()) {
-		// Client not found
-		return -1;
-	}
-	Clients& partingClient = *iter;
+	std::vector<std::string> cmd = client.getCmd();
+	std::string partMessage = "";
+	if (cmd.size() > 2)
+		partMessage = cmd[2];
 	// Find the channel
-	Channel& channel = Manager::getChannelByName(channelName);
+	Channel& channel = Manager::getChannelByName(cmd[1]);
 	// Check if the client is in the channel
-	if (!channel.isClientInChannel(clientId)) {
-		// Client is not in the channel, nothing to do
-		return -1;
-	}
+	if (!channel.isClientInChannel(client.getId()))
+		return ;
 	// Notify other clients in the channel about the PART
 	if (!partMessage.empty())
-		BroadcastMessageChan(channel, formatMessage(partingClient, "PART_CHANNEL") + " " + channel.getName() + " " + partMessage);
+		BroadcastMessageChan(channel, formatMessage(client, "PART_CHANNEL") + " " + channel.getName() + " " + partMessage);
 	else
-		BroadcastMessageChan(channel, formatMessage(partingClient, "PART_CHANNEL") + " " + channel.getName());
+		BroadcastMessageChan(channel, formatMessage(client, "PART_CHANNEL") + " " + channel.getName());
 	// Send a PART message to the client to indicate they left the channel.
-	sendIrcMessage(formatMessage(partingClient) + " PART " + channel.getName(), clientId);
-	BroadcastMessageChan(channel, formatMessage(partingClient, "QUIT_CHANNEL") + " :has quit");
-	channel.removeClient(clientId);
-	messageUpdateUserList(channel, partingClient);
+	sendIrcMessage(formatMessage(client) + " PART " + channel.getName(), client.getId());
+	BroadcastMessageChan(channel, formatMessage(client, "QUIT_CHANNEL") + " :has quit");
 	// Remove the user from the channel
-	return 1;
+	channel.removeClient(client.getId());
+	messageUpdateUserList(channel, client);
+	return ;
 }
 
-int	Manager::joinAction(int clientId, std::vector<std::string> &splits )
+void	Manager::joinAction( Clients &client )
 {
+	std::vector<std::string> cmd = client.getCmd();
 	// First, check if the channel exists
-	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
-	std::cout << clientId << std::endl;
-	Clients& client = *iter;
-	std::string &channelName = splits[1];
+	std::string &channelName = cmd[1];
 	int isValidChan = isValidChannel(channelName);
 
 	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
 	if (isValidChan == CREATED)
 	{
-		if (!checkChannelParameters(channelName, client, splits))
-			return 0;
+		if (!checkChannelParameters(channelName, client, cmd))
+			return ;
 		Channel& existingChannel = getChannelByName(channelName);
-		existingChannel.addClient(clientId);
-		joinProtocol(client, existingChannel, clientId);
+		existingChannel.addClient(client.getId());
+		joinProtocol(client, existingChannel, client.getId());
 	}
 	else if (isValidChan == VALID_NAME)
 	{
 		_channels.push_back(Channel(channelName));
-		_channels.back().addClient(clientId);
-		_channels.back().addOperator(clientId);
-		joinProtocol(client, _channels.back(), clientId);
+		_channels.back().addClient(client.getId());
+		_channels.back().addOperator(client.getId());
+		joinProtocol(client, _channels.back(), client.getId());
 	}
 	else if (isValidChan == NOT_VALID)
-		sendIrcMessage(formatMessage(client, BADCHANNELNAME) + " " + channelName + " :Invalid channel name, try with #", clientId);
-	return 1;
+		sendIrcMessage(formatMessage(client, BADCHANNELNAME) + " " + channelName + " :Invalid channel name, try with #", client.getId());
+	return ;
 }
 
-int	Manager::quitAction(int clientId)
+void	Manager::quitAction( Clients &client )
 {
-	// Find the client who wants to quit
-	std::vector<Clients>::iterator iter = getClientById(clientId);
-	if (iter == _clients.end()) {
-		// Client not found
-		return -1;
-	}
-	Clients& quittingClient = *iter;
-
-	// Remove the client from all channels
-	removeClientFromAllChannels(clientId);
-	// Notify the quitting client that they have quit
-	sendIrcMessage(formatMessage(quittingClient) + " QUIT :Goodbye!", clientId);
-	// Remove client from clients list
-	return 1;
+	removeClientFromAllChannels(client.getId());
+	sendIrcMessage(formatMessage(client) + " QUIT :Goodbye!", client.getId());
+	removeClient(client.getId());
+	return ;
 }
 
-
-int	Manager::privAction( const Clients &client, std::vector<std::string> &splits, std::string fullMessage)
+void	Manager::privAction( Clients &client)
 {
 	//TODO: remember later to Verify User Permissions
-
-	std::string &recipient = splits[1];
+	std::vector<std::string> cmd = client.getCmd();
+	std::string &recipient = cmd[1];
 	std::vector<std::string> message;
 
-	if (fullMessage.find(':') != std::string::npos)
-		message = split(fullMessage, ":");
+	if (client.getFullMessage().find(':') != std::string::npos)
+		message = split(client.getFullMessage(), ":");
 	else
 	{
 		sendIrcMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send, TRY ADDING A ':' AFTER THE NICKNAME", client.getId());
-		return (0);
+		return ;
 	}
 	if (isValidChannel(recipient) == CREATED)
 	{
 		Channel& channel = getChannelByName(recipient);
 		std::cout  << channel.isClientMuted(client.getId()) << std::endl;
 		if (channel.isClientMuted(client.getId()))
-			return (sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId()));
+		{
+			sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId());
+			return ;
+		}
 		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
 	}
 	else if (isValidClient(recipient))
@@ -160,84 +151,103 @@ int	Manager::privAction( const Clients &client, std::vector<std::string> &splits
 		int recipientId = getClientByNick(recipient).getId();
 		sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
 	}
-	return (1);
 }
 
-int	Manager::kickAction( void )
+void	Manager::kickAction( void )
 {
 	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
 	//	KICK <channel> <user> :<reason>
-	return(1);
+	return ;
 }
 
-int	Manager::modeAction( std::vector<std::string> split, int clientId )
+void	Manager::modeAction( Clients& client )
 {
-	std::vector<Clients>::iterator iter = Manager::getClientById(clientId);
-	std::cout << clientId << std::endl;
-	Clients& client = *iter;
-	if (!validateMode(split, client))
-		return (1);
-	changeMode(split, client);
-	return(1);
+	if (!validateMode(client))
+		return ;
+	changeMode(client);
+	return ;
 }
 
-int	Manager::topicAction( Clients &client, std::vector<std::string> &splits )
+void	Manager::topicAction( Clients &client )
 {
-	Channel& _channel = getChannelByName(splits[1]);
-
-	if (!_channel.isClientOperator(client.getId()))
-		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId()));
-	if (splits.size() < 3 && _channel.getTopic().empty())
-		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId()));
-	if (splits.size() < 3)
-		return (sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
+	std::vector<std::string> cmd = client.getCmd();
+	Channel& _channel = getChannelByName(cmd[1]);
+	if (cmd.size() < 3 && _channel.getTopic().empty()) {
+		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId());
+		return ;
+	}
+	if (cmd.size() < 3) {
+		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId());
+		return ;
+	}
+	if (!_channel.isClientOperator(client.getId())) {
+		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId());
+		return ;
+	}
 	//Check if user has permissions in channel
-	if (!_channel.isModeSet("t"))
-		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId()));
-	_channel.setTopic(splits[2]);
-	return(sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId()));
+	if (!_channel.isModeSet("t")) {
+		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId());
+		return ;
+	}
+	_channel.setTopic(cmd[2]);
+	BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
 }
 
-int	Manager::inviteAction( std::vector<std::string> &splits, int clientId )
+void	Manager::inviteAction( Clients& inviter )
 {
-	std::string &channelName = splits[2];
-	std::string	&invitedClient = splits[1];
-	std::vector<Clients>::iterator iter = getClientById(clientId);
-	Clients& inviter = *iter;
+	std::vector<std::string> cmd = inviter.getCmd();
+	std::string &channelName = cmd[2];
+	std::string	&invitedClient = cmd[1];
 	int isValidChan = isValidChannel(channelName);
 	if (isValidChan == CREATED)
 	{
 		Channel &channel = getChannelByName(channelName);
-		if (!channel.isClientOperator(clientId))
-			return (sendIrcMessage(formatMessage(inviter, CHANOPRIVSNEEDED) + " " + channelName + " :Permission denied, you're not channel operator.", clientId));
-		if (!channel.isClientInChannel(clientId))
-			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", clientId));
-		if (!isValidClient(invitedClient))
-			return (sendIrcMessage(formatMessage(inviter, NOSUCHNICK) + " " + invitedClient + " :Not such user in Server", clientId));
-		if (channel.isClientInChannel(getClientByNick(invitedClient).getId()))
-			return (sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + invitedClient + " :user already in Channel " + channelName, clientId));
-		// :<server> 341 <invited_user> <channel> <inviter>
+		if (!channel.isClientOperator(inviter.getId())) {
+			sendIrcMessage(formatMessage(inviter, CHANOPRIVSNEEDED) + " " + channelName + " :Permission denied, you're not channel operator.", inviter.getId());
+			return ;
+		}
+		if (!channel.isClientInChannel(inviter.getId())) {
+			sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", inviter.getId());
+			return ;
+		}
+		if (!isValidClient(invitedClient)) {
+			sendIrcMessage(formatMessage(inviter, NOSUCHNICK) + " " + invitedClient + " :Not such user in Server", inviter.getId());
+			return ;
+		}
+		if (channel.isClientInChannel(getClientByNick(invitedClient).getId())) {
+			sendIrcMessage(formatMessage(inviter, ERR_USERONCHANNEL) + " " + invitedClient + " :user already in Channel " + channelName, inviter.getId());
+			return ;
+		}
 		channel.addInvitee(getClientByNick(invitedClient).getId());
-		sendIrcMessage(formatMessage(inviter, INVITING) + " " + invitedClient + " " + channelName, clientId);
+		sendIrcMessage(formatMessage(inviter, INVITING) + " " + invitedClient + " " + channelName, inviter.getId());
 		sendIrcMessage(formatMessage(inviter) + " NOTICE " + invitedClient + " you have been invited to join " + channelName, getClientByNick(invitedClient).getId());
 	}
 	else
-		return (sendIrcMessage(formatMessage(inviter, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ", clientId));
-	return 1;
+		sendIrcMessage(formatMessage(inviter, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ",  inviter.getId());
 }
 
-int	Manager::nickAction( Clients &client, std::vector<std::string> &splits )
+void	Manager::nickAction( Clients& client )
 {
-	if (splits.size() < 2)
-		return (sendIrcMessage(formatMessage(client, NONICKNAMEGIVEN) + " :No nickname given", client.getId()));
-	if (splits[1].size() > 9)
-		return (sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " " + splits[1] + " :Erroneous nickname", client.getId()));
-	if (isValidClient(splits[1]))
-		return (sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + splits[1] + " :Nickname is already in use", client.getId()));
-	client.setNickname(splits[1]);
-	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + splits[1] + " :Nickname changed successfully", client.getId());
-	return 1;
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 2)
+	{
+		sendIrcMessage(formatMessage(client, NONICKNAMEGIVEN) + " :No nickname given", client.getId());
+		return ;
+	}
+	if (cmd[1].size() > 9)
+	{
+		sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " " + cmd[1] + " :Erroneous nickname", client.getId());
+		return ;
+	}
+	if (isValidClient(cmd[1]))
+	{
+		sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + cmd[1] + " :Nickname is already in use", client.getId());
+		return ;
+	}
+	client.setNickname(cmd[1]);
+	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
+
 /*int	Manager::muteAction( const Clients &client, std::vector<std::string> &splits)
 {
 	if (splits.size() < 3)

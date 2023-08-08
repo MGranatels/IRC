@@ -4,8 +4,6 @@
 int	Manager::tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client)
 {
 	if (split[2][0] == '+') {
-		if (split.size() != 4)
-			return (sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 		_channel.setMode("t");
 		_channel.setTopic(split[3]);
 		sendIrcMessage(formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), _client.getId());
@@ -13,7 +11,7 @@ int	Manager::tOperator(std::vector<std::string> split, Channel& _channel, Client
 	else {
 		_channel.unsetMode("t");
 		_channel.setTopic("");
-		sendIrcMessage(formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", _client.getId());
+		BroadcastMessageChan(_channel, formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set");
 	}
 	return 1;
 }
@@ -44,10 +42,10 @@ int	Manager::kOperator(std::vector<std::string> split, Channel& _channel, Client
 
 int	Manager::oOperator(std::vector<std::string> split, Channel& channel, Clients& _client)
 {
+	if (split.size() != 4)
+		return (sendIrcMessage(formatMessage(channel, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 	if (_client.getNickname() == split[3])
 		return (sendIrcMessage(formatMessage(_client, CHANOPRIVSNEEDED) + " :Permission denied, can't remove your own privileges.", _client.getId()));
-	if (split.size() != 4)
-		return (sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId()));
 	if (!isValidClient(split[3]))
 		return (sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " :No such Nickname", _client.getId()));
 	if (split[2][0] == '+') {

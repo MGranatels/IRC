@@ -9,7 +9,10 @@
 # include <colors.h>
 # include <Channel.hpp>
 
+
 class Sockets;
+
+typedef void (*ActionFunction)(Clients& client);
 
 //Static management
 class Manager
@@ -17,7 +20,7 @@ class Manager
 	private:
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channels;
-
+   		static std::map<std::string, ActionFunction> actionMap;
 	public:
 		static std::string 			hostname;
 
@@ -31,18 +34,19 @@ class Manager
 		static std::string 		getUsersList(Channel &Channel);
 
 		// --------- Channel Actions ---------
-		static	int			joinAction( int clientId, std::vector<std::string> &splits );
-		static void			joinProtocol(Clients &client, Channel &channelName, int &clientId);
-		static	int			kickAction( void );
-		static	int			quitAction( int clientId );
-		static	int			modeAction( std::vector<std::string> split, int clientId  );
-		static	int			topicAction( Clients &client, std::vector<std::string> &splits );
-		static	int			privAction( const Clients &client, std::vector<std::string> &splits, std::string full_message);
-		static	int			inviteAction( std::vector<std::string> &splits, int clientId );
-		static	int			partAction(std::string channelName, int clientId, std::string partMessage);
-		static	int			muteAction( const Clients &client, std::vector<std::string> &splits);
-		static	int			nickAction( Clients &client, std::vector<std::string> &splits);
-		static	int			runChanActions( std::vector<std::string> &splits, int clientId, std::string full_message);
+		static	void 		on(std::string event, void (*ActionFunction)(Clients& client));
+		static	void		joinAction( Clients &client );
+		static	void		partAction( Clients &client);
+		static	void		modeAction( Clients &client );
+		static	void		quitAction( Clients &client);
+		static	void		topicAction( Clients &client);
+		static	void		inviteAction( Clients &client);
+		static	void		privAction( Clients &client);
+		static	void		nickAction( Clients &client);
+		static	void		kickAction( void );
+		//static	int			(*muteAction)( Clients &client);
+		static void			joinProtocol(Clients &client, Channel &channelName, int clientId);
+		static	int			runChanActions( Clients& client);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
 		static	void		BroadcastMessageChan(int senderId, Channel &channel, std::string message);
@@ -52,9 +56,9 @@ class Manager
 		static const std::string	formatMessage(const Channel &_channel, std::string code);
 		static	void		setChannOpps(Clients *client);
 		static	bool		checkChannelOp(Channel _channel, int id);
-		static	int			validateMode(std::vector<std::string> split, Clients client);
+		static	int			validateMode( Clients client );
 		static	bool		checkFlagFormat(std::string flag);
-		static	int			changeMode(std::vector<std::string> split, Clients client);
+		static	int			changeMode( Clients &client );
 		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
 		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
@@ -65,6 +69,7 @@ class Manager
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
 		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits);
+		static	void		defineActionMap();
 
 
 		/* Client Methods*/
@@ -74,7 +79,7 @@ class Manager
 		static	bool		isValidClient(int	id);
 		static	const std::vector<Clients>&	getClients();
 		static	int		firstTimeClient(std::vector<Clients>::iterator it);
-		static	bool	checkClientData(std::vector<std::string> &splits, std::vector<Clients>::iterator iter);
+		static	bool	checkClientData( Clients& foundClient );
 		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
 		static	void	removeClientFromAllChannels(int clientId); //TODO:

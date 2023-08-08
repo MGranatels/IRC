@@ -68,3 +68,20 @@ bool	Clients::getClientSettings( void ) const {
 bool	Clients::getOppChannel( void ) const {
 	return (this->_opChannel);
 }
+
+void	Clients::setCmd( std::vector<std::string> cmd ) {
+	this->_cmd.clear();
+	this->_cmd = cmd;
+}
+
+std::vector<std::string>	Clients::getCmd( void ) const {
+	return (this->_cmd);
+}
+
+void	Clients::setFullMessage(std::string message) {
+	this->_fullMessage = message;
+}
+
+std::string	Clients::getFullMessage( void ) const {
+	return (this->_fullMessage);
+}

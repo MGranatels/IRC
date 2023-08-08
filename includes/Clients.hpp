@@ -9,10 +9,11 @@ class Clients
 		int			_id;
 		bool		_opChannel;
 		bool		_clientSettings;
-		//bool		_passCheck;
 		std::string	_password;
 		std::string	_nickcname;
 		std::string	_username;
+		std::string	_fullMessage;
+		std::vector<std::string>	_cmd;
 
 
 	public:
@@ -20,20 +21,24 @@ class Clients
 		Clients( int _id);
 		~Clients( void );
 		//Setters
+		void		initClient(std::string nickname, std::string username);
+		void		setCmd( std::vector<std::string> cmd );
 		void		setId( int id );
 		void		setNickname( std::string nickname);
 		void		setUsername( std::string username );
 		void		setPassword( std::string username );
 		void		setClientSettings( bool clientSettings );
 		void		setOppChannel( bool opChannel );
+		void		setFullMessage( std::string fullMessage );
 		//Getters
-		int			getId( void ) const;
-		std::string	getNickname( void ) const;
-		std::string	getUsername( void ) const;
-		std::string	getPassword( void ) const;
-		bool		getClientSettings( void ) const;
-		bool		getOppChannel( void ) const;
-		void		initClient(std::string nickname, std::string username);
+		int							getId( void ) const;
+		std::string					getNickname( void ) const;
+		std::string					getUsername( void ) const;
+		std::string					getPassword( void ) const;
+		std::string					getFullMessage( void ) const;
+		std::vector<std::string>	getCmd( void ) const;
+		bool						getClientSettings( void ) const;
+		bool						getOppChannel( void ) const;
 };
 
 #endif
