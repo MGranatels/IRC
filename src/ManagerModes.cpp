@@ -2,8 +2,9 @@
 #include <utils.hpp>
 
 
-int	Manager::changeMode(std::vector<std::string> split, Clients& client)
+int	Manager::changeMode( Clients& client )
 {
+	std::vector<std::string> split = client.getCmd();
 	Channel& _channel = getChannelByName(split[1]);
 	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
 	std::string key(1, split[2][1]);
@@ -44,19 +45,20 @@ bool	Manager::checkFlagFormat(std::string flag)
 	return true;
 }
 
-int	Manager::validateMode(std::vector<std::string> split, Clients client)
+int	Manager::validateMode(Clients client)
 {
-	if (isValidChannel(split[1]) != CREATED)
+	std::vector<std::string> cmd = client.getCmd();
+	if (isValidChannel(cmd[1]) != CREATED)
 		return (sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :You are not in Any Channel. Please Join a Channel First to use the MODE Command", client.getId()));
 	// Lets check if its the channel is being created now, if so We send a message to the channel with the modes
-	if (split.size() == 2) {
-		Channel& foundChannel = getChannelByName(split[1]);
+	if (cmd.size() == 2) {
+		Channel& foundChannel = getChannelByName(cmd[1]);
 		BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
 		return (0);
 	}
-	if (!checkFlagFormat(split[2]))
+	if (!checkFlagFormat(cmd[2]))
 		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
-	if (!checkChannelOp(getChannelByName(split[1]), client.getId()))
+	if (!checkChannelOp(getChannelByName(cmd[1]), client.getId()))
 		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, can't change modes. Talk to an Admin for Help!", client.getId()));
 	return 1;
 }

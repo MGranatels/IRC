@@ -25,20 +25,18 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 {
 	buffer[read] = 0;
 	std::string str(buffer);
-	std::vector<std::string> splits = split(str, "\r\n\t ");
 	if (FD_ISSET(i, &_fdMaster))
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
 		Clients& foundClient = *iter;
+		foundClient.setCmd(split(str, "\r\n\t "));
+		foundClient.setFullMessage(str);
 		if (iter != Manager::getClients().end()) {
-			if (!Manager::checkClientData(splits, iter))
+			if (!Manager::checkClientData(foundClient))
 				passwordCheck(i);
 			else
-				Manager::runChanActions(splits, i, str);
+				Manager::runChanActions(foundClient);
 		}
-		if (i != _fdSocket)
-			if (send(i, buffer, read, 0) == -1)
-				exit(Error::message("Error sending message"));
 		if (foundClient.getClientSettings() && !foundClient.getOppChannel())
 			Manager::setChannOpps(&foundClient);
 	}
