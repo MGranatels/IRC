@@ -42,6 +42,7 @@ int			Clients::getId( void ) const {
 	return (this->_id);
 }
 
+//test
 
 std::string	Clients::getNickname( void ) const {
 	return (this->_nickcname);
