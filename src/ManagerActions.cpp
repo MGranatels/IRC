@@ -31,11 +31,6 @@ void Manager::defineActionMap( void )
 bool	Manager::checkClientData( Clients& foundClient )
 {
 	std::vector<std::string> cmd = foundClient.getCmd();
-<<<<<<< HEAD
-=======
-	// for (unsigned int i = 0; i < cmd.size(); i++)
-	// 	std::cout << i << " cmd: " <<  cmd[i] << std::endl;
->>>>>>> main
 	if (foundClient.getClientSettings() == true)
 		return true;
 	for (unsigned int i = 0 ; i < cmd.size(); i++)
@@ -64,7 +59,7 @@ int	Manager::runChanActions(Clients& client) {
 	if (it != actionMap.end())
 		(it->second)(client);
 	else
-		sendIrcMessage(formatMessage(client, ERR_UNKNOWNCOMMAND) + " " + actionName + ": Unknown command", client.getId());
+		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " " + actionName + ": Unknown command", client.getId());
 	return -1;
 }
 
@@ -272,7 +267,7 @@ void	Manager::whoAction( Clients &client )
 	}
 }
 
-int	Manager::listAction( Clients& client)
+void	Manager::listAction( Clients& client)
 {
 	std::vector<std::string> cmd = client.getCmd();
 	std::string listMessage;
