@@ -145,6 +145,7 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 			std::string fullMessage;
 			for (unsigned int i = 4; i < cmd.size(); i++)
 				fullMessage += cmd[i] + " ";
+			kickClientFromChannel(_client, foundClient, _channel);
 			sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName() + " :You were banned from Channel. Reason: " + fullMessage, foundClient.getId());
 		}
 		else

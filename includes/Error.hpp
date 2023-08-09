@@ -16,6 +16,7 @@
 # define RPL_WHOREPLY		"352"
 # define NAMREPLY			"353"
 # define ENDOFNAMES			"366"
+# define ENDOFBANLIST		"368"
 # define NOSUCHNICK			"401"
 # define NOSUCHSERVER		"402"
 # define ERR_NOSUCHCHANNEL	"403"
