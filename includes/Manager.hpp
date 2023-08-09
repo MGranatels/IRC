@@ -47,6 +47,7 @@ class Manager
 		static	void		nickAction( Clients &client);
 		static	void		listAction( Clients& client );
 		static	void		namesAction( Clients& client );
+		static	void		whoAction( Clients &client);
 		static	void		kickAction( void );
 		//static	int			(*muteAction)( Clients &client);
 		static void			joinProtocol(Clients &client, Channel &channelName, int clientId);
