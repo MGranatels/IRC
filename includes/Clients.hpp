@@ -18,7 +18,7 @@ class Clients
 	public:
 
 		std::string	fullMessage;
-		Clients( int _id);
+		Clients( int _id );
 		~Clients( void );
 		//Setters
 		void		initClient(std::string nickname, std::string username);

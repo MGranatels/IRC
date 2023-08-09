@@ -26,6 +26,7 @@ void Manager::defineActionMap( void )
 	on("LIST", &Manager::listAction);
 	on("NAMES", &Manager::namesAction);
 	on("WHO", &Manager::whoAction);
+	on("LUSERS", &Manager::lusersAction);
 }
 
 bool	Manager::checkClientData( Clients& foundClient )
@@ -319,13 +320,20 @@ void	Manager::namesAction( Clients& client )
 		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel", client.getId());
 }
 
-// void	Manager::lusersAction( Client& client )
-// {
-// 	:server-name 251 user :There are <user-count> users and <services-count> services on <server-count> servers
-// 	:server-name 252 user <integer> :<integer> operator(s) online
-// 	:server-name 253 user <integer> :<integer> unknown connection(s)
-// 	:server-name 254 user <integer> :<integer> channels formed
-// 	std::vector<std::string> cmd = client.getCmd();
-// 	sendIrcMessage(formatMessage(client, LUSEROP) + " " + cmd[1] + " :No such channel", client.getId());
-
-// }
+void	Manager::lusersAction( Clients& client )
+{
+	std::stringstream ss;
+	ss << _clients.size();
+	std::string numberClients = ss.str();
+	std::string numberOpps = getAllChanOps();
+	std::string unkownClients = getUnkownClients();
+	ss.str("");
+	ss.clear();
+	ss << _channels.size();
+	std::string numberChannels = ss.str();
+	std::cout << "Number of channels: " <<  _channels.size() << std::endl;
+	sendIrcMessage(formatMessage(client, LUSERCLIENT) + " :There are " + numberClients + " users" + " 1 services on 1 server(s)", client.getId());
+	sendIrcMessage(formatMessage(client, LUSEROP) + " :" + numberOpps + " operator(s) online", client.getId());
+	sendIrcMessage(formatMessage(client, LUSERUNKNOWN) + " :" + unkownClients + " unknown connection(s)", client.getId());
+	sendIrcMessage(formatMessage(client, LUSERCHANNELS) + " :" + numberChannels + " channels formed", client.getId());
+}
