@@ -27,6 +27,7 @@
 # define CHANOPRIVSNEEDED	"482"
 # define UMODEUNKNOWNFLAG	"501"
 # define ERR_NOTEXTTOSEND	"412"
+# define ERR_UNKNOWNCOMMAND	"421"
 
 class Error
 {

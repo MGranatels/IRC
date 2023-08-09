@@ -21,15 +21,15 @@ void Manager::defineActionMap( void )
 	on("JOIN", &Manager::joinAction);
 	on("INVITE", &Manager::inviteAction);
 	on("PRIVMSG", &Manager::privAction);
-	// on("NICK", &Manager::nickAction);
+	on("WHO", &Manager::whoAction);
     // actionMap["KICK"] = &Manager::kickAction;
 }
 
 bool	Manager::checkClientData( Clients& foundClient )
 {
 	std::vector<std::string> cmd = foundClient.getCmd();
-	for (unsigned int i = 0; i < cmd.size(); i++)
-		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
+	// for (unsigned int i = 0; i < cmd.size(); i++)
+	// 	std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (foundClient.getClientSettings() == true)
 		return true;
 	for (unsigned int i = 0 ; i < cmd.size(); i++)
@@ -49,7 +49,7 @@ int	Manager::runChanActions(Clients& client) {
 	std::string actionName = cmd[0];
 
 	for (unsigned int i = 0; i < cmd.size(); i++)
-		std::cout << i << " Cmd: " <<  cmd[i] << std::endl;
+		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	defineActionMap();
 	if (!isValidClient(client.getId()))
 		return -1;
@@ -57,6 +57,8 @@ int	Manager::runChanActions(Clients& client) {
 	std::map<std::string, ActionFunction>::iterator it = actionMap.find(actionName);
 	if (it != actionMap.end())
 		(it->second)(client);
+	else
+		sendIrcMessage(formatMessage(client, ERR_UNKNOWNCOMMAND) + " " + actionName + ": Unknown command", client.getId());
 	return -1;
 }
 
@@ -189,7 +191,7 @@ void	Manager::topicAction( Clients &client )
 		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId());
 		return ;
 	}
-	_channel.setTopic(cmd[2]);
+	_channel.setTopic(split(client.fullMessage, ":")[1]);
 	BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
 }
 
@@ -246,6 +248,22 @@ void	Manager::nickAction( Clients& client )
 	}
 	client.setNickname(cmd[1]);
 	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
+}
+
+void	Manager::whoAction( Clients &client )
+{
+	if (client.getCmd().size() == 2)
+	{
+		std::cout << "Give info about a channel " + client.getCmd()[1] << std::endl;
+	}
+	if (client.getCmd().size() == 1)
+	{
+		std::cout << "Give info about everyone in server" << std::endl;
+	}
+	if (client.getCmd().size() == 3)
+	{
+		std::cout << "Give info just about operator" << std::endl;
+	}
 }
 
 /*int	Manager::muteAction( const Clients &client, std::vector<std::string> &splits)
