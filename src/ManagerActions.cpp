@@ -251,21 +251,6 @@ void	Manager::nickAction( Clients& client )
 	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
 
-void	Manager::sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender)
-{
-	for (std::vector<int>::size_type i = 0; i < clientsIds.size(); i++)
-	{
-		Clients& client = *Manager::getClientById(clientsIds[i]);
-		std::string status;
-		if (chanName != "*")
-			status = getChannelByName(chanName).isClientOperator(client.getId()) ? "@" : "+";
-		// :<server> 352 <user> <channel> <username> <host> <server> <nick> <H|G>[*][@|+] :<hopcount> <real name>
-		sendIrcMessage(formatMessage(sender, RPL_WHOREPLY) + " " + chanName + " localhost ft_irc " + client.getNickname() + " H" + status + " :1 " + client.getUsername(), sender.getId());
-	}
-	// :irc.example.com 315 user123 #channel :End of WHO list
-	sendIrcMessage(formatMessage(sender, RPL_ENDOFWHO) + " " + chanName + " :End of WHO list", sender.getId());
-}
-
 void	Manager::whoAction( Clients &client )
 {
 	if (client.getCmd().size() == 1)
