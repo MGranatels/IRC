@@ -17,6 +17,7 @@ void Manager::defineActionMap( void )
 {
 	on("JOIN", &Manager::joinAction);
 	on("QUIT", &Manager::quitAction);
+	on("KICK", &Manager::kickAction);
 	on("PART", &Manager::partAction);
 	on("MODE", &Manager::modeAction);
 	on("TOPIC", &Manager::topicAction);
@@ -91,8 +92,8 @@ void	Manager::partAction( Clients &client )
 
 void	Manager::joinAction( Clients &client )
 {
-	std::vector<std::string> cmd = client.getCmd();
 	// First, check if the channel exists
+	std::vector<std::string> cmd = client.getCmd();
 	std::string &channelName = cmd[1];
 	int isValidChan = isValidChannel(channelName);
 
@@ -116,6 +117,63 @@ void	Manager::joinAction( Clients &client )
 		sendIrcMessage(formatMessage(client, BADCHANNELNAME) + " " + channelName + " :Invalid channel name, try with #", client.getId());
 	return ;
 }
+
+void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel)
+{
+	std::cout << "entrou para kickar" << std::endl;
+	if (channel.isClientInChannel(target.getId()))
+	{
+		// Notify the kicked client
+		sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :You have been kicked from the channel.", target.getId());
+
+		// Notify other clients in the channel about the kick
+		BroadcastMessageChan(channel, formatMessage(kicker, "KICK_CHANNEL") + " " + channel.getName() + " " + target.getNickname() + " :has been kicked from the channel");
+
+		// Remove the user from the channel
+		channel.removeClient(target.getId());
+		messageUpdateUserList(channel, target);
+	}
+}
+
+void Manager::kickAction( Clients &kicker )
+{
+	std::vector<std::string> cmd = kicker.getCmd();
+	std::vector<Clients>::iterator leaver = _clients.begin();
+	int	flag = 0;
+	if (cmd.size() > 3)
+		flag = 1;
+	// Find if channel created
+	if (!isValidChannel(cmd[1]))
+	{
+		std::cout << "erro1" << std::endl;
+		return;
+	}
+	Channel& channel = getChannelByName(cmd[1]);
+	//Check if client exists
+	for (; leaver <= _clients.end(); leaver++)
+	{
+		if (leaver == _clients.end())
+		{
+			std::cout << Red << "client you wanted to ban does not have that nickname." << NC << std::endl;
+			return;
+		}
+		std::cout << "|" << ":" + leaver->getNickname() << "| vs |" << cmd[3] << "|" << std::endl;
+		if ((":" + leaver->getNickname()) == cmd[2 + flag])
+			break;
+	}
+	//Check if the kicker is an operator or has necessary permissions to kick
+	if (!checkChannelOp(channel, kicker.getId()))
+	{
+		// Kicker is not allowed to kick others
+		std::cout << "erro4" << std::endl;
+		sendIrcMessage(formatMessage(kicker, "NOTICE") + " :You do not have permission to kick users from the channel", kicker.getId());
+		return;
+	}
+	// Perform the kick
+	kickClientFromChannel(kicker, *leaver, channel);
+	return;
+}
+
 
 void	Manager::quitAction( Clients &client )
 {
@@ -155,13 +213,6 @@ void	Manager::privAction( Clients &client)
 		if (recipientId != client.getId())
 			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
 	}
-}
-
-void	Manager::kickAction( void )
-{
-	std::cout << "Tas todo ze queres kickar quem crl" << std::endl;
-	//	KICK <channel> <user> :<reason>
-	return ;
 }
 
 void	Manager::modeAction( Clients& client )
