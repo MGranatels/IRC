@@ -252,38 +252,24 @@ void	Manager::nickAction( Clients& client )
 	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
 
-void	Manager::sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender)
-{
-	for (std::vector<int>::size_type i = 0; i < clientsIds.size(); i++)
-		{
-			Clients& client = *Manager::getClientById(clientsIds[i]);
-			std::string status;
-			if (chanName != "*")
-				status = getChannelByName(chanName).isClientOperator(client.getId()) ? "@" : "+";
-			// :<server> 352 <user> <channel> <username> <host> <server> <nick> <H|G>[*][@|+] :<hopcount> <real name>
-			sendIrcMessage(formatMessage(sender, RPL_WHOREPLY) + " " + chanName + " localhost ft_irc " + client.getNickname() + " H" + status + " :1 " + client.getUsername(), sender.getId());
-		}
-}
-
 void	Manager::whoAction( Clients &client )
 {
-	if (client.getCmd().size() == 2)
-	{
-		Channel &channel = getChannelByName(client.getCmd()[1]);
-		sendWhoMessage(channel.getClients(), channel.getName(), client);
-		std::cout << "Give info about a channel " + client.getCmd()[1] << std::endl;
-	}
 	if (client.getCmd().size() == 1)
 	{
 		sendWhoMessage(getAllClientsIds(), "*", client);
 		std::cout << "Give info about everyone in server" << std::endl;
 	}
-	if (client.getCmd().size() == 3)
+	else if (client.getCmd().size() <= 3 && isValidChannel(client.getCmd()[1]) == CREATED)
 	{
 		Channel &channel = getChannelByName(client.getCmd()[1]);
-		sendWhoMessage(channel.getOperators(), channel.getName(), client);
-		std::cout << "Give info just about operator" << std::endl;
+		if (client.getCmd().size() == 3 && client.getCmd()[2] == "o")
+			sendWhoMessage(channel.getOperators(), channel.getName(), client);
+		else
+			sendWhoMessage(channel.getClients(), channel.getName(), client);
+		std::cout << "Give info about a channel " + client.getCmd()[1] << std::endl;
 	}
+	else
+		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + ": USAGE: WHO [<mask> [<o>]]", client.getId());
 }
 
 void	Manager::listAction( Clients& client)
@@ -320,6 +306,7 @@ void	Manager::namesAction( Clients& client )
 		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel", client.getId());
 }
 
+<<<<<<< HEAD
 void	Manager::lusersAction( Clients& client )
 {
 	std::stringstream ss;
@@ -337,3 +324,15 @@ void	Manager::lusersAction( Clients& client )
 	sendIrcMessage(formatMessage(client, LUSERUNKNOWN) + " :" + unkownClients + " unknown connection(s)", client.getId());
 	sendIrcMessage(formatMessage(client, LUSERCHANNELS) + " :" + numberChannels + " channels formed", client.getId());
 }
+=======
+// void	Manager::lusersAction( Client& client )
+// {
+// 	:server-name 251 user :There are <user-count> users and <services-count> services on <server-count> servers
+// 	:server-name 252 user <integer> :<integer> operator(s) online
+// 	:server-name 253 user <integer> :<integer> unknown connection(s)
+// 	:server-name 254 user <integer> :<integer> channels formed
+// 	std::vector<std::string> cmd = client.getCmd();
+// 	sendIrcMessage(formatMessage(client, LUSEROP) + " " + cmd[1] + " :No such channel", client.getId());
+
+// }
+>>>>>>> 28291edb198c3d31a4e44859dd7a532871c3795f

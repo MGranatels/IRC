@@ -18,14 +18,14 @@ void Manager::defineModeMap( void )
 
 void	Manager::changeMode(Clients& client)
 {
-	Channel& _channel = getChannelByName(client.getCmd()[1]);
+	Channel& channel = getChannelByName(client.getCmd()[1]);
 	std::string modeName(1, client.getCmd()[2][1]);
 	defineModeMap();
 	std::map<std::string, ModeFunction>::iterator it = modeMap.find(modeName);
 	if (it != modeMap.end())
-		(it->second)(_channel, client);
+		(it->second)(channel, client);
 	else
-		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :Operation does Not exist in the Channel. Type for HELP to See a List of Commands", client.getId());
+		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " " + channel.getName() +  " :Operation does Not exist in the Channel. Type for HELP to See a List of Commands", client.getId());
 }
 
 bool	Manager::checkChannelOp(Channel _channel, int id)
@@ -52,15 +52,15 @@ int	Manager::validateMode(Clients client)
 	if (isValidChannel(cmd[1]) != CREATED)
 		return (sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :You are not in Any Channel. Please Join a Channel First to use the MODE Command", client.getId()));
 	// Lets check if its the channel is being created now, if so We send a message to the channel with the modes
+	Channel& foundChannel = getChannelByName(cmd[1]);
 	if (cmd.size() == 2) {
-		Channel& foundChannel = getChannelByName(cmd[1]);
 		BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
 		return (0);
 	}
 	if (!checkFlagFormat(cmd[2]))
-		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
+		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " " + foundChannel.getName() + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
 	if (!checkChannelOp(getChannelByName(cmd[1]), client.getId()))
-		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, can't change modes. Talk to an Admin for Help!", client.getId()));
+		return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + foundChannel.getName() + " :Permission denied, can't change modes. Talk to an Admin for Help!", client.getId()));
 	return 1;
 }
 
