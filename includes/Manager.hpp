@@ -50,7 +50,8 @@ class Manager
 		static	void		whoAction( Clients &client);
 		static	void		kickAction( void );
 		//static	int			(*muteAction)( Clients &client);
-		static void			joinProtocol(Clients &client, Channel &channelName, int clientId);
+		static	void		joinProtocol(Clients &client, Channel &channelName, int clientId);
+		static	void		sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender);
 		static	int			runChanActions( Clients& client);
 		static	int			sendIrcMessage(std::string message, int id);
 		static	void		BroadcastMessageChan(Channel &channel, std::string message);
@@ -90,7 +91,8 @@ class Manager
 		static	bool	checkClientData( Clients& foundClient );
 		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
-		static	void	removeClientFromAllChannels(int clientId); //TODO:
+		static	void	removeClientFromAllChannels(int clientId);
+		static	std::vector<int> getAllClientsIds(void);
 };
 
 #endif

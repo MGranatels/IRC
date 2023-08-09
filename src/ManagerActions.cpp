@@ -251,18 +251,36 @@ void	Manager::nickAction( Clients& client )
 	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
 
+void	Manager::sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender)
+{
+	for (std::vector<int>::size_type i = 0; i < clientsIds.size(); i++)
+		{
+			Clients& client = *Manager::getClientById(clientsIds[i]);
+			std::string status;
+			if (chanName != "*")
+				status = getChannelByName(chanName).isClientOperator(client.getId()) ? "@" : "+";
+			// :<server> 352 <user> <channel> <username> <host> <server> <nick> <H|G>[*][@|+] :<hopcount> <real name>
+			sendIrcMessage(formatMessage(sender, RPL_WHOREPLY) + " " + chanName + " localhost ft_irc " + client.getNickname() + " H" + status + " :1 " + client.getUsername(), sender.getId());
+		}
+}
+
 void	Manager::whoAction( Clients &client )
 {
 	if (client.getCmd().size() == 2)
 	{
+		Channel &channel = getChannelByName(client.getCmd()[1]);
+		sendWhoMessage(channel.getClients(), channel.getName(), client);
 		std::cout << "Give info about a channel " + client.getCmd()[1] << std::endl;
 	}
 	if (client.getCmd().size() == 1)
 	{
+		sendWhoMessage(getAllClientsIds(), "*", client);
 		std::cout << "Give info about everyone in server" << std::endl;
 	}
 	if (client.getCmd().size() == 3)
 	{
+		Channel &channel = getChannelByName(client.getCmd()[1]);
+		sendWhoMessage(channel.getOperators(), channel.getName(), client);
 		std::cout << "Give info just about operator" << std::endl;
 	}
 }

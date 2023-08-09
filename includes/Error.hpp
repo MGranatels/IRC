@@ -13,6 +13,7 @@
 # define CHANNELMODEIS		"324"
 # define TOPIC_CHANNEL		"332"
 # define INVITING			"341"
+# define RPL_WHOREPLY		"352"
 # define NAMREPLY			"353"
 # define ENDOFNAMES			"366"
 # define NOSUCHNICK			"401"
