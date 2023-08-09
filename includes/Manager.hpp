@@ -50,7 +50,6 @@ class Manager
 		static	void		whoAction( Clients &client );
 		static	void		kickAction( Clients &client );
 		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel);
-		static	void		whoAction( Clients &client);
 		static	void		lusersAction( Clients& client );
 		//static	int			(*muteAction)( Clients &client);
 		static	void		joinProtocol(Clients &client, Channel &channelName, int clientId);
