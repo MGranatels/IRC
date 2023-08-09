@@ -40,18 +40,17 @@ class Manager
 		static	void		joinAction( Clients &client );
 		static	void		partAction( Clients &client);
 		static	void		modeAction( Clients &client );
-		static	void		quitAction( Clients &client );
-		static	void		topicAction( Clients &client );
-		static	void		inviteAction( Clients &client );
-		static	void		privAction( Clients &client );
-		static	void		nickAction( Clients &client );
+		static	void		quitAction( Clients &client);
+		static	void		topicAction( Clients &client);
+		static	void		inviteAction( Clients &client);
+		static	void		privAction( Clients &client);
+		static	void		nickAction( Clients &client);
 		static	void		listAction( Clients& client );
 		static	void		namesAction( Clients& client );
-		static	void		whoAction( Clients &client );
-		static	void		kickAction( Clients &client );
-		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel);
 		static	void		whoAction( Clients &client);
 		static	void		lusersAction( Clients& client );
+
+		static	void		kickAction( void );
 		//static	int			(*muteAction)( Clients &client);
 		static	void		joinProtocol(Clients &client, Channel &channelName, int clientId);
 		static	void		sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender);
