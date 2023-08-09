@@ -50,6 +50,8 @@ class Manager
 		static	void		whoAction( Clients &client );
 		static	void		kickAction( Clients &client );
 		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel);
+		static	void		whoAction( Clients &client);
+		static	void		lusersAction( Clients& client );
 		//static	int			(*muteAction)( Clients &client);
 		static	void		joinProtocol(Clients &client, Channel &channelName, int clientId);
 		static	void		sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender);
@@ -94,6 +96,8 @@ class Manager
 		static	bool	checkPassword(Clients client, std::string password);
 		static	void	removeClientFromAllChannels(int clientId);
 		static	std::vector<int> getAllClientsIds(void);
+		static	std::string	getAllChanOps( void );
+		static	std::string	getUnkownClients( void );
 };
 
 #endif

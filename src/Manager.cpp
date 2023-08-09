@@ -196,7 +196,7 @@ void	Manager::removeClientFromAllChannels(int clientId)
 	}
 }
 
-std::vector<int> Manager::getAllClientsIds(void)
+std::vector<int> Manager::getAllClientsIds( void )
 {
 	std::vector<int> clients;
 	std::vector<Clients>::iterator it = _clients.begin();
@@ -204,4 +204,29 @@ std::vector<int> Manager::getAllClientsIds(void)
 	for ( ; it != _clients.end(); it++)
 		clients.push_back(it->getId());
 	return (clients);
+}
+// Lets make a function that checks all channels for the channel operators and returns the total of chanops
+std::string	Manager::getAllChanOps( void )
+{
+	std::stringstream ss;
+	int total = 0;
+	std::vector<Channel>::iterator it = _channels.begin();
+
+	for ( ; it != _channels.end(); it++)
+		total += it->getOperators().size();
+	ss << total;
+	return (ss.str());
+}
+
+std::string	Manager::getUnkownClients( void )
+{
+	std::stringstream ss;
+	int total = 0;
+	std::vector<Clients>::iterator it = _clients.begin();
+
+	for ( ; it != _clients.end(); it++)
+		if (it->getClientSettings() == false)
+			total++;
+	ss << total;
+	return (ss.str());
 }

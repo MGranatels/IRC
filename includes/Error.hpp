@@ -1,9 +1,9 @@
 #ifndef Error_HPP
 # define Error_HPP
 
-
 # define WELCOME_MESSAGE	"001"
 # define CHANNEL_OPPS		"005"
+# define LUSERCLIENT		"251"
 # define LUSEROP			"252"
 # define LUSERUNKNOWN		"253"
 # define LUSERCHANNELS		"254"
