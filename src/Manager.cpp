@@ -79,7 +79,7 @@ std::string	Manager::getUsersList(Channel &Channel)
 		if (checkChannelOp(Channel, client.getId()))
 			usersList += "@" + client.getNickname() + " ";
 		else
-			usersList += client.getNickname() + " ";
+			usersList += "%" + client.getNickname() + " ";
 	}
 	return usersList;
 }

@@ -1,30 +1,31 @@
 #include <Manager.hpp>
 #include <utils.hpp>
 
+void Manager::onMode(std::string event, ModeFunction fun) {
+	modeMap.insert(std::pair<std::string, ModeFunction>(event, fun));
+}
 
-int	Manager::changeMode( Clients& client )
+void Manager::defineModeMap( void )
 {
-	std::vector<std::string> split = client.getCmd();
-	Channel& _channel = getChannelByName(split[1]);
-	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
-	std::string key(1, split[2][1]);
-	std::map<std::string, ChannelModeStatus>::iterator it = modes.find(key);
+	onMode("k", &Manager::kOperator);
+	onMode("o", &Manager::oOperator);
+	onMode("l", &Manager::lOperator);
+	onMode("i", &Manager::iOperator);
+	onMode("t", &Manager::tOperator);
+	onMode("m", &Manager::mOperator);
+	onMode("b", &Manager::bOperator);
+}
 
-	if (it == modes.end())
-		return (sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :Operation does Not exist in the Channel. Type for HELP to See a List of Commands", client.getId()));
-	if (split[2][1] == 'k') // Needs password as argument
-		return (kOperator(split, _channel, client));
-	else if (split[2][1] == 'o') // Needs client name as argument
-		return (oOperator(split, _channel, client));
-	else if (split[2][1] == 'l') // Needs limit number as argument
-		return (lOperator(split, _channel, client));
-	else if (split[2][1] == 'i')
-		return (iOperator(split, _channel));
-	else if (split[2][1] == 't')
-		return (tOperator(split, _channel, client));
-	else if	(split[2][1] == 'm')
-		return (mOperator(split, _channel, client));
-	return 0;
+void	Manager::changeMode(Clients& client)
+{
+	Channel& _channel = getChannelByName(client.getCmd()[1]);
+	std::string modeName(1, client.getCmd()[2][1]);
+	defineModeMap();
+	std::map<std::string, ModeFunction>::iterator it = modeMap.find(modeName);
+	if (it != modeMap.end())
+		(it->second)(_channel, client);
+	else
+		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :Operation does Not exist in the Channel. Type for HELP to See a List of Commands", client.getId());
 }
 
 bool	Manager::checkChannelOp(Channel _channel, int id)
@@ -101,8 +102,20 @@ bool	Manager::checkChannelInvite(std::string channelName, Clients client)
 	return true;
 }
 
+bool	Manager::checkChannelBan(std::string channelName, Clients client)
+{
+	Channel& channel = getChannelByName(channelName);
+	if (channel.isClientBanned(client.getId())) {
+		sendIrcMessage(formatMessage(client, BANNEDFROMCHAN) + " :Cannot join channel (+b). Access Denied, you are banned", client.getId());
+		return false;
+	}
+	return true;
+}
+
 bool	Manager::checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits)
 {
+	if (!checkChannelBan(channelName, client))
+		return false;
 	if (!checkChannelPassword(channelName, client, splits))
 		return false;
 	if (!checkChannelLimit(channelName, client))

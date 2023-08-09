@@ -5,6 +5,8 @@ std::vector<Clients> 		Manager::_clients;
 std::vector<Channel> 		Manager::_channels;
 std::string 				Manager::hostname = "localhost";
 std::map<std::string, ActionFunction> Manager::actionMap;
+std::map<std::string, ModeFunction> Manager::modeMap;
+
 
 
 void Manager::on(std::string event, ActionFunction fun) {
@@ -21,6 +23,8 @@ void Manager::defineActionMap( void )
 	on("JOIN", &Manager::joinAction);
 	on("INVITE", &Manager::inviteAction);
 	on("PRIVMSG", &Manager::privAction);
+	on("LIST", &Manager::listAction);
+	on("NAMES", &Manager::namesAction);
 	// on("NICK", &Manager::nickAction);
     // actionMap["KICK"] = &Manager::kickAction;
 }
@@ -28,8 +32,6 @@ void Manager::defineActionMap( void )
 bool	Manager::checkClientData( Clients& foundClient )
 {
 	std::vector<std::string> cmd = foundClient.getCmd();
-	for (unsigned int i = 0; i < cmd.size(); i++)
-		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (foundClient.getClientSettings() == true)
 		return true;
 	for (unsigned int i = 0 ; i < cmd.size(); i++)
@@ -248,30 +250,47 @@ void	Manager::nickAction( Clients& client )
 	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
 
-/*int	Manager::muteAction( const Clients &client, std::vector<std::string> &splits)
+void	Manager::listAction( Clients& client )
 {
-	if (splits.size() < 3)
-		return (sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Action. Type HELP For a List of Commands", client.getId()));
-	std::string &channelName = splits[2];
-	if (!isValidClient(splits[1]))
-		return (sendIrcMessage(formatMessage(client, NOSUCHNICK) + " " + splits[1] + " :No such user in Server", client.getId()));
-	Clients	&mutedClient = getClientByNick(splits[1]);
-	int isValidChan = isValidChannel(channelName);
-	if (isValidChan == CREATED)
+	std::vector<std::string> cmd = client.getCmd();
+	std::string listMessage;
+
+	std::cout << cmd.size() << std::endl;
+	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
-		Channel &channel = getChannelByName(channelName);
-		if (!channel.isClientOperator(client.getId()))
-			return (sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + channelName + " :Permission denied, you're not channel operator.", client.getId()));
-		if (!channel.isClientInChannel(mutedClient.getId()))
-			return (sendIrcMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + channelName + " :User not in Channel", client.getId()));
-		if (channel.isClientMuted(mutedClient.getId()))
-			return (sendIrcMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + mutedClient.getNickname() + " :user already muted" + channelName, client.getId()));
-		if (splits[0] == "MUTED")
-			channel.addMuted(mutedClient.getId());
-		else
-			channel.removeMuted(mutedClient.getId());
+		Channel& channel = *it;
+		std::string numberClients = channel.getClientsCountStr();
+		listMessage += formatMessage(client, RPL_LIST) + " " + channel.getName() + " " + numberClients + " :" + channel.getTopic() + "\r\n";
+		sendIrcMessage(listMessage, client.getId());
+	}
+	sendIrcMessage(formatMessage(client, RPL_LISTEND) + " :End of LIST", client.getId());
+}
+
+void	Manager::namesAction( Clients& client )
+{
+	std::vector<std::string> cmd = client.getCmd();
+
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " NAMES :Not enough parameters", client.getId());
+		return ;
+	}
+	if (isValidChannel(cmd[1]) == CREATED) {
+		Channel& channel = getChannelByName(cmd[1]);
+		std::string usersList = getUsersList(channel);
+		sendIrcMessage(formatMessage(client, NAMREPLY) + " = " + channel.getName() + " :" + usersList, client.getId());
+		sendIrcMessage(formatMessage(client, ENDOFNAMES) + " " + channel.getName() + " :End of NAMES list", client.getId());
 	}
 	else
-		return (sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channelName + " :Not such channel in Server ", client.getId()));
-	return 1;
-}*/
+		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel", client.getId());
+}
+
+// void	Manager::lusersAction( Client& client )
+// {
+// 	:server-name 251 user :There are <user-count> users and <services-count> services on <server-count> servers
+// 	:server-name 252 user <integer> :<integer> operator(s) online
+// 	:server-name 253 user <integer> :<integer> unknown connection(s)
+// 	:server-name 254 user <integer> :<integer> channels formed
+// 	std::vector<std::string> cmd = client.getCmd();
+// 	sendIrcMessage(formatMessage(client, LUSEROP) + " " + cmd[1] + " :No such channel", client.getId());
+
+// }

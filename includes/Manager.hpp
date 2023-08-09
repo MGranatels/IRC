@@ -13,6 +13,7 @@
 class Sockets;
 
 typedef void (*ActionFunction)(Clients& client);
+typedef void (*ModeFunction)(Channel& channel, Clients& client);
 
 //Static management
 class Manager
@@ -21,6 +22,7 @@ class Manager
 		static std::vector<Clients>	_clients;
 		static std::vector<Channel>	_channels;
    		static std::map<std::string, ActionFunction> actionMap;
+   		static std::map<std::string, ModeFunction> modeMap;
 	public:
 		static std::string 			hostname;
 
@@ -43,6 +45,8 @@ class Manager
 		static	void		inviteAction( Clients &client);
 		static	void		privAction( Clients &client);
 		static	void		nickAction( Clients &client);
+		static	void		listAction( Clients& client );
+		static	void		namesAction( Clients& client );
 		static	void		kickAction( void );
 		//static	int			(*muteAction)( Clients &client);
 		static void			joinProtocol(Clients &client, Channel &channelName, int clientId);
@@ -58,19 +62,22 @@ class Manager
 		static	bool		checkChannelOp(Channel _channel, int id);
 		static	int			validateMode( Clients client );
 		static	bool		checkFlagFormat(std::string flag);
-		static	int			changeMode( Clients &client );
-		static	int			kOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
-		static	int			oOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
-		static	int			lOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
-		static	int			iOperator(std::vector<std::string> split, Channel& _channel);
-		static	int			tOperator(std::vector<std::string> split, Channel& _channel, Clients& _client);
-		static	int			mOperator(std::vector<std::string> split, Channel& _channel, Clients _client);
+		static	void		changeMode( Clients &client );
+		static	void		kOperator(Channel& _channel, Clients& _client);
+		static	void		oOperator(Channel& _channel, Clients& _client);
+		static	void		lOperator(Channel& _channel, Clients& _client);
+		static	void		iOperator(Channel& _channel, Clients& _client);
+		static	void		tOperator(Channel& _channel, Clients& _client);
+		static	void		mOperator(Channel& _channel, Clients& _client);
+		static	void		bOperator(Channel& _channel, Clients& _client);
+		static	void		onMode(std::string event, ModeFunction fun);
 		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
 		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits);
-		static	void		defineActionMap();
-
+		static	bool		checkChannelBan(std::string channelName, Clients client);
+		static	void		defineActionMap( void );
+		static	void		defineModeMap( void );
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);

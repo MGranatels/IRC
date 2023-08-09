@@ -8,6 +8,7 @@ Channel::Channel(std::string name):
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
 	this->_modes["m"] = MODE_NOT_SET;
+	this->_modes["b"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -19,6 +20,7 @@ Channel::Channel(std::string name, std::string topic):
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
 	this->_modes["m"] = MODE_NOT_SET;
+	this->_modes["b"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -98,6 +100,18 @@ const std::vector<int>& Channel::getOperators(void) const
 	return (this->_operatorsIds);
 }
 
+int	Channel::getClientsCount(void) const {
+	return (this->_clientsIds.size());
+}
+
+std::string	Channel::getClientsCountStr(void) const {
+	std::stringstream ss;
+
+	ss << this->getClients().size();
+	std::string numberClients = ss.str();
+	return (numberClients);
+}
+
 void Channel::addOperator(int operatorId)
 {
 	this->_operatorsIds.push_back(operatorId);
@@ -152,6 +166,16 @@ bool Channel::isClientMuted( int clientId)
 	return (false);
 }
 
+bool Channel::isClientBanned(int clientId) {
+	std::vector<int>::iterator it = _bannedIds.begin();
+	for ( ; it != _bannedIds.end(); it ++)
+	{
+		if (*it == clientId)
+			return (true);
+	}
+	return (false);
+}
+
 void	Channel::setMode(const std::string& mode) {
 	_modes[mode] = MODE_SET;
 }
@@ -184,4 +208,12 @@ void Channel::setLimit(int limit) {
 
 unsigned int Channel::getLimit(void) const {
 	return _limit;
+}
+
+void Channel::addBanned(int newClientId) {
+	_bannedIds.push_back(newClientId);
+}
+
+void Channel::removeBanned(int clientId) {
+	removeElementFromVector(_bannedIds, clientId);
 }
