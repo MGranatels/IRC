@@ -306,7 +306,6 @@ void	Manager::namesAction( Clients& client )
 		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel", client.getId());
 }
 
-<<<<<<< HEAD
 void	Manager::lusersAction( Clients& client )
 {
 	std::stringstream ss;
@@ -324,15 +323,3 @@ void	Manager::lusersAction( Clients& client )
 	sendIrcMessage(formatMessage(client, LUSERUNKNOWN) + " :" + unkownClients + " unknown connection(s)", client.getId());
 	sendIrcMessage(formatMessage(client, LUSERCHANNELS) + " :" + numberChannels + " channels formed", client.getId());
 }
-=======
-// void	Manager::lusersAction( Client& client )
-// {
-// 	:server-name 251 user :There are <user-count> users and <services-count> services on <server-count> servers
-// 	:server-name 252 user <integer> :<integer> operator(s) online
-// 	:server-name 253 user <integer> :<integer> unknown connection(s)
-// 	:server-name 254 user <integer> :<integer> channels formed
-// 	std::vector<std::string> cmd = client.getCmd();
-// 	sendIrcMessage(formatMessage(client, LUSEROP) + " " + cmd[1] + " :No such channel", client.getId());
-
-// }
->>>>>>> 28291edb198c3d31a4e44859dd7a532871c3795f
