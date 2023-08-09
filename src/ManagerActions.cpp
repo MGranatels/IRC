@@ -23,14 +23,9 @@ void Manager::defineActionMap( void )
 	on("JOIN", &Manager::joinAction);
 	on("INVITE", &Manager::inviteAction);
 	on("PRIVMSG", &Manager::privAction);
-<<<<<<< HEAD
 	on("LIST", &Manager::listAction);
 	on("NAMES", &Manager::namesAction);
-	// on("NICK", &Manager::nickAction);
-=======
 	on("WHO", &Manager::whoAction);
->>>>>>> main
-    // actionMap["KICK"] = &Manager::kickAction;
 }
 
 bool	Manager::checkClientData( Clients& foundClient )
