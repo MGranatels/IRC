@@ -28,7 +28,7 @@
 # define UMODEUNKNOWNFLAG	"501"
 # define ERR_NOTEXTTOSEND	"412"
 # define ERR_UNKNOWNCOMMAND	"421"
-
+# define RPL_WHOREPLY		"352"
 class Error
 {
 	public:

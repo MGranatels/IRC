@@ -195,3 +195,13 @@ void	Manager::removeClientFromAllChannels(int clientId)
 		}
 	}
 }
+
+std::vector<int> Manager::getAllClientsIds(void)
+{
+	std::vector<int> clients;
+	std::vector<Clients>::iterator it = _clients.begin();
+
+	for ( ; it != _clients.end(); it++)
+		clients.push_back(it->getId());
+	return (clients);
+}

@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+#executavel
+ircserv
+
 # Compiled Object files
 *.slo
 *.lo
