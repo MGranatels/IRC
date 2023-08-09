@@ -36,6 +36,7 @@
 # define BADCHANNELNAME		"476"
 # define CHANOPRIVSNEEDED	"482"
 # define UMODEUNKNOWNFLAG	"501"
+# define RPL_ENDOFWHO		"315"
 
 class Error
 {
