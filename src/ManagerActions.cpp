@@ -143,9 +143,9 @@ void Manager::kickAction( Clients &kicker )
 	if (cmd.size() > 3)
 		flag = 1;
 	// Find if channel created
-	if (isValidChannel(cmd[1 + flag]) <= 0)
+	if (isValidChannel(cmd[1 + flag]) <= 0 && cmd[1 + flag].compare("irc") != 0)
 	{
-		std::cout << "erro1" << std::endl;
+		sendIrcMessage(formatMessage(kicker, ERR_NOSUCHCHANNEL) + " " + cmd[1 + flag] + " :No such channel", kicker.getId());
 		return;
 	}
 	Channel& channel = getChannelByName(cmd[1 + flag]);
@@ -154,12 +154,11 @@ void Manager::kickAction( Clients &kicker )
 	{
 		if (leaver == _clients.end())
 		{
-			std::cout << Red << "client you wanted to ban does not have that nickname." << NC << std::endl;
+			sendIrcMessage(formatMessage(kicker, USERNOTINCHANNEL) + leaver->getNickname() + " " + channel.getName() + " :They aren't on that channel", kicker.getId());
 			return;
 		}
 		if (flag == 0 && leaver->getNickname() == cmd[2 + flag])
 			break;
-		std::cout << "|" << ":" + leaver->getNickname() << "| vs |" << cmd[2 + flag] << "|" << std::endl;
 		if (flag == 1 && (":" + leaver->getNickname()) == cmd[2 + flag])
 			break;
 	}
@@ -167,8 +166,7 @@ void Manager::kickAction( Clients &kicker )
 	if (!checkChannelOp(channel, kicker.getId()))
 	{
 		// Kicker is not allowed to kick others
-		std::cout << "erro4" << std::endl;
-		sendIrcMessage(formatMessage(kicker, "NOTICE") + " :You do not have permission to kick users from the channel", kicker.getId());
+		sendIrcMessage(formatMessage(kicker, CHANOPRIVSNEEDED) + " :You do not have permission to kick users from the channel", kicker.getId());
 		return;
 	}
 	// Perform the kick
