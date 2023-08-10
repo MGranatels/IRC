@@ -138,9 +138,7 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 		_channel.addBanned(foundClient.getId());
 		_channel.setMode("b");
 		// remove client from channel and update channel user:
-		_channel.removeClient(foundClient.getId());
-		messageUpdateUserList(_channel, _client);
-		if (cmd.size() > 4 && !cmd[4].empty())
+		if (cmd.size() > 4)
 		{
 			std::string fullMessage;
 			for (unsigned int i = 4; i < cmd.size(); i++)
@@ -149,10 +147,14 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 			sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName() + " :You were banned from Channel. Reason: " + fullMessage, foundClient.getId());
 		}
 		else
+		{
+			kickClientFromChannel(_client, foundClient, _channel);
 			sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName() + " :You were banned from Channel", foundClient.getId());
-		// Missing Kick action to remove client from channel
+		}
+		_channel.removeClient(foundClient.getId());
 	}
 	else {
+		std::cout << "Unban this guy: " << foundClient.getNickname() << std::endl;
 		_channel.removeBanned(foundClient.getId());
 		_channel.unsetMode("b");
 	}
