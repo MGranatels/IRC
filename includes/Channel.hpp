@@ -28,6 +28,7 @@ class	Channel
 		std::string _name;
 		std::string _topic;
 		std::string _password;
+		std::string	_superUser;
 		std::vector<int> _clientsIds;
 		std::vector<int> _operatorsIds;
 		std::vector<int> _inviteesIds;
@@ -46,11 +47,14 @@ class	Channel
 		void	addClient(int newClientId);
 		void	addInvitee(int clientId);
 		void	addMuted(int newClientId);
+		void	addSuperUser( std::string user);
 		void	removeClient(int clientId);
+		void	removeAllOperators( void );
 		void	removeOperator(int operatorId);
 		void	removeInvitee(int clientId);
 		void	removeMuted(int clientId);
 		void	removeBanned(int clientId);
+		void	removeSuperUser( void );
 		bool	isClientInvited(int clientId);
 		bool	isModeSet(const std::string& mode);
 		bool	isClientInChannel(int clientId);
@@ -76,6 +80,8 @@ class	Channel
 		unsigned int	getLimit(void) const;
 		int				getClientsCount(void) const;
 		std::string		getClientsCountStr(void) const;
+		std::string		getSuperUser(void) const;
+		std::string		getChannelModes( void );
 		// TODO: bool isChanop(int ClientId); //to do -> return if a given client is a chanop i.e has right to execute the commands
 };
 

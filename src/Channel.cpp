@@ -9,6 +9,7 @@ Channel::Channel(std::string name):
 	this->_modes["l"] = MODE_NOT_SET;
 	this->_modes["m"] = MODE_NOT_SET;
 	this->_modes["b"] = MODE_NOT_SET;
+	this->_modes["s"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -21,6 +22,7 @@ Channel::Channel(std::string name, std::string topic):
 	this->_modes["l"] = MODE_NOT_SET;
 	this->_modes["m"] = MODE_NOT_SET;
 	this->_modes["b"] = MODE_NOT_SET;
+	this->_modes["s"] = MODE_NOT_SET;
 	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
@@ -73,6 +75,10 @@ void Channel::addInvitee(int newClientId)
 void Channel::addMuted(int newClientId)
 {
 	_mutedIds.push_back(newClientId);
+}
+
+void	Channel::addSuperUser( std::string user ) {
+	this->_superUser = user;
 }
 
 void Channel::setTopic(std::string topic)
@@ -194,7 +200,7 @@ std::map<std::string, ChannelModeStatus> Channel::getModes() const {
     return _modes;
 }
 
-void Channel::setPassword(std::string password) {
+void	Channel::setPassword(std::string password) {
 	_password = password;
 }
 
@@ -202,7 +208,21 @@ std::string Channel::getPassword(void) const {
 	return _password;
 }
 
-void Channel::setLimit(int limit) {
+std::string Channel::getSuperUser(void) const {
+	return this->_superUser;
+}
+
+std::string Channel::getChannelModes() {
+    const char modeFlags[] = "tkolmbs";
+    std::string modes;
+
+    for (const char* flag = modeFlags; *flag; ++flag) {
+        modes += (this->isModeSet(std::string(1, *flag))) ? ("+" + std::string(1, *flag) + " ") : ("-" + std::string(1, *flag) + " ");
+    }
+    return modes;
+}
+
+void	Channel::setLimit(int limit) {
 	_limit = limit;
 }
 
@@ -210,10 +230,18 @@ unsigned int Channel::getLimit(void) const {
 	return _limit;
 }
 
-void Channel::addBanned(int newClientId) {
+void	Channel::addBanned(int newClientId) {
 	_bannedIds.push_back(newClientId);
 }
 
-void Channel::removeBanned(int clientId) {
+void	Channel::removeBanned(int clientId) {
 	removeElementFromVector(_bannedIds, clientId);
+}
+
+void	Channel::removeSuperUser( void ) {
+	this->_superUser = "";
+}
+
+void	Channel::removeAllOperators( void ) {
+	this->_operatorsIds.clear();
 }

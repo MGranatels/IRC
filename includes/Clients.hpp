@@ -29,6 +29,8 @@ class Clients
 		void		setPassword( std::string username );
 		void		setClientSettings( bool clientSettings );
 		void		setOppChannel( bool opChannel );
+		void		removeCmd( void );
+
 		//Getters
 		int							getId( void ) const;
 		std::string					getNickname( void ) const;

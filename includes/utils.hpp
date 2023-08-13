@@ -9,14 +9,16 @@
 # include <algorithm>
 # include <cctype>
 
+std::vector<std::string>	split(const std::string& str, const std::string& delimiter);
 std::string                 toUpperCase(const std::string& input);
+std::string 				removeCharacter(const std::string& str, char target);
 void						removeElementFromVector(std::vector<int> &vector, int element);
 void						ft_bzero(void *s, size_t n);
 void						handlesginal(int sig);
 void						removeWhitespace(std::string& str);
-int							printMessage(std::string message, std::string color);
 bool						IsDigit(std::string str);
 bool						isNickValid(const std::string &nick);
-std::vector<std::string>	split(const std::string& str, const std::string& delimiter);
+bool						containsSubstring(const std::string& haystack, const std::string& needle);
+int							printMessage(std::string message, std::string color);
 
 #endif

@@ -23,6 +23,7 @@ class Manager
 		static std::vector<Channel>	_channels;
    		static std::map<std::string, ActionFunction> actionMap;
    		static std::map<std::string, ModeFunction> modeMap;
+		static std::string			_serverName;
 	public:
 		static std::string 			hostname;
 
@@ -49,7 +50,7 @@ class Manager
 		static	void		namesAction( Clients& client );
 		static	void		whoAction( Clients &client );
 		static	void		kickAction( Clients &client );
-		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel);
+		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel, std::string kickReason);
 		static	void		lusersAction( Clients& client );
 
 		//static	int			(*muteAction)( Clients &client);
@@ -64,7 +65,6 @@ class Manager
 		static const std::string	formatMessage(const Clients &client, std::string code);
 		static const std::string	formatMessage(const Channel &_channel, std::string code);
 		static	void		setChannOpps(Clients *client);
-		static	bool		checkChannelOp(Channel _channel, int id);
 		static	int			validateMode( Clients client );
 		static	bool		checkFlagFormat(std::string flag);
 		static	void		changeMode( Clients &client );
@@ -75,17 +75,18 @@ class Manager
 		static	void		tOperator(Channel& _channel, Clients& _client);
 		static	void		mOperator(Channel& _channel, Clients& _client);
 		static	void		bOperator(Channel& _channel, Clients& _client);
+		static	void		sOperator(Channel& _channel, Clients& _client);
 		static	void		onMode(std::string event, ModeFunction fun);
 		static	bool		checkChannelPassword(Clients client, std::string channelName, std::string key);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
 		static	bool		checkChannelParameters(Clients client, std::string channelName, std::string key);
 		static	bool		checkChannelBan(std::string channelName, Clients client);
+		static	bool		checkChannelOp(Channel _channel, int id);
 		static	void		defineActionMap( void );
 		static	void		defineModeMap( void );
 		static	std::map<std::string, std::string>	getChannelNameAndKey(std::vector<std::string>& cmd);
 		static	void	leaveAllChannels(Clients& client);
-
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);
@@ -97,6 +98,7 @@ class Manager
 		static	bool	checkClientData( Clients& foundClient );
 		static  bool	checkNickName(Clients client);
 		static	bool	checkPassword(Clients client, std::string password);
+		static	void	checkSuperUser(std::string channelName, Clients client);
 		static	void	removeClientFromAllChannels(int clientId);
 		static	std::vector<int> getAllClientsIds(void);
 		static	std::string	getAllChanOps( void );

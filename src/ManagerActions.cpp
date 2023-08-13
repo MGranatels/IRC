@@ -1,14 +1,6 @@
 #include <Manager.hpp>
 #include <Channel.hpp>
 
-std::vector<Clients> 		Manager::_clients;
-std::vector<Channel> 		Manager::_channels;
-std::string 				Manager::hostname = "localhost";
-std::map<std::string, ActionFunction> Manager::actionMap;
-std::map<std::string, ModeFunction> Manager::modeMap;
-
-
-
 void Manager::on(std::string event, ActionFunction fun) {
 	actionMap.insert(std::pair<std::string, ActionFunction>(event, fun));
 }
@@ -48,14 +40,18 @@ bool	Manager::checkClientData( Clients& foundClient )
 }
 
 int	Manager::runChanActions(Clients& client) {
+	client.removeCmd();
 	std::vector<std::string> cmd = client.getCmd();
 	std::string actionName = cmd[0];
 
 	for (unsigned int i = 0; i < cmd.size(); i++)
 		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
-	defineActionMap();
-	if (!isValidClient(client.getId()))
+	if (cmd.size() < 2 && cmd[0] != "LUSERS" && cmd[0] != "LIST" && cmd[0] != "USERS" && cmd[0] != "QUIT" && \
+	cmd[0] != "WHO" && cmd[0] != "NAMES" )
+		return(sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId()));
+	if (cmd.size() >= 4 && cmd[2] == "WHO")
 		return -1;
+	defineActionMap();
 	// Find the action function in the map
 	std::map<std::string, ActionFunction>::iterator it = actionMap.find(actionName);
 	if (it != actionMap.end())
@@ -72,18 +68,19 @@ void	Manager::partAction( Clients &client )
 	if (cmd.size() > 2)
 		for (unsigned int i = 2; i < cmd.size(); i++)
 			partMessage += cmd[i];
-	// Find the channel
 	Channel& channel = Manager::getChannelByName(cmd[1]);
-	// Check if the client is in the channel
 	if (!channel.isClientInChannel(client.getId()))
 		return ;
-	// Notify other clients in the channel about the PART
 	BroadcastMessageChan(channel, formatMessage(client, "PART") + " " + channel.getName() + " " + partMessage);
-	// Send a PART message to the client to indicate they left the channel.
 	sendIrcMessage(formatMessage(client) + " PART " + channel.getName(), client.getId());
 	BroadcastMessageChan(channel, formatMessage(client, "QUIT") + " :has quit the channel");
-	// Remove the user from the channel
 	channel.removeClient(client.getId());
+	if (channel.isClientOperator(client.getId()))
+		if (channel.getOperators().size() == 1)
+		{
+			channel.removeOperator(client.getId());
+			channel.addOperator(channel.getClients()[0]);
+		}
 	messageUpdateUserList(channel, client);
 	return ;
 }
@@ -91,7 +88,6 @@ void	Manager::partAction( Clients &client )
 void	Manager::joinAction( Clients &client )
 {
 	std::vector<std::string> cmd = client.getCmd();
-
 	std::map<std::string, std::string> channelProp = getChannelNameAndKey(cmd);
 	std::map<std::string, std::string>::iterator it = channelProp.begin();
 	for (std::map<std::string, std::string>::const_iterator it = channelProp.begin(); it != channelProp.end(); ++it) {
@@ -129,13 +125,16 @@ void	Manager::joinAction( Clients &client )
 	}
 }
 
-void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel)
+void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel, std::string kickReason)
 {
 	std::cout << "entrou para kickar" << std::endl;
+	// Get commands and check if there are any extra arguments:
 	if (channel.isClientInChannel(target.getId()))
 	{
-		// Notify the kicked client
-		sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :You have been kicked from the channel.", target.getId());
+		if (kickReason.empty())
+			sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :No reason Given.", target.getId());
+		else
+			sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :" + kickReason, target.getId());
 		channel.removeClient(target.getId());
 		messageUpdateUserList(channel, target);
 	}
@@ -144,38 +143,34 @@ void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& c
 void Manager::kickAction( Clients &kicker )
 {
 	std::vector<std::string> cmd = kicker.getCmd();
-	std::vector<Clients>::iterator leaver = _clients.begin();
-	int	flag = 0;
-	if (cmd.size() > 3)
-		flag = 1;
+	std::string	kickReason;
 	// Find if channel created
-	if (isValidChannel(cmd[1 + flag]) <= 0 && cmd[1 + flag].compare("irc") != 0) {
-		sendIrcMessage(formatMessage(kicker, ERR_NOSUCHCHANNEL) + " " + cmd[1 + flag] + " :No such channel", kicker.getId());
+	if (!isValidChannel(cmd[1]) || cmd.size() < 3) {
+		sendIrcMessage(formatMessage(kicker, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel exists argument was not given", kicker.getId());
 		return;
 	}
-	Channel& channel = getChannelByName(cmd[1 + flag]);
-	//Check if client exists
-	for (; leaver <= _clients.end(); leaver++)
-	{
-		if (leaver == _clients.end())
-		{
-			sendIrcMessage(formatMessage(kicker, USERNOTINCHANNEL) + leaver->getNickname() + " " + channel.getName() + " :They aren't on that channel", kicker.getId());
-			return;
-		}
-		if (flag == 0 && leaver->getNickname() == cmd[2 + flag])
-			break;
-		if (flag == 1 && (":" + leaver->getNickname()) == cmd[2 + flag])
-			break;
+	Channel& channel = getChannelByName(cmd[1]);
+	if (!isValidClient(cmd[2])) {
+		sendIrcMessage(formatMessage(kicker, NOSUCHNICK) + " " + cmd[2] + " :No such user with that Nick", kicker.getId());
+		return;
 	}
-	//Check if the kicker is an operator or has necessary permissions to kick
-	if (!checkChannelOp(channel, kicker.getId()))
-	{
-		// Kicker is not allowed to kick others
+	Clients& leaver = getClientByNick(cmd[2]);
+	if (!channel.isClientInChannel(leaver.getId())) {
+			sendIrcMessage(formatMessage(kicker, USERNOTINCHANNEL) + " " + channel.getName() + " :" +  leaver.getNickname() + " Is not on this channel" , kicker.getId());
+			return ;
+	}
+	if (leaver.getNickname() == kicker.getNickname()) {
+		sendIrcMessage(formatMessage(kicker, NOPRIVILEGES) + " :You cannot kick yourself", kicker.getId());
+		return ;
+	}
+	if (!checkChannelOp(channel, kicker.getId())) {
 		sendIrcMessage(formatMessage(kicker, CHANOPRIVSNEEDED) + " :You do not have permission to kick users from the channel", kicker.getId());
 		return;
 	}
 	// Perform the kick
-	kickClientFromChannel(kicker, *leaver, channel);
+	for (unsigned int i = 3; i < cmd.size(); i++)
+		kickReason += cmd[i] + " ";
+	kickClientFromChannel(kicker, leaver, channel, kickReason);
 	return;
 }
 
@@ -231,6 +226,10 @@ void	Manager::modeAction( Clients& client )
 void	Manager::topicAction( Clients &client )
 {
 	std::vector<std::string> cmd = client.getCmd();
+	if (!isValidChannel(cmd[1])) {
+		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel exists", client.getId());
+		return ;
+	}
 	Channel& _channel = getChannelByName(cmd[1]);
 	if (cmd.size() < 3 && _channel.getTopic().empty()) {
 		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId());
@@ -328,20 +327,23 @@ void	Manager::whoAction( Clients &client )
 		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + ": USAGE: WHO [<mask> [<o>]]", client.getId());
 }
 
-void	Manager::listAction( Clients& client)
+void Manager::listAction(Clients& client)
 {
-	std::vector<std::string> cmd = client.getCmd();
-	std::string listMessage;
+    std::vector<std::string> cmd = client.getCmd();
 
-	std::cout << cmd.size() << std::endl;
-	for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-	{
-		Channel& channel = *it;
-		std::string numberClients = channel.getClientsCountStr();
-		listMessage += formatMessage(client, RPL_LIST) + " " + channel.getName() + " " + numberClients + " :" + channel.getTopic() + "\r\n";
-		sendIrcMessage(listMessage, client.getId());
-	}
-	sendIrcMessage(formatMessage(client, RPL_LISTEND) + " :End of LIST", client.getId());
+    // Send RPL_LISTSTART numeric reply
+    sendIrcMessage(formatMessage(client, RPL_LISTSTART) + " :Channel list", client.getId());
+
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+    {
+        Channel& channel = *it;
+        std::string numberClients = channel.getClientsCountStr();
+        // Send RPL_LIST numeric reply for each channel
+        sendIrcMessage(formatMessage(client, RPL_LIST) + " " + channel.getName() + " " + numberClients + " :" + channel.getTopic(), client.getId());
+    }
+
+    // Send RPL_LISTEND numeric reply
+    sendIrcMessage(formatMessage(client, RPL_LISTEND) + " :End of LIST", client.getId());
 }
 
 void	Manager::namesAction( Clients& client )

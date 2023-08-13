@@ -119,6 +119,7 @@ void	Manager::mOperator(Channel& _channel, Clients& _client)
 void	Manager::bOperator(Channel& _channel, Clients& _client)
 {
 	std::vector<std::string> cmd = _client.getCmd();
+	std::string	banReason;
 
 	if (cmd.size() != 4) {
 		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
@@ -137,15 +138,44 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 	if (cmd[2][0] == '+') {
 		_channel.addBanned(foundClient.getId());
 		_channel.setMode("b");
-		kickClientFromChannel(_client, foundClient, _channel);
-		_channel.removeClient(foundClient.getId());
-		sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName(), foundClient.getId());
-		_channel.removeClient(foundClient.getId());
+		for (unsigned int i = 3; i < cmd.size(); i++)
+			banReason += cmd[i] + " ";
+		kickClientFromChannel(_client, foundClient, _channel, banReason);
+		sendIrcMessage(formatMessage(foundClient, BANNEDFROMCHAN) + " " + _channel.getName() + " " + foundClient.getNickname(), foundClient.getId());
 	}
 	else {
 		std::cout << "Unban this guy: " << foundClient.getNickname() << std::endl;
 		_channel.removeBanned(foundClient.getId());
 		_channel.unsetMode("b");
+	}
+	return ;
+}
+
+//Lets create a new operator, its s and its for a SuperUser mode
+
+void	Manager::sOperator(Channel& _channel, Clients& _client)
+{
+	std::vector<std::string> cmd = _client.getCmd();
+
+	if (cmd.size() != 4) {
+		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+		return ;
+	}
+	if (!isValidClient(cmd[3])) {
+		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " " + _channel.getName() + " :No such Nickname", _client.getId());
+		return ;
+	}
+	Clients& foundClient = getClientByNick(cmd[3]);
+	if (cmd[2][0] == '+') {
+		_channel.addSuperUser(foundClient.getNickname());
+		//inform user about super mode activated
+		_channel.setMode("s");
+		sendIrcMessage(formatMessage(_channel, CHANNELMODEIS) + " " + _channel.getName() + " :+s SuperUser Activated", foundClient.getId());
+	}
+	else {
+		_channel.removeSuperUser();
+		_channel.unsetMode("s");
+		sendIrcMessage(formatMessage(_channel, CHANNELMODEIS) + " " + _channel.getName() + " :-s SuperUser Deactivated", foundClient.getId());
 	}
 	return ;
 }

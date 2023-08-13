@@ -14,6 +14,7 @@ void Manager::defineModeMap( void )
 	onMode("t", &Manager::tOperator);
 	onMode("m", &Manager::mOperator);
 	onMode("b", &Manager::bOperator);
+	onMode("s", &Manager::sOperator);
 }
 
 void	Manager::changeMode(Clients& client)
@@ -55,7 +56,7 @@ int	Manager::validateMode(Clients client)
 	Channel& foundChannel = getChannelByName(cmd[1]);
 	if (cmd.size() == 2) {
 		// BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
-		return (sendIrcMessage(formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l", client.getId()));
+		return (sendIrcMessage(formatMessage(foundChannel, CHANNELMODEIS) + " " + foundChannel.getName() + ": " + foundChannel.getChannelModes(), client.getId()));
 	}
 	if (!checkFlagFormat(cmd[2]))
 		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " " + foundChannel.getName() + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
@@ -112,6 +113,16 @@ bool	Manager::checkChannelBan(std::string channelName, Clients client)
 	return true;
 }
 
+void	Manager::checkSuperUser(std::string channelName, Clients client)
+{
+	Channel& channel = getChannelByName(channelName);
+	if (!channel.getSuperUser().empty() && client.getNickname() ==  channel.getSuperUser())
+	{
+		channel.removeAllOperators();
+		channel.addOperator(client.getId());
+	}
+}
+
 bool	Manager::checkChannelParameters(Clients client, std::string channelName, std::string key)
 {
 	if (!checkChannelBan(channelName, client))
@@ -122,5 +133,6 @@ bool	Manager::checkChannelParameters(Clients client, std::string channelName, st
 		return false;
 	if (!checkChannelInvite(channelName, client))
 		return false;
+	checkSuperUser(channelName, client);
 	return true;
 }

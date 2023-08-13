@@ -25,3 +25,28 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		}
 	}
 }
+
+
+
+BAN COMMAND PARSING:
+From server:
+0 cmd: MODE
+1 cmd: ft_irc
+2 cmd: +b
+3 cmd: #ERT
+From Channel:
+0 cmd: MODE
+1 cmd: #ERT
+2 cmd: +b
+3 cmd: silinder
+
+Kick Command From SERVER:
+0 cmd: KICK
+1 cmd: ft_irc
+2 cmd: #ERT
+3 cmd: :silinder
+
+Kick Command From CHANNEL:
+0 cmd: KICK
+1 cmd: #ERT
+2 cmd: Itachi

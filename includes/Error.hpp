@@ -36,6 +36,7 @@
 # define BANNEDFROMCHAN			"474"
 # define BADCHANNELKEY			"475"
 # define BADCHANNELNAME			"476"
+# define NOPRIVILEGES			"481"
 # define CHANOPRIVSNEEDED		"482"
 # define UMODEUNKNOWNFLAG		"501"
 # define RPL_ENDOFWHO			"315"
