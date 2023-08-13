@@ -70,20 +70,18 @@ void	Manager::partAction( Clients &client )
 	std::vector<std::string> cmd = client.getCmd();
 	std::string partMessage = "";
 	if (cmd.size() > 2)
-		partMessage = cmd[2];
+		for (unsigned int i = 2; i < cmd.size(); i++)
+			partMessage += cmd[i];
 	// Find the channel
 	Channel& channel = Manager::getChannelByName(cmd[1]);
 	// Check if the client is in the channel
 	if (!channel.isClientInChannel(client.getId()))
 		return ;
 	// Notify other clients in the channel about the PART
-	if (!partMessage.empty())
-		BroadcastMessageChan(channel, formatMessage(client, "PART_CHANNEL") + " " + channel.getName() + " " + partMessage);
-	else
-		BroadcastMessageChan(channel, formatMessage(client, "PART_CHANNEL") + " " + channel.getName());
+	BroadcastMessageChan(channel, formatMessage(client, "PART") + " " + channel.getName() + " " + partMessage);
 	// Send a PART message to the client to indicate they left the channel.
 	sendIrcMessage(formatMessage(client) + " PART " + channel.getName(), client.getId());
-	BroadcastMessageChan(channel, formatMessage(client, "QUIT_CHANNEL") + " :has quit");
+	BroadcastMessageChan(channel, formatMessage(client, "QUIT") + " :has quit the channel");
 	// Remove the user from the channel
 	channel.removeClient(client.getId());
 	messageUpdateUserList(channel, client);
@@ -92,30 +90,43 @@ void	Manager::partAction( Clients &client )
 
 void	Manager::joinAction( Clients &client )
 {
-	// First, check if the channel exists
 	std::vector<std::string> cmd = client.getCmd();
-	std::string &channelName = cmd[1];
-	int isValidChan = isValidChannel(channelName);
 
-	std::cout << "Check Nick in Client Vector " << client.getNickname() << std::endl ;
-	if (isValidChan == CREATED)
-	{
-		if (!checkChannelParameters(channelName, client, cmd))
-			return ;
-		Channel& existingChannel = getChannelByName(channelName);
-		existingChannel.addClient(client.getId());
-		joinProtocol(client, existingChannel, client.getId());
+	std::map<std::string, std::string> channelProp = getChannelNameAndKey(cmd);
+	std::map<std::string, std::string>::iterator it = channelProp.begin();
+	for (std::map<std::string, std::string>::const_iterator it = channelProp.begin(); it != channelProp.end(); ++it) {
+		std::cout << "Channel: " << it->first << " | Key: " << it->second << std::endl;
 	}
-	else if (isValidChan == VALID_NAME)
-	{
-		_channels.push_back(Channel(channelName));
-		_channels.back().addClient(client.getId());
-		_channels.back().addOperator(client.getId());
-		joinProtocol(client, _channels.back(), client.getId());
+	if (cmd[1] == "0") {
+		leaveAllChannels(client);
+		return ;
 	}
-	else if (isValidChan == NOT_VALID)
-		sendIrcMessage(formatMessage(client, BADCHANNELNAME) + " " + channelName + " :Invalid channel name, try with #", client.getId());
-	return ;
+	while (it != channelProp.end())
+	{
+		int isValidChan = isValidChannel(it->first);
+		if (isValidChan == CREATED)
+		{
+			Channel& existingChannel = getChannelByName(it->first);
+			if (existingChannel.isClientInChannel(client.getId()))
+				return ;
+			if (!checkChannelParameters(client, it->first, it->second)) {
+				it++;
+				continue ;
+			}
+			existingChannel.addClient(client.getId());
+			joinProtocol(client, existingChannel, client.getId());
+		}
+		else if (isValidChan == VALID_NAME)
+		{
+			_channels.push_back(Channel(it->first));
+			_channels.back().addClient(client.getId());
+			_channels.back().addOperator(client.getId());
+			joinProtocol(client, _channels.back(), client.getId());
+		}
+		else if (isValidChan == NOT_VALID)
+			sendIrcMessage(formatMessage(client, BADCHANNELNAME) + " " + it->first + " :Invalid channel name, try with #", client.getId());
+		it++;
+	}
 }
 
 void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel)
@@ -125,11 +136,6 @@ void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& c
 	{
 		// Notify the kicked client
 		sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :You have been kicked from the channel.", target.getId());
-
-		// Notify other clients in the channel about the kick
-		BroadcastMessageChan(channel, formatMessage(kicker, "KICK_CHANNEL") + " " + channel.getName() + " " + target.getNickname() + " :has been kicked from the channel");
-
-		// Remove the user from the channel
 		channel.removeClient(target.getId());
 		messageUpdateUserList(channel, target);
 	}
@@ -143,8 +149,7 @@ void Manager::kickAction( Clients &kicker )
 	if (cmd.size() > 3)
 		flag = 1;
 	// Find if channel created
-	if (isValidChannel(cmd[1 + flag]) <= 0 && cmd[1 + flag].compare("irc") != 0)
-	{
+	if (isValidChannel(cmd[1 + flag]) <= 0 && cmd[1 + flag].compare("irc") != 0) {
 		sendIrcMessage(formatMessage(kicker, ERR_NOSUCHCHANNEL) + " " + cmd[1 + flag] + " :No such channel", kicker.getId());
 		return;
 	}

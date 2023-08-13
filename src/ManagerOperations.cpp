@@ -137,20 +137,9 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 	if (cmd[2][0] == '+') {
 		_channel.addBanned(foundClient.getId());
 		_channel.setMode("b");
-		// remove client from channel and update channel user:
-		if (cmd.size() > 4)
-		{
-			std::string fullMessage;
-			for (unsigned int i = 4; i < cmd.size(); i++)
-				fullMessage += cmd[i] + " ";
-			kickClientFromChannel(_client, foundClient, _channel);
-			sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName() + " :You were banned from Channel. Reason: " + fullMessage, foundClient.getId());
-		}
-		else
-		{
-			kickClientFromChannel(_client, foundClient, _channel);
-			sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName() + " :You were banned from Channel", foundClient.getId());
-		}
+		kickClientFromChannel(_client, foundClient, _channel);
+		_channel.removeClient(foundClient.getId());
+		sendIrcMessage(formatMessage(_client, BANNEDFROMCHAN) + " " + _channel.getName(), foundClient.getId());
 		_channel.removeClient(foundClient.getId());
 	}
 	else {

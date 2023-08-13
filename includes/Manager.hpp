@@ -51,6 +51,7 @@ class Manager
 		static	void		kickAction( Clients &client );
 		static	void		kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel);
 		static	void		lusersAction( Clients& client );
+
 		//static	int			(*muteAction)( Clients &client);
 		static	void		joinProtocol(Clients &client, Channel &channelName, int clientId);
 		static	void		sendWhoMessage(const std::vector<int> &clientsIds, const std::string &chanName, Clients &sender);
@@ -75,13 +76,16 @@ class Manager
 		static	void		mOperator(Channel& _channel, Clients& _client);
 		static	void		bOperator(Channel& _channel, Clients& _client);
 		static	void		onMode(std::string event, ModeFunction fun);
-		static	bool		checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits);
+		static	bool		checkChannelPassword(Clients client, std::string channelName, std::string key);
 		static	bool		checkChannelLimit(std::string channelName, Clients client);
 		static	bool		checkChannelInvite(std::string channelName, Clients client);
-		static	bool		checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits);
+		static	bool		checkChannelParameters(Clients client, std::string channelName, std::string key);
 		static	bool		checkChannelBan(std::string channelName, Clients client);
 		static	void		defineActionMap( void );
 		static	void		defineModeMap( void );
+		static	std::map<std::string, std::string>	getChannelNameAndKey(std::vector<std::string>& cmd);
+		static	void	leaveAllChannels(Clients& client);
+
 
 		/* Client Methods*/
 		static	std::vector<Clients>::iterator	getClientById(int id);

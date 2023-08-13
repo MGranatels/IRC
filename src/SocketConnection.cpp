@@ -32,8 +32,6 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		foundClient.setCmd(split(str, "\r\n\t "));
 		foundClient.fullMessage = buffer;
 		std::vector<std::string> cmd = foundClient.getCmd();
-		for (unsigned int i = 0; i < cmd.size(); i++)
-			std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 		if (iter != Manager::getClients().end()) {
 			if (!Manager::checkClientData(foundClient))
 				passwordCheck(i);

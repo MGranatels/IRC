@@ -230,3 +230,36 @@ std::string	Manager::getUnkownClients( void )
 	ss << total;
 	return (ss.str());
 }
+
+std::map<std::string, std::string> Manager::getChannelNameAndKey(std::vector<std::string>& cmd)
+{
+    std::map<std::string, std::string> result;
+
+    std::istringstream channelStream(cmd[1]);
+    std::istringstream keyStream(cmd[2]);
+    std::string channel, key;
+
+    while (std::getline(channelStream, channel, ','))
+    {
+        if (std::getline(keyStream, key, ','))
+            result[channel] = key;
+        else
+            result[channel] = ""; // or you can omit this line if you prefer
+    }
+
+    return result;
+}
+
+void Manager::leaveAllChannels(Clients& client) {
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+        if ((it)->isClientInChannel(client.getId())) {
+            BroadcastMessageChan(*it, formatMessage(client, "PART") + " " + (it)->getName());
+            // Send a PART message to the client to indicate they left the channel.
+            sendIrcMessage(formatMessage(client) + " PART " + (it)->getName(), client.getId());
+            BroadcastMessageChan(*it, formatMessage(client, "QUIT") + " :has quit the channel");
+            // Remove the user from the channel
+            (it)->removeClient(client.getId());
+            messageUpdateUserList(*it, client);
+        }
+    }
+}
