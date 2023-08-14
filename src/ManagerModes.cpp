@@ -14,6 +14,7 @@ void Manager::defineModeMap( void )
 	onMode("t", &Manager::tOperator);
 	onMode("m", &Manager::mOperator);
 	onMode("b", &Manager::bOperator);
+	onMode("s", &Manager::sOperator);
 }
 
 void	Manager::changeMode(Clients& client)
@@ -54,8 +55,8 @@ int	Manager::validateMode(Clients client)
 	// Lets check if its the channel is being created now, if so We send a message to the channel with the modes
 	Channel& foundChannel = getChannelByName(cmd[1]);
 	if (cmd.size() == 2) {
-		BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
-		return (0);
+		// BroadcastMessageChan(foundChannel, formatMessage(foundChannel, CHANNELMODEIS) + " +t -i -k +o -l");
+		return (sendIrcMessage(formatMessage(foundChannel, CHANNELMODEIS) + " " + foundChannel.getName() + ": " + foundChannel.getChannelModes(), client.getId()));
 	}
 	if (!checkFlagFormat(cmd[2]))
 		return (sendIrcMessage(formatMessage(client, UMODEUNKNOWNFLAG) + " " + foundChannel.getName() + " :Invalid Flag Format. Type for HELP to See a List of Commands", client.getId()));
@@ -64,14 +65,14 @@ int	Manager::validateMode(Clients client)
 	return 1;
 }
 
-bool	Manager::checkChannelPassword(std::string channelName, Clients client, std::vector<std::string> &splits)
+bool	Manager::checkChannelPassword(Clients client, std::string channelName, std::string key)
 {
 	Channel& _channel = getChannelByName(channelName);
 	std::map<std::string, ChannelModeStatus> modes = _channel.getModes();
 	if (modes["k"] == MODE_SET)
 	{
-		if (splits.size() != 3 || splits[2].empty() || _channel.getPassword() != splits[2]) {
-			sendIrcMessage(formatMessage(client, BADCHANNELKEY) + " :Cannot join channel (+k), bad Password", client.getId());
+		if (key.empty() || _channel.getPassword() != key) {
+			sendIrcMessage(formatMessage(client, BADCHANNELKEY) + " " + _channel.getName(), client.getId());
 			return false;
 		}
 	}
@@ -112,15 +113,26 @@ bool	Manager::checkChannelBan(std::string channelName, Clients client)
 	return true;
 }
 
-bool	Manager::checkChannelParameters(std::string channelName, Clients client, std::vector<std::string> &splits)
+void	Manager::checkSuperUser(std::string channelName, Clients client)
+{
+	Channel& channel = getChannelByName(channelName);
+	if (!channel.getSuperUser().empty() && client.getNickname() ==  channel.getSuperUser())
+	{
+		channel.removeAllOperators();
+		channel.addOperator(client.getId());
+	}
+}
+
+bool	Manager::checkChannelParameters(Clients client, std::string channelName, std::string key)
 {
 	if (!checkChannelBan(channelName, client))
 		return false;
-	if (!checkChannelPassword(channelName, client, splits))
+	if (!checkChannelPassword(client, channelName, key))
 		return false;
 	if (!checkChannelLimit(channelName, client))
 		return false;
 	if (!checkChannelInvite(channelName, client))
 		return false;
+	checkSuperUser(channelName, client);
 	return true;
 }

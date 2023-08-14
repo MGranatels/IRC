@@ -1,5 +1,12 @@
 #include <Manager.hpp>
 
+std::vector<Clients> 		Manager::_clients;
+std::vector<Channel> 		Manager::_channels;
+std::string 				Manager::hostname = "localhost";
+std::string 				Manager::_serverName = "irc";
+std::map<std::string, ActionFunction> Manager::actionMap;
+std::map<std::string, ModeFunction> Manager::modeMap;
+
 int	Manager::addClient(int id)
 {
 	if (Manager::getClientById(id) != _clients.end())
@@ -229,4 +236,42 @@ std::string	Manager::getUnkownClients( void )
 			total++;
 	ss << total;
 	return (ss.str());
+}
+
+std::map<std::string, std::string> Manager::getChannelNameAndKey(std::vector<std::string>& cmd)
+{
+    std::map<std::string, std::string> result;
+    std::string channel, key;
+    std::istringstream channelStream(cmd[1]);
+    if (cmd.size() < 3)
+    {
+		 while (std::getline(channelStream, channel, ','))
+		 	result[channel] = "";
+        return result;
+    }
+    std::istringstream keyStream(cmd[2]);
+    while (std::getline(channelStream, channel, ','))
+    {
+        if (std::getline(keyStream, key, ','))
+            result[channel] = key;
+        else
+            result[channel] = ""; // or you can omit this line if you prefer
+    }
+
+    return result;
+}
+
+
+void Manager::leaveAllChannels(Clients& client) {
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+        if ((it)->isClientInChannel(client.getId())) {
+            BroadcastMessageChan(*it, formatMessage(client, "PART") + " " + (it)->getName());
+            // Send a PART message to the client to indicate they left the channel.
+            sendIrcMessage(formatMessage(client) + " PART " + (it)->getName(), client.getId());
+            BroadcastMessageChan(*it, formatMessage(client, "QUIT") + " :has quit the channel");
+            // Remove the user from the channel
+            (it)->removeClient(client.getId());
+            messageUpdateUserList(*it, client);
+        }
+    }
 }

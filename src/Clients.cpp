@@ -78,3 +78,11 @@ void	Clients::setCmd( std::vector<std::string> cmd ) {
 std::vector<std::string>	Clients::getCmd( void ) const {
 	return (this->_cmd);
 }
+
+// Remove argument int cmd from vector
+void	Clients::removeCmd( void ) {
+	if (containsSubstring(_cmd[1], "irc"))
+		this->_cmd.erase(this->_cmd.begin() + 1);
+	for (unsigned int i = 0; i < _cmd.size(); i++)
+		this->_cmd[i] = removeCharacter(this->_cmd[i], ':');
+}

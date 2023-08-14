@@ -78,3 +78,19 @@ bool	isNickValid(const std::string &nick)
 {
 	return (nick.find_first_not_of("0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_") == std::string::npos);
 }
+
+std::string removeCharacter(const std::string& str, char target) {
+    std::string result = str;
+
+    size_t found = result.find(target);
+    while (found != std::string::npos) {
+        result.erase(found, 1);
+        found = result.find(target, found); // Search again from the same position
+    }
+    return result;
+}
+
+bool containsSubstring(const std::string& haystack, const std::string& needle)
+{
+    return haystack.find(needle) != std::string::npos;
+}
