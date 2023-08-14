@@ -136,17 +136,17 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 		return ;
 	}
 	if (cmd[2][0] == '+') {
-		_channel.addBanned(foundClient.getId());
+		_channel.addBanned(foundClient, _client);
 		_channel.setMode("b");
-		for (unsigned int i = 3; i < cmd.size(); i++)
-			banReason += cmd[i] + " ";
+		banReason = "Banned from channel. ";
 		kickClientFromChannel(_client, foundClient, _channel, banReason);
-		sendIrcMessage(formatMessage(foundClient, BANNEDFROMCHAN) + " " + _channel.getName() + " " + foundClient.getNickname(), foundClient.getId());
 	}
 	else {
 		std::cout << "Unban this guy: " << foundClient.getNickname() << std::endl;
+
 		_channel.removeBanned(foundClient.getId());
 		_channel.unsetMode("b");
+		sendIrcMessage(formatMessage(_client) + " MODE " + _channel.getName() + " -b " + foundClient.getNickname() +  "!*@*", foundClient.getId());
 	}
 	return ;
 }

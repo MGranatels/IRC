@@ -50,6 +50,8 @@ bool	Manager::checkFlagFormat(std::string flag)
 int	Manager::validateMode(Clients client)
 {
 	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() == 1)
+		return (sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId()));
 	if (isValidChannel(cmd[1]) != CREATED)
 		return (sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + " :You are not in Any Channel. Please Join a Channel First to use the MODE Command", client.getId()));
 	// Lets check if its the channel is being created now, if so We send a message to the channel with the modes
@@ -107,7 +109,8 @@ bool	Manager::checkChannelBan(std::string channelName, Clients client)
 {
 	Channel& channel = getChannelByName(channelName);
 	if (channel.isClientBanned(client.getId())) {
-		sendIrcMessage(formatMessage(client, BANNEDFROMCHAN) + " :Cannot join channel (+b). Access Denied, you are banned", client.getId());
+		// sendIrcMessage(formatMessage(foundClient, BANNEDFROMCHAN) + " " + _channel.getName() + " " + foundClient.getNickname(), foundClient.getId());
+		sendIrcMessage(formatMessage(client, BANNEDFROMCHAN) + " " + channelName, client.getId());
 		return false;
 	}
 	return true;
