@@ -38,6 +38,7 @@ class Manager
 
 		// --------- Channel Actions ---------
 		static	void 		on(std::string event, void (*ActionFunction)(Clients& client));
+		static	void 		helpAction(Clients &client);
 		static	void		joinAction( Clients &client );
 		static	void		partAction( Clients &client);
 		static	void		modeAction( Clients &client );
