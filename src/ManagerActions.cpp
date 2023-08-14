@@ -155,17 +155,17 @@ void Manager::kickAction( Clients &kicker )
 		return;
 	}
 	Clients& leaver = getClientByNick(cmd[2]);
+	if (!checkChannelOp(channel, kicker.getId())) {
+		sendIrcMessage(formatMessage(kicker, CHANOPRIVSNEEDED) + " " + channel.getName() + " :You do not have permission to kick users from the channel", kicker.getId());
+		return;
+	}
 	if (!channel.isClientInChannel(leaver.getId())) {
 			sendIrcMessage(formatMessage(kicker, USERNOTINCHANNEL) + " " + channel.getName() + " :" +  leaver.getNickname() + " Is not on this channel" , kicker.getId());
 			return ;
 	}
 	if (leaver.getNickname() == kicker.getNickname()) {
-		sendIrcMessage(formatMessage(kicker, NOPRIVILEGES) + " :You cannot kick yourself", kicker.getId());
+		sendIrcMessage(formatMessage(kicker, NOPRIVILEGES) + " " +  channel.getName() + " :You cannot kick yourself", kicker.getId());
 		return ;
-	}
-	if (!checkChannelOp(channel, kicker.getId())) {
-		sendIrcMessage(formatMessage(kicker, CHANOPRIVSNEEDED) + " :You do not have permission to kick users from the channel", kicker.getId());
-		return;
 	}
 	// Perform the kick
 	for (unsigned int i = 3; i < cmd.size(); i++)
@@ -248,7 +248,7 @@ void	Manager::topicAction( Clients &client )
 		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId());
 		return ;
 	}
-	_channel.setTopic(split(client.fullMessage, ":")[1]);
+	_channel.setTopic(removeCharacter(split(client.fullMessage, ":")[1], '\n'));
 	BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
 }
 
