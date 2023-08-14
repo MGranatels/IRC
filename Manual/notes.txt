@@ -50,3 +50,9 @@ Kick Command From CHANNEL:
 0 cmd: KICK
 1 cmd: #ERT
 2 cmd: Itachi
+
+Segfault:
+0 cmd: PART
+1 cmd: #1
+2 cmd: Leaving
+

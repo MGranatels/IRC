@@ -42,13 +42,12 @@ bool	Manager::checkClientData( Clients& foundClient )
 int	Manager::runChanActions(Clients& client) {
 	client.removeCmd();
 	std::vector<std::string> cmd = client.getCmd();
+	if (cmd[0].empty())
+		return 1;
 	std::string actionName = cmd[0];
 
 	for (unsigned int i = 0; i < cmd.size(); i++)
 		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
-	if (cmd.size() < 2 && cmd[0] != "LUSERS" && cmd[0] != "LIST" && cmd[0] != "USERS" && cmd[0] != "QUIT" && \
-	cmd[0] != "WHO" && cmd[0] != "NAMES" )
-		return(sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId()));
 	if (cmd.size() >= 4 && cmd[2] == "WHO")
 		return -1;
 	defineActionMap();
@@ -65,6 +64,10 @@ void	Manager::partAction( Clients &client )
 {
 	std::vector<std::string> cmd = client.getCmd();
 	std::string partMessage = "";
+	if (cmd.size() == 1) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
+		return;
+	}
 	if (cmd.size() > 2)
 		for (unsigned int i = 2; i < cmd.size(); i++)
 			partMessage += cmd[i];
@@ -92,6 +95,10 @@ void	Manager::joinAction( Clients &client )
 	std::map<std::string, std::string>::iterator it = channelProp.begin();
 	for (std::map<std::string, std::string>::const_iterator it = channelProp.begin(); it != channelProp.end(); ++it) {
 		std::cout << "Channel: " << it->first << " | Key: " << it->second << std::endl;
+	}
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
+		return;
 	}
 	if (cmd[1] == "0") {
 		leaveAllChannels(client);
@@ -132,9 +139,10 @@ void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& c
 	if (channel.isClientInChannel(target.getId()))
 	{
 		if (kickReason.empty())
-			sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :No reason Given.", target.getId());
+			BroadcastMessageChan(channel, ":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :No reason Given.");
 		else
-			sendIrcMessage(":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :" + kickReason, target.getId());
+			BroadcastMessageChan(channel, ":" + kicker.getNickname() + " KICK " + channel.getName() + " " + target.getNickname() + " :" + kickReason);
+		// BroadcastMessageChan(channel, formatMessage(kicker, "KICK") + " " + channel.getName() + " " + target.getNickname()  + " :has been removed from channel");
 		channel.removeClient(target.getId());
 		messageUpdateUserList(channel, target);
 	}
@@ -145,6 +153,10 @@ void Manager::kickAction( Clients &kicker )
 	std::vector<std::string> cmd = kicker.getCmd();
 	std::string	kickReason;
 	// Find if channel created
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(kicker, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", kicker.getId());
+		return;
+	}
 	if (!isValidChannel(cmd[1]) || cmd.size() < 3) {
 		sendIrcMessage(formatMessage(kicker, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel exists argument was not given", kicker.getId());
 		return;
@@ -189,10 +201,13 @@ void	Manager::privAction( Clients &client)
 	std::string &recipient = cmd[1];
 	std::vector<std::string> message;
 
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
+		return;
+	}
 	if (client.fullMessage.find(':') != std::string::npos)
 		message = split(client.fullMessage, ":");
-	else
-	{
+	else {
 		sendIrcMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send, TRY ADDING A ':' AFTER THE NICKNAME", client.getId());
 		return ;
 	}
@@ -200,15 +215,13 @@ void	Manager::privAction( Clients &client)
 	{
 		Channel& channel = getChannelByName(recipient);
 		std::cout  << channel.isClientMuted(client.getId()) << std::endl;
-		if (channel.isClientMuted(client.getId()))
-		{
+		if (channel.isClientMuted(client.getId())) {
 			sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId());
 			return ;
 		}
 		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
 	}
-	else if (isValidClient(recipient))
-	{
+	else if (isValidClient(recipient)) {
 		int recipientId = getClientByNick(recipient).getId();
 		if (recipientId != client.getId())
 			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
@@ -226,6 +239,10 @@ void	Manager::modeAction( Clients& client )
 void	Manager::topicAction( Clients &client )
 {
 	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
+		return;
+	}
 	if (!isValidChannel(cmd[1])) {
 		sendIrcMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel exists", client.getId());
 		return ;
@@ -258,6 +275,10 @@ void	Manager::inviteAction( Clients& inviter )
 	std::string &channelName = cmd[2];
 	std::string	&invitedClient = cmd[1];
 	int isValidChan = isValidChannel(channelName);
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(inviter, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", inviter.getId());
+		return ;
+	}
 	if (isValidChan == CREATED)
 	{
 		Channel &channel = getChannelByName(channelName);
@@ -288,18 +309,15 @@ void	Manager::inviteAction( Clients& inviter )
 void	Manager::nickAction( Clients& client )
 {
 	std::vector<std::string> cmd = client.getCmd();
-	if (cmd.size() < 2)
-	{
-		sendIrcMessage(formatMessage(client, NONICKNAMEGIVEN) + " :No nickname given", client.getId());
+	if (cmd.size() < 2) {
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
 		return ;
 	}
-	if (cmd[1].size() > 9)
-	{
+	if (cmd[1].size() > 9) {
 		sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " " + cmd[1] + " :Erroneous nickname", client.getId());
 		return ;
 	}
-	if (isValidClient(cmd[1]))
-	{
+	if (isValidClient(cmd[1])) {
 		sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + cmd[1] + " :Nickname is already in use", client.getId());
 		return ;
 	}
@@ -309,13 +327,11 @@ void	Manager::nickAction( Clients& client )
 
 void	Manager::whoAction( Clients &client )
 {
-	if (client.getCmd().size() == 1)
-	{
+	if (client.getCmd().size() == 1) {
 		sendWhoMessage(getAllClientsIds(), "*", client);
 		std::cout << "Give info about everyone in server" << std::endl;
 	}
-	else if (client.getCmd().size() <= 3 && isValidChannel(client.getCmd()[1]) == CREATED)
-	{
+	else if (client.getCmd().size() <= 3 && isValidChannel(client.getCmd()[1]) == CREATED) {
 		Channel &channel = getChannelByName(client.getCmd()[1]);
 		if (client.getCmd().size() == 3 && client.getCmd()[2] == "o")
 			sendWhoMessage(channel.getOperators(), channel.getName(), client);
@@ -333,9 +349,7 @@ void Manager::listAction(Clients& client)
 
     // Send RPL_LISTSTART numeric reply
     sendIrcMessage(formatMessage(client, RPL_LISTSTART) + " :Channel list", client.getId());
-
-    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-    {
+    for (std::vector<Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
         Channel& channel = *it;
         std::string numberClients = channel.getClientsCountStr();
         // Send RPL_LIST numeric reply for each channel
@@ -351,7 +365,7 @@ void	Manager::namesAction( Clients& client )
 	std::vector<std::string> cmd = client.getCmd();
 
 	if (cmd.size() < 2) {
-		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " NAMES :Not enough parameters", client.getId());
+		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
 		return ;
 	}
 	if (isValidChannel(cmd[1]) == CREATED) {
