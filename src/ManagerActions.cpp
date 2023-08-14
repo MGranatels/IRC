@@ -138,6 +138,7 @@ void Manager::kickAction( Clients &kicker )
 {
 	std::vector<std::string> cmd = kicker.getCmd();
 	std::vector<Clients>::iterator leaver = _clients.begin();
+	//There's a function to find the client from nickname : getClientByName()
 	int	flag = 0;
 	if (cmd.size() > 3)
 		flag = 1;

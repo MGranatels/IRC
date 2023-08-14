@@ -167,13 +167,9 @@ bool Channel::isClientMuted( int clientId)
 }
 
 bool Channel::isClientBanned(int clientId) {
-	std::vector<int>::iterator it = _bannedIds.begin();
-	for ( ; it != _bannedIds.end(); it ++)
-	{
-		if (*it == clientId)
-			return (true);
-	}
-	return (false);
+	if (_bannedIds.find(clientId) != _bannedIds.end())
+		return true;
+	return false;
 }
 
 void	Channel::setMode(const std::string& mode) {
@@ -210,10 +206,19 @@ unsigned int Channel::getLimit(void) const {
 	return _limit;
 }
 
-void Channel::addBanned(int newClientId) {
-	_bannedIds.push_back(newClientId);
+void Channel::addBanned(Clients &newClientId, Clients &BanSetterId) {
+
+	std::time_t currentTime = std::time(NULL);
+	std::string timestamp = std::ctime(&currentTime);
+	size_t newlinePos = timestamp.find('\n');
+
+	if (newlinePos != std::string::npos)
+		timestamp.erase(newlinePos, 1);
+	_bannedIds[newClientId.getId()].timestamp = timestamp;
+	_bannedIds[newClientId.getId()].banMask = ":" + newClientId.getNickname() + "!" + BanSetterId.getUsername();
+	_bannedIds[newClientId.getId()].banSetter = BanSetterId.getNickname();
 }
 
 void Channel::removeBanned(int clientId) {
-	removeElementFromVector(_bannedIds, clientId);
+	_bannedIds.erase(clientId);
 }

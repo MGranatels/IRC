@@ -8,6 +8,7 @@
 # include <Clients.hpp>
 # include <map>
 # include <functional>
+#include <ctime>
 
 //notes:
 // Channel names are case insensitive.
@@ -21,6 +22,12 @@ enum ChannelModeStatus {
     MODE_SET = 1
 };
 
+typedef struct s_banClient {
+	std::string banMask; //mask to identify user
+	std::string timestamp;
+	std::string	banSetter; //The nickname of the user who set the ban.
+} t_banClient;
+
 class	Channel
 {
 	private:
@@ -32,7 +39,7 @@ class	Channel
 		std::vector<int> _operatorsIds;
 		std::vector<int> _inviteesIds;
 		std::vector<int> _mutedIds;
-		std::vector<int> _bannedIds;
+		std::map<int, t_banClient> _bannedIds;
 		unsigned int	 _limit;
 
 	public:
@@ -42,7 +49,7 @@ class	Channel
 
 		// Channel Operators:
 		void	addOperator(int operatorId);
-		void	addBanned(int newClientId);
+		void	addBanned(Clients &newClientId, Clients &BanSetterId);
 		void	addClient(int newClientId);
 		void	addInvitee(int clientId);
 		void	addMuted(int newClientId);
