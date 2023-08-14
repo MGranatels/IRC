@@ -7,6 +7,7 @@ void Manager::on(std::string event, ActionFunction fun) {
 
 void Manager::defineActionMap( void )
 {
+	on("HELP", &Manager::helpAction);
 	on("JOIN", &Manager::joinAction);
 	on("QUIT", &Manager::quitAction);
 	on("KICK", &Manager::kickAction);
@@ -37,6 +38,61 @@ bool	Manager::checkClientData( Clients& foundClient )
 			foundClient.setUsername(cmd[i + 1]);
 	}
 	return false;
+}
+
+void Manager::helpAction(Clients &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+
+	if (cmd.size() == 2 || (cmd.size() == 3 && cmd[2] == "HELP"))
+	{
+		sendIrcMessage("List of available commands:", client.getId());
+		sendIrcMessage("/QUIT	- Quit IRC.", client.getId());
+		sendIrcMessage("/JOIN	- Join a channel.", client.getId());
+		sendIrcMessage("/KICK	- Kick a user from a channel.", client.getId());
+		sendIrcMessage("/WHO	- Displays user information based on a given criteria or mask.", client.getId());
+		sendIrcMessage("/KICK	- Removes a user from a channel.", client.getId());
+		sendIrcMessage("/PART	- Leaves one or multiple channels.", client.getId());
+		sendIrcMessage("/MODE	- Changes or displays modes for users or channels.", client.getId());
+		sendIrcMessage("/LIST	- Lists available channels and their topics.", client.getId());
+		sendIrcMessage("/JOIN	- Joins one or multiple channels.", client.getId());
+		sendIrcMessage("/TOPIC	- Changes or displays the topic of a channel.", client.getId());
+		sendIrcMessage("/INVITE	- Invites a user to a channel.", client.getId());
+		sendIrcMessage("/PRIVM	- Sends a private message to another user or a channel.", client.getId());
+		sendIrcMessage("/NAMES	- Lists all users in a given channel.", client.getId());
+		sendIrcMessage("/LUSER	- Displays server statistics and user counts.", client.getId());
+		sendIrcMessage("For more details on a command, type /HELP <command>.", client.getId());
+
+	}
+	else
+	{
+		if (cmd[2] == "JOIN")
+		sendIrcMessage("/JOIN <channel_name> - Join the specified channel by providing its name.", client.getId());
+		else if (cmd[2] == "QUIT")
+			sendIrcMessage("/QUIT - Leave the IRC server. No additional parameters needed.", client.getId());
+		else if (cmd[2] == "KICK")
+			sendIrcMessage("/KICK <channel_name> <user> - Kick the specified user from the given channel.", client.getId());
+		else if (cmd[2] == "WHO")
+			sendIrcMessage("/WHO <mask> - Query users based on a given criteria or mask. The mask can be optional.", client.getId());
+		else if (cmd[2] == "PART")
+			sendIrcMessage("/PART <channel_name> - Leave the specified channel. You can also specify multiple channels separated by commas.", client.getId());
+		else if (cmd[2] == "MODE")
+			sendIrcMessage("/MODE <channel/user> <modes> - Change or display modes for the specified user or channel.", client.getId());
+		else if (cmd[2] == "LIST")
+			sendIrcMessage("/LIST [<channel_name>] - List available channels and their topics. Providing a channel name is optional.", client.getId());
+		else if (cmd[2] == "TOPIC")
+			sendIrcMessage("/TOPIC <channel_name> [new_topic] - View or set the topic for the specified channel. Providing a new topic is optional.", client.getId());
+		else if (cmd[2] == "INVITE")
+			sendIrcMessage("/INVITE <user> <channel_name> - Invite the specified user to the given channel.", client.getId());
+		else if (cmd[2] == "PRIVM")
+			sendIrcMessage("/PRIVM <user/channel> <message> - Send a private message to the specified user or channel.", client.getId());
+		else if (cmd[2] == "NAMES")
+			sendIrcMessage("/NAMES <channel_name> - List all users in the specified channel.", client.getId());
+		else if (cmd[2] == "LUSER")
+			sendIrcMessage("/LUSER - Get statistics about the server and its users. No additional parameters needed.", client.getId());
+		else
+			sendIrcMessage("Unknown command. For a list of available commands, type /HELP.", client.getId());
+	}
 }
 
 int	Manager::runChanActions(Clients& client) {
