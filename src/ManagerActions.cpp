@@ -213,6 +213,16 @@ void	Manager::startBot( Clients& client )
 		mybot.actionCenter(client);
 }
 
+std::string getFullMessage(Clients &client, std::string &recipient)
+{
+	std::string subFull;
+	size_t size = client.fullMessage.size();
+	size_t pos = client.fullMessage.find(recipient, 0);
+	size_t pos2 = client.fullMessage.find(" ", pos);
+	subFull = client.fullMessage.substr(pos2 + 1, size - pos2);
+	return (subFull);
+}
+
 void	Manager::privAction( Clients &client)
 {
 	//TODO: remember later to Verify User Permissions
@@ -226,6 +236,8 @@ void	Manager::privAction( Clients &client)
 	}
 	if (client.fullMessage.find(':') != std::string::npos)
 		message = split(client.fullMessage, ":")[1];
+	else
+		message = getFullMessage(client, recipient);
 	if (cmd[1] == "FieryBot") {
 		startBot(client);
 		return ;
