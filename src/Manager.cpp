@@ -1,11 +1,13 @@
 #include <Manager.hpp>
 
+int							Manager::_awake = 0;
 std::vector<Clients> 		Manager::_clients;
 std::vector<Channel> 		Manager::_channels;
 std::string 				Manager::hostname = "localhost";
 std::string 				Manager::_serverName = "irc";
 std::map<std::string, ActionFunction> Manager::actionMap;
 std::map<std::string, ModeFunction> Manager::modeMap;
+
 
 int	Manager::addClient(int id)
 {
@@ -144,12 +146,13 @@ bool	Manager::checkPassword(Clients client, std::string password) {
 	return true;
 }
 
-void	Manager::setChannOpps(Clients *client)
+void	Manager::setChannOpps(Clients& client)
 {
-	sendIrcMessage(formatMessage(*client, WELCOME_MESSAGE) + " :Welcome to the Darkest Region of the Internet", client->getId());
-	sendIrcMessage(formatMessage(*client, CHANNEL_OPPS) + " :CHANTYPES=#", client->getId());
-	sendIrcMessage(formatMessage(*client, CHANNEL_OPPS) + " :CHANMODES=i,t,k,o,l", client->getId());
-	client->setOppChannel(true);
+	sendIrcMessage(formatMessage(client, WELCOME_MESSAGE) + " :Welcome to the Darkest Region of the Internet", client.getId());
+	sendIrcMessage(formatMessage(client, CHANNEL_OPPS) + " :CHANTYPES=#", client.getId());
+	sendIrcMessage(formatMessage(client, CHANNEL_OPPS) + " :CHANMODES=i,t,k,o,l", client.getId());
+	Bot myBot(client);
+	client.setOppChannel(true);
 }
 
 Clients&	Manager::getClientByNick(std::string nickname)

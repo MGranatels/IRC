@@ -69,6 +69,7 @@ SRCS = 	utils.cpp \
 		ManagerActions.cpp \
 		ManagerOperations.cpp \
 		Channel.cpp \
+		Bot.cpp \
 		main.cpp
 
 
