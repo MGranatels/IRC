@@ -213,19 +213,31 @@ void	Manager::startBot( Clients& client )
 		mybot.actionCenter(client);
 }
 
+std::string getFullMessage(Clients &client, std::string &recipient)
+{
+	std::string subFull;
+	size_t size = client.fullMessage.size();
+	size_t pos = client.fullMessage.find(recipient, 0);
+	size_t pos2 = client.fullMessage.find(" ", pos);
+	subFull = client.fullMessage.substr(pos2 + 1, size - pos2);
+	return (subFull);
+}
+
 void	Manager::privAction( Clients &client)
 {
 	//TODO: remember later to Verify User Permissions
 	std::vector<std::string> cmd = client.getCmd();
 	std::string &recipient = cmd[1];
-	std::vector<std::string> message;
+	std::string message;
 
 	if (cmd.size() < 2) {
 		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
 		return;
 	}
 	if (client.fullMessage.find(':') != std::string::npos)
-		message = split(client.fullMessage, ":");
+		message = split(client.fullMessage, ":")[1];
+	else
+		message = getFullMessage(client, recipient);
 	if (cmd[1] == "FieryBot") {
 		startBot(client);
 		return ;
@@ -238,12 +250,12 @@ void	Manager::privAction( Clients &client)
 			sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId());
 			return ;
 		}
-		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
+		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message);
 	}
 	else if (isValidClient(recipient)) {
 		int recipientId = getClientByNick(recipient).getId();
 		if (recipientId != client.getId())
-			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
+			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message, recipientId);
 	}
 }
 
