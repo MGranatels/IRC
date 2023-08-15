@@ -14,13 +14,13 @@ void Manager::defineActionMap( void )
 	on("PART", &Manager::partAction);
 	on("MODE", &Manager::modeAction);
 	on("TOPIC", &Manager::topicAction);
-	on("JOIN", &Manager::joinAction);
 	on("INVITE", &Manager::inviteAction);
 	on("PRIVMSG", &Manager::privAction);
 	on("LIST", &Manager::listAction);
 	on("NAMES", &Manager::namesAction);
 	on("WHO", &Manager::whoAction);
 	on("LUSERS", &Manager::lusersAction);
+	on("NICK", &Manager::nickAction);
 }
 
 bool	Manager::checkClientData( Clients& foundClient )
@@ -43,9 +43,9 @@ bool	Manager::checkClientData( Clients& foundClient )
 
 int	Manager::runChanActions(Clients& client) {
 	std::vector<std::string> cmd = client.getCmd();
-	// for (unsigned int i = 0; i < cmd.size(); i++)
-	// 	std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	client.removeCmd();
+	for (unsigned int i = 0; i < cmd.size(); i++)
+		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (cmd[0].empty())
 		return 1;
 	std::string actionName = cmd[0];
@@ -218,14 +218,14 @@ void	Manager::privAction( Clients &client)
 	//TODO: remember later to Verify User Permissions
 	std::vector<std::string> cmd = client.getCmd();
 	std::string &recipient = cmd[1];
-	std::vector<std::string> message;
+	std::string message;
 
 	if (cmd.size() < 2) {
 		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
 		return;
 	}
 	if (client.fullMessage.find(':') != std::string::npos)
-		message = split(client.fullMessage, ":");
+		message = split(client.fullMessage, ":")[1];
 	if (cmd[1] == "FieryBot") {
 		startBot(client);
 		return ;
@@ -238,12 +238,12 @@ void	Manager::privAction( Clients &client)
 			sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId());
 			return ;
 		}
-		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message[1]);
+		BroadcastMessageChan(client.getId(), channel, formatMessage(client) + " PRIVMSG " + recipient + " " + message);
 	}
 	else if (isValidClient(recipient)) {
 		int recipientId = getClientByNick(recipient).getId();
 		if (recipientId != client.getId())
-			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message[1], recipientId);
+			sendIrcMessage(formatMessage(client) + " PRIVMSG " + recipient + " " + message, recipientId);
 	}
 }
 
@@ -340,8 +340,8 @@ void	Manager::nickAction( Clients& client )
 		sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + cmd[1] + " :Nickname is already in use", client.getId());
 		return ;
 	}
+	sendIrcMessage(":" + client.getNickname() +  " NICK :" + cmd[1], client.getId());
 	client.setNickname(cmd[1]);
-	sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " " + client.getNickname() + cmd[1] + " :Nickname changed successfully", client.getId());
 }
 
 void	Manager::whoAction( Clients &client )
