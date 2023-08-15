@@ -204,7 +204,8 @@ void	Manager::removeClientFromAllChannels(int clientId)
 			if (it->isClientOperator(clientId))
 			{
 				it->removeOperator(clientId);
-				it->addOperator(*(it->getClients().begin()));
+				if (it->getOperators().empty())
+					it->addOperator(*(it->getClients().begin()));
 			}
 			messageUpdateUserList(*it, client);
 		}

@@ -29,8 +29,12 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
 		Clients& foundClient = *iter;
-		foundClient.setCmd(split(str, "\r\n\t "));
-		foundClient.fullMessage = buffer;
+		if (!containsSubstring(buffer,"\r\n")) {
+			foundClient.fullMessage += str;
+			return ;
+		}
+		foundClient.fullMessage += str;
+		foundClient.setCmd(split(foundClient.fullMessage, "\r\n\t "));
 		std::vector<std::string> cmd = foundClient.getCmd();
 		if (iter != Manager::getClients().end()) {
 			if (!Manager::checkClientData(foundClient))
@@ -40,6 +44,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 		}
 		if (foundClient.getClientSettings() && !foundClient.getOppChannel())
 			Manager::setChannOpps(foundClient);
+		foundClient.fullMessage.clear();
 	}
 }
 

@@ -44,8 +44,6 @@ bool	Manager::checkClientData( Clients& foundClient )
 int	Manager::runChanActions(Clients& client) {
 	std::vector<std::string> cmd = client.getCmd();
 	client.removeCmd();
-	for (unsigned int i = 0; i < cmd.size(); i++)
-		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (cmd[0].empty())
 		return 1;
 	std::string actionName = cmd[0];
@@ -79,13 +77,7 @@ void	Manager::partAction( Clients &client )
 	BroadcastMessageChan(channel, formatMessage(client, "PART") + " " + channel.getName() + " " + partMessage);
 	sendIrcMessage(formatMessage(client) + " PART " + channel.getName(), client.getId());
 	BroadcastMessageChan(channel, formatMessage(client, "QUIT") + " :has quit the channel");
-	channel.removeClient(client.getId());
-	if (channel.isClientOperator(client.getId()))
-		if (channel.getOperators().size() == 1)
-		{
-			channel.removeOperator(client.getId());
-			channel.addOperator(channel.getClients()[0]);
-		}
+	removeClientFromAllChannels(client.getId());
 	messageUpdateUserList(channel, client);
 	return ;
 }
@@ -279,25 +271,16 @@ void	Manager::topicAction( Clients &client )
 		return ;
 	}
 	Channel& _channel = getChannelByName(cmd[1]);
-	if (cmd.size() < 3 && _channel.getTopic().empty()) {
+	if (cmd.size() < 3 && _channel.getTopic().empty())
 		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set", client.getId());
-		return ;
-	}
-	if (cmd.size() < 3) {
+	else if (cmd.size() < 3)
 		sendIrcMessage(formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), client.getId());
-		return ;
+	else if (!_channel.isClientOperator(client.getId()) && _channel.isModeSet("t"))
+		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + _channel.getName()  + " :Permission denied, topic restriction activated.", client.getId());
+	else {
+		_channel.setTopic(removeCharacter(split(client.fullMessage, ":")[1], '\n'));
+		BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
 	}
-	if (!_channel.isClientOperator(client.getId())) {
-		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, you're not channel operator.", client.getId());
-		return ;
-	}
-	//Check if user has permissions in channel
-	if (!_channel.isModeSet("t")) {
-		sendIrcMessage(formatMessage(client, CHANOPRIVSNEEDED) + " :Permission denied, topic Channel 't' not set.", client.getId());
-		return ;
-	}
-	_channel.setTopic(removeCharacter(split(client.fullMessage, ":")[1], '\n'));
-	BroadcastMessageChan(_channel, formatMessage(client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic());
 }
 
 void	Manager::inviteAction( Clients& inviter )

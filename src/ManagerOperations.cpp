@@ -7,13 +7,9 @@ void	Manager::tOperator(Channel& _channel, Clients& _client)
 
 	if (cmd[2][0] == '+') {
 		_channel.setMode("t");
-		_channel.setTopic(cmd[3]);
-		sendIrcMessage(formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :" + _channel.getTopic(), _client.getId());
 	}
 	else {
 		_channel.unsetMode("t");
-		_channel.setTopic("");
-		BroadcastMessageChan(_channel, formatMessage(_client, TOPIC_CHANNEL) + " " + _channel.getName() + " :No topic is set");
 	}
 }
 
@@ -33,7 +29,7 @@ void	Manager::kOperator(Channel& _channel, Clients& _client)
 
 	if (cmd[2][0] == '+') {
 		if (cmd.size() != 4) {
-			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
 			return ;
 		}
 		_channel.setPassword(cmd[3]);
@@ -50,11 +46,11 @@ void	Manager::oOperator(Channel& channel, Clients& _client)
 	std::vector<std::string> cmd = _client.getCmd();
 
 	if (cmd.size() != 4)
-		sendIrcMessage(formatMessage(channel, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+		sendIrcMessage(formatMessage(channel, NEEDMOREPARAMS) + " " + channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
 	else if (_client.getNickname() == cmd[3])
-		sendIrcMessage(formatMessage(_client, CHANOPRIVSNEEDED) + " :Permission denied, can't remove your own privileges.", _client.getId());
+		sendIrcMessage(formatMessage(_client, CHANOPRIVSNEEDED) + " " + channel.getName() + " :Permission denied, can't remove your own privileges.", _client.getId());
 	else if (!isValidClient(cmd[3]))
-		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " :No such Nickname", _client.getId());
+		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " " + channel.getName() + " :No such Nickname", _client.getId());
 	else if (cmd[2][0] == '+') {
 		channel.addOperator(getClientByNick(cmd[3]).getId());
 		channel.setMode("o");
@@ -73,13 +69,15 @@ void	Manager::lOperator(Channel& _channel, Clients& _client)
 
 	if (cmd[2][0] == '+') {
 		if (cmd.size() != 4)
-			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
 		else if (!IsDigit(cmd[3]))
-			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Argument type for Selected Mode. Type HELP For a List of Commands", _client.getId());
+			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Argument type for Selected Mode. Type HELP For a List of Commands", _client.getId());
 		else if (std::atoi(cmd[3].c_str()) <= 0)
-			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Limit Needs to be a Value Higher than 0", _client.getId());
-		_channel.setMode("l");
-		_channel.setLimit(std::atoi(cmd[3].c_str()));
+			sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Limit Needs to be a Value Higher than 0", _client.getId());
+		else {
+			_channel.setMode("l");
+			_channel.setLimit(std::atoi(cmd[3].c_str()));
+		}
 	}
 	else {
 		_channel.unsetMode("l");
@@ -93,16 +91,16 @@ void	Manager::mOperator(Channel& _channel, Clients& _client)
 	std::vector<std::string> cmd = _client.getCmd();
 
 	if (cmd.size() != 4) {
-		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
 		return ;
 	}
 	if (!isValidClient(cmd[3])) {
-		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " :No such Nickname", _client.getId());
+		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " " + _channel.getName() + " :No such Nickname", _client.getId());
 		return ;
 	}
 	Clients& foundClient = getClientByNick(cmd[3]);
 	if (!_channel.isClientInChannel(foundClient.getId())) {
-		sendIrcMessage(formatMessage(_client, ERR_USERONCHANNEL) + " " + _channel.getName() + " :User not in Channel", _client.getId());
+		sendIrcMessage(formatMessage(_client, ERR_USERONCHANNEL) + " " + _channel.getName()  + " " + _channel.getName() + " :User not in Channel", _client.getId());
 		return ;
 	}
 	if (cmd[2][0] == '+') {
@@ -122,11 +120,11 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 	std::string	banReason;
 
 	if (cmd.size() != 4) {
-		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
+		sendIrcMessage(formatMessage(_client, NEEDMOREPARAMS) + " " + _channel.getName() + " :Incorrect Number os Arguments for Selected Mode. Type HELP For a List of Commands", _client.getId());
 		return ;
 	}
 	if (!isValidClient(cmd[3])) {
-		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " :No such Nickname", _client.getId());
+		sendIrcMessage(formatMessage(_client, NOSUCHNICK) + " " + _channel.getName() + " :No such Nickname", _client.getId());
 		return ;
 	}
 	Clients& foundClient = getClientByNick(cmd[3]);

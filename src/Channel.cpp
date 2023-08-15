@@ -3,7 +3,7 @@
 Channel::Channel(std::string name):
 	_name(name) {
 	this->_modes["i"] = MODE_NOT_SET;
-	this->_modes["t"] = MODE_SET;
+	this->_modes["t"] = MODE_NOT_SET;
 	this->_modes["k"] = MODE_NOT_SET;
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
@@ -16,7 +16,7 @@ Channel::Channel(std::string name):
 Channel::Channel(std::string name, std::string topic):
 	_name(name), _topic(topic) {
 	this->_modes["i"] = MODE_NOT_SET;
-	this->_modes["t"] = MODE_SET;
+	this->_modes["t"] = MODE_NOT_SET;
 	this->_modes["k"] = MODE_NOT_SET;
 	this->_modes["o"] = MODE_SET;
 	this->_modes["l"] = MODE_NOT_SET;
