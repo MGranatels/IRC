@@ -33,7 +33,7 @@ bool	Manager::checkChannelOp(Channel _channel, int id)
 {
 	const std::vector <int> opUser = _channel.getOperators();
 	for (unsigned int i = 0; i < opUser.size(); i++)
-		if (opUser[i] == id
+		if (opUser[i] == id)
 			return true;
 	return false;
 }

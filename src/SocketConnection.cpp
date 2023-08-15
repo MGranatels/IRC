@@ -39,7 +39,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 				Manager::runChanActions(foundClient);
 		}
 		if (foundClient.getClientSettings() && !foundClient.getOppChannel())
-			Manager::setChannOpps(&foundClient);
+			Manager::setChannOpps(foundClient);
 	}
 }
 

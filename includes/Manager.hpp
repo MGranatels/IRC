@@ -8,6 +8,7 @@
 # include <Clients.hpp>
 # include <colors.h>
 # include <Channel.hpp>
+# include <Bot.hpp>
 
 
 class Sockets;
@@ -26,7 +27,7 @@ class Manager
 		static std::string			_serverName;
 	public:
 		static std::string 			hostname;
-
+		static	int					_awake;
 		/* Channels Methods*/
 		static	int			addClient(int id);
 		static	void		removeClient(int id);
@@ -35,10 +36,10 @@ class Manager
 		static	Channel&	getChannelByName(std::string name);
 		static int			isValidChannel(std::string name);
 		static std::string 		getUsersList(Channel &Channel);
+		static	void	startBot( Clients& client );
 
 		// --------- Channel Actions ---------
 		static	void 		on(std::string event, void (*ActionFunction)(Clients& client));
-		static	void 		helpAction(Clients &client);
 		static	void		joinAction( Clients &client );
 		static	void		partAction( Clients &client);
 		static	void		modeAction( Clients &client );
@@ -65,7 +66,7 @@ class Manager
 		static const std::string	formatMessage(const Clients &client);
 		static const std::string	formatMessage(const Clients &client, std::string code);
 		static const std::string	formatMessage(const Channel &_channel, std::string code);
-		static	void		setChannOpps(Clients *client);
+		static	void		setChannOpps(Clients& client);
 		static	int			validateMode( Clients client );
 		static	bool		checkFlagFormat(std::string flag);
 		static	void		changeMode( Clients &client );

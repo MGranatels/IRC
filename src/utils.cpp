@@ -94,3 +94,14 @@ bool containsSubstring(const std::string& haystack, const std::string& needle)
 {
     return haystack.find(needle) != std::string::npos;
 }
+
+
+bool	isInside(std::vector<std::string> vec, std::string str)
+{
+	std::vector<std::string>::iterator it = vec.begin();
+
+	for ( ; it != vec.end(); it++)
+		if (it->find(str) != std::string::npos)
+			return true;
+	return false;
+}
