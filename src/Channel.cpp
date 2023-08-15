@@ -10,7 +10,6 @@ Channel::Channel(std::string name):
 	this->_modes["m"] = MODE_NOT_SET;
 	this->_modes["b"] = MODE_NOT_SET;
 	this->_modes["s"] = MODE_NOT_SET;
-	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
 Channel::Channel(std::string name, std::string topic):
@@ -23,11 +22,9 @@ Channel::Channel(std::string name, std::string topic):
 	this->_modes["m"] = MODE_NOT_SET;
 	this->_modes["b"] = MODE_NOT_SET;
 	this->_modes["s"] = MODE_NOT_SET;
-	std::cout << "Channel " << _name << " created" << std::endl;
 }
 
 Channel::~Channel( void ) {
-	std::cout << "Channel " << _name << " deleted" << std::endl;
 }
 
 //function to return users in channel minus the sender

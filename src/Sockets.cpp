@@ -40,7 +40,6 @@ int	Sockets::bindSocketFD(struct addrinfo *serv)
 		if (bind(fd_socket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 			close(fd_socket);
 		else {
-			std::cout << fd_socket << std::endl;
 			return (fd_socket);
 		}
 	}

@@ -140,8 +140,6 @@ void	Manager::bOperator(Channel& _channel, Clients& _client)
 		kickClientFromChannel(_client, foundClient, _channel, banReason);
 	}
 	else {
-		std::cout << "Unban this guy: " << foundClient.getNickname() << std::endl;
-
 		_channel.removeBanned(foundClient.getId());
 		_channel.unsetMode("b");
 		sendIrcMessage(formatMessage(_client) + " MODE " + _channel.getName() + " -b " + foundClient.getNickname() +  "!*@*", foundClient.getId());

@@ -31,7 +31,6 @@ void	Manager::removeClient(int id)
 			return ;
 		}
 	}
-	// std::cout << "Client Not Found" << std::endl;
 }
 
 std::vector<Clients>::iterator Manager::getClientById(int id)
@@ -100,7 +99,6 @@ int	Manager::firstTimeClient(std::vector<Clients>::iterator it)
 	// They should be in a list of commands, like a vector of strings
 	// We also need to check if the password is correct
 	// We should also add
-	std::cout << client.getId() << std::endl;
 	if (!client.getUsername().empty())
 		return 0;
 	return (1);
@@ -119,7 +117,6 @@ int	Manager::sendIrcMessage(std::string message, int clientId)
 bool	Manager::checkNickName(Clients client) {
 	printMessage("Checking Nickname...", LightRed);
 	if (!isNickValid(client.getNickname()))	{
-			std::cout << "Erroneus Nickname" << std::endl;
 			sendIrcMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getId());
 			return false;
 	}
@@ -127,7 +124,6 @@ bool	Manager::checkNickName(Clients client) {
 		if (it->getId() == client.getId())
 			continue ;
 		if (it->getNickname() == client.getNickname()) {
-			std::cout << "Nickname already in use" << std::endl;
 			sendIrcMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getId());
 			return false;
 		}

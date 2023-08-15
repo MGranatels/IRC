@@ -17,7 +17,6 @@ int	Sockets::passwordCheck(int _id)
 		return 0;
 	}
 	foundClient.setClientSettings(true);
-	std::cout << "Check Client status: "<< foundClient.getClientSettings() << std::endl;
 	return (printMessage("Client Is Correctly Connected to the Server!", Green));
 }
 
@@ -29,7 +28,7 @@ void	Sockets::handleMessage(int i, int read, char *buffer)
 	{
 		std::vector<Clients>::iterator iter = Manager::getClientById(i);
 		Clients& foundClient = *iter;
-		if (!containsSubstring(buffer,"\r\n")) {
+		if (!containsSubstring(buffer,"\n")) {
 			foundClient.fullMessage += str;
 			return ;
 		}

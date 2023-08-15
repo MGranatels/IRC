@@ -44,7 +44,7 @@ bool	Manager::checkClientData( Clients& foundClient )
 int	Manager::runChanActions(Clients& client) {
 	std::vector<std::string> cmd = client.getCmd();
 	client.removeCmd();
-	if (cmd[0].empty())
+	if (cmd.size() == 0 || cmd[0].empty())
 		return 1;
 	std::string actionName = cmd[0];
 
@@ -87,9 +87,6 @@ void	Manager::joinAction( Clients &client )
 	std::vector<std::string> cmd = client.getCmd();
 	std::map<std::string, std::string> channelProp = getChannelNameAndKey(cmd);
 	std::map<std::string, std::string>::iterator it = channelProp.begin();
-	for (std::map<std::string, std::string>::const_iterator it = channelProp.begin(); it != channelProp.end(); ++it) {
-		std::cout << "Channel: " << it->first << " | Key: " << it->second << std::endl;
-	}
 	if (cmd.size() < 2) {
 		sendIrcMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR :Not enough parameters", client.getId());
 		return;
@@ -128,7 +125,6 @@ void	Manager::joinAction( Clients &client )
 
 void	Manager::kickClientFromChannel(Clients& kicker, Clients& target, Channel& channel, std::string kickReason)
 {
-	std::cout << "entrou para kickar" << std::endl;
 	// Get commands and check if there are any extra arguments:
 	if (channel.isClientInChannel(target.getId()))
 	{
@@ -237,7 +233,6 @@ void	Manager::privAction( Clients &client)
 	if (isValidChannel(recipient) == CREATED)
 	{
 		Channel& channel = getChannelByName(recipient);
-		std::cout  << channel.isClientMuted(client.getId()) << std::endl;
 		if (channel.isClientMuted(client.getId())) {
 			sendIrcMessage(formatMessage(client, CANNOTSENDTOCHAN) + " " + recipient + " :Cannot send message to channel, you have been Muted, shiuuuuuuu!", client.getId());
 			return ;
@@ -343,7 +338,6 @@ void	Manager::whoAction( Clients &client )
 {
 	if (client.getCmd().size() == 1) {
 		sendWhoMessage(getAllClientsIds(), "*", client);
-		std::cout << "Give info about everyone in server" << std::endl;
 	}
 	else if (client.getCmd().size() <= 3 && isValidChannel(client.getCmd()[1]) == CREATED) {
 		Channel &channel = getChannelByName(client.getCmd()[1]);
@@ -351,7 +345,6 @@ void	Manager::whoAction( Clients &client )
 			sendWhoMessage(channel.getOperators(), channel.getName(), client);
 		else
 			sendWhoMessage(channel.getClients(), channel.getName(), client);
-		std::cout << "Give info about a channel " + client.getCmd()[1] << std::endl;
 	}
 	else
 		sendIrcMessage(formatMessage(client, UNKNOWNCOMMAND) + ": USAGE: WHO [<mask> [<o>]]", client.getId());
