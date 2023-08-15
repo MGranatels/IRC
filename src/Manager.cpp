@@ -198,6 +198,11 @@ void	Manager::removeClientFromAllChannels(int clientId)
 		{
 			BroadcastMessageChan(*it, formatMessage(client) + " QUIT :has quit");
 			it->removeClient(clientId);
+			if (it->isClientOperator(clientId))
+			{
+				it->removeOperator(clientId);
+				it->addOperator(*(it->getClients().begin()));
+			}
 			messageUpdateUserList(*it, client);
 		}
 	}
