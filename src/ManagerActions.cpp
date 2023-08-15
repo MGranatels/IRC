@@ -42,14 +42,14 @@ bool	Manager::checkClientData( Clients& foundClient )
 
 
 int	Manager::runChanActions(Clients& client) {
-	client.removeCmd();
 	std::vector<std::string> cmd = client.getCmd();
+	// for (unsigned int i = 0; i < cmd.size(); i++)
+	// 	std::cout << i << " cmd: " <<  cmd[i] << std::endl;
+	client.removeCmd();
 	if (cmd[0].empty())
 		return 1;
 	std::string actionName = cmd[0];
 
-	for (unsigned int i = 0; i < cmd.size(); i++)
-		std::cout << i << " cmd: " <<  cmd[i] << std::endl;
 	if (cmd.size() >= 4 && cmd[2] == "WHO")
 		return -1;
 	defineActionMap();
@@ -228,10 +228,6 @@ void	Manager::privAction( Clients &client)
 		message = split(client.fullMessage, ":");
 	if (cmd[1] == "FieryBot") {
 		startBot(client);
-		return ;
-	}
-	else {
-		sendIrcMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send, TRY ADDING A ':' AFTER THE NICKNAME", client.getId());
 		return ;
 	}
 	if (isValidChannel(recipient) == CREATED)
